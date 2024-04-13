@@ -1,13 +1,13 @@
 import React from "react";
 import '../styling/layout.css'
-import Navbar from '../layout/navbar'
+import Navbar from "./Navbar";
+
 const Header = () =>{
     return(
         <>
-            <header className='homeheader'>
-                <h1>Dorms</h1>
+            <div className='header'>
                 <Navbar/>
-            </header>
+            </div>
         </>
     )
 }
