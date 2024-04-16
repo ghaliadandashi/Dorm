@@ -5,14 +5,22 @@ const bcrypt = require('bcrypt')
 const cors = require('cors');
 const app = express()
 const multer = require('multer');
-const upload = multer();
+const cookieParser = require('cookie-parser');
 const userRoutes = require('./routes/UserRoutes')
 const User = require("./models/User");
 
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use('/api', userRoutes);
+
 
 mongoose.connect(process.env.DB_URI)
     .then(()=>console.log("DATABASE CONNECTED <3"))

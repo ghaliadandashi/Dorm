@@ -3,12 +3,14 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import LoadingPage from "../../pages/LoadingPage";
 import {signInWithMicrosoft} from "../../firebase-config";
+import {WindowsFilled} from "@ant-design/icons";
+import {Alert, Spin} from "antd";
 
 
 const LoginForm = () => {
     const MLogin= () => {
         return (
-            <button onClick={signInWithMicrosoft} className='Mloginbtn'>Login in with Microsoft</button>
+            <button onClick={signInWithMicrosoft} className='Mloginbtn'><WindowsFilled /> Login in with Microsoft</button>
         );
     }
     const [loginForm , setLoginForm] = useState({
@@ -28,38 +30,29 @@ const LoginForm = () => {
     const handleSubmit = (event)=>{
         event.preventDefault();
         setIsLoading(true);
-        const loginData = new FormData();
 
-        Object.entries(loginForm).forEach(([key,value])=>{
-            loginData.append(key,value)
+        axios.post('http://localhost:3001/api/login', loginForm, {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json'
+            }
         })
-
-        axios.post('http://localhost:3001/api/login', loginData, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
             .then(response => {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('role',response.data.role)
-                localStorage.setItem('status',response.data.status)
                 navigate('/home');
+                window.location.reload();
             })
             .catch(error => {
-                console.error('Login failed:', error.response.data);
+                console.error('Login failed:', error.response?.data?.message || 'Error during login');
                 setIsLoading(false);
-                setError(error.response.data.message);
+                setError(error.response?.data?.message || 'General login error');
             });
-
-
     }
 
     if (isLoading) {
-        return <LoadingPage />;
+        return <Spin />;
     }
     return (
         <>
-            {error && <div className="error" style={{backgroundColor:"red",padding:'10px'}}>{error}</div>}
             <div className='loginform'>
                 <form onSubmit={handleSubmit}>
                     <label htmlFor='email'>
@@ -71,6 +64,7 @@ const LoginForm = () => {
                     </label>
                     <input type='password' id='password' name='password' value={loginForm.password} onChange={handleInputChange}/>
                     <input type='submit' value='Login' />
+                    {error?<Alert type='error' message={error} closable />:null }
                 </form>
                 <h4>or</h4>
                 <MLogin/>

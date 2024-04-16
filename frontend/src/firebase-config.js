@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import {getAuth, signInWithRedirect, OAuthProvider, getRedirectResult, signInWithPopup} from 'firebase/auth';
+import {getAuth, signInWithRedirect, OAuthProvider, getRedirectResult} from 'firebase/auth';
 import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
 import axios from "axios";
@@ -32,19 +32,19 @@ export const RedirectHandler = () => {
                 axios.post('http://localhost:3001/api/user', {
                     uid,
                     email,
-                    name: displayName
-                })
+                    name: displayName,
+                },{withCredentials:true})
                     .then(response => {
                         console.log('User saved to database:', response.data);
                         navigate('/home');
                     })
                     .catch(error => {
-                        console.error('Failed to save user:', error);
+                        // console.error('Failed to save user:', error);
                         navigate('/home')
                     });
             })
             .catch((error) => {
-                console.error("Authentication error:", error.code, error.message);
+                //console.error("Authentication error:", error.code, error.message);
             });
     }, [navigate]);
 

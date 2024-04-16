@@ -89,27 +89,108 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({message: 'User not found'});
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        const isMatch = await bcrypt.compare(req.body.password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign(
-            { userId: user.id, role: user.role, status: user.status },
+        const accessToken = jwt.sign(
+            { userId: user._id, role: user.role, status: user.status },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        res.json({ token, role: user.role, status: user.status });
+
+        const refreshToken = jwt.sign(
+            { userId: user._id },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        user.refreshToken = refreshToken;
+        await user.save();
+
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax'
+        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax'
+        });
+
+        res.json({ message: 'Authentication successful' });
+
     } catch (error) {
         console.error(error);
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
+exports.refreshToken = async (req, res) => {
+    const { refreshToken } = req.cookies;
+    // if (!refreshToken) return res.sendStatus(401);
+
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const user = await User.findById(decoded.userId);
+        if (!user || user.refreshToken !== refreshToken) {
+            return res.sendStatus(403);
+        }
+
+        const newAccessToken = jwt.sign(
+            { userId: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '15m' }
+        );
+
+        res.cookie('accessToken', newAccessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'lax'
+        });
+
+        res.send('Access token refreshed');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error refreshing access token');
     }
 };
+
+
+
+exports.logout = async (req, res) => {
+    const userId = req.user.userId;
+    if (!userId) {
+        console.error('No user information in request');
+        return res.status(400).send('No user information available');
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        user.refreshToken = '';
+        await user.save();
+        res.cookie('accessToken', '', { httpOnly: true, expires: new Date(0), secure: false, sameSite: 'strict' });
+        res.cookie('refreshToken', '', { httpOnly: true, expires: new Date(0), secure: false, sameSite: 'strict' });
+
+        res.send('Logged out successfully');
+    } catch (error) {
+        console.error('Logout Error:', error);
+        res.status(500).send('Error during logout');
+    }
+};
+
+
 
 exports.user = async(req,res)=>{
     const { uid, email, name } = req.body;
@@ -117,7 +198,32 @@ exports.user = async(req,res)=>{
     try {
         const existingUser = await User.findOne({ microsoftID: uid });
         if (existingUser) {
-            return res.status(409).send('User already exists.');
+            const accessToken = jwt.sign(
+                { userId: existingUser._id, role: existingUser.role, status: existingUser.status },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            const refreshToken = jwt.sign(
+                { userId: existingUser._id },
+                process.env.REFRESH_TOKEN_SECRET,
+                { expiresIn: '7d' }
+            );
+
+            existingUser.refreshToken = refreshToken;
+            existingUser.save();
+
+            res.cookie('accessToken', accessToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax'
+            });
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax'
+            });
+            return res.status(201).send(existingUser);
         }
         const newUser = new User({
             microsoftID: uid,
@@ -128,9 +234,100 @@ exports.user = async(req,res)=>{
         });
 
         const savedUser = await newUser.save();
+        const accessToken = jwt.sign(
+            { userId: savedUser._id, role: savedUser.role, status: savedUser.status },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        const refreshToken = jwt.sign(
+            { userId: savedUser._id },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        savedUser.refreshToken = refreshToken;
+        savedUser.save();
+
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax'
+        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax'
+        });
         res.status(201).send(savedUser);
     } catch (err) {
         console.error('Database error:', err);
         res.status(500).send(err);
+    }
+}
+
+
+exports.validate = (req, res) => {
+    const token = req.cookies.accessToken;
+    if (!token) {
+        return res.status(401).send("Access Denied: No token provided!");
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).send("Invalid Token");
+        }
+        res.status(200).json({
+            message: "Token is valid",
+            user: {
+                userId: decoded.userId,
+                role: decoded.role,
+                status: decoded.status
+            }
+        });
+    });
+};
+
+exports.profile = async (req, res) => {
+    const userId = req.user.userId;
+    try {
+        const owner = await User.findById(userId);
+        if (!owner) {
+            return res.status(404).send('Dorm owner not found');
+        }
+        res.json({
+            user: {
+                name: owner.name,
+                email: owner.email,
+                dob: owner.dob,
+                phoneNo: owner.phoneNo
+            }
+        });
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).send('Error retrieving dorm owner data');
+    }
+};
+
+exports.getDorm = async (req,res)=>{
+    const userid = req.user.userId;
+    const user = await User.findById(userid)
+    console.log(user)
+    try{
+        const dorms = await Dorm.find({owner:user._id})
+        if(!dorms){
+            res.status(200).send('Owner doesnt own any dorms!')
+        }
+        const responseDorms = dorms.map(dorm => ({
+            dormName: dorm.dormName,
+            services: dorm.services,
+            capacity: dorm.capacity,
+            location: dorm.location,
+            dormType: dorm.type
+        }));
+        res.json(responseDorms);
+    }catch (error){
+        console.error('Database error:',error);
+        res.status(500).send('Error retrieving dorm data')
     }
 }

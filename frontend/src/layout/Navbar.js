@@ -3,43 +3,42 @@ import {Link, useLocation, useNavigate} from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 import {getAuth, onAuthStateChanged} from "firebase/auth";
+import axios, {get} from "axios";
+import {useAuth} from "../components/Auth/AuthHook";
+import {LogoutOutlined, UserOutlined} from "@ant-design/icons";
+import {Avatar} from "antd";
 
 const Navbar = () => {
-    const role = localStorage.getItem('role');
-    const status = localStorage.getItem('status');
-    const icon = <FontAwesomeIcon icon={faUser} />;
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { isLoggedIn, role, status } = useAuth();
+    // const icon = <FontAwesomeIcon icon={faUser} />;
     const currentPage = useLocation().pathname;
     const navigate = useNavigate();
+    axios.defaults.withCredentials = true;
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(getAuth(), user => {
-            if(user){
-                setIsLoggedIn(true)
-            }else{
-                setIsLoggedIn(false)
-            }
-        });
-        return () => unsubscribe();
-    }, []);
-
-    const handleLogout = ()=>{
-        const auth = getAuth();
-        auth.signOut().then(() => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('role');
-            localStorage.removeItem('status');
-            setIsLoggedIn(false);
-            navigate('/home');
-        }).catch((error) => {
-            console.error('Firebase Logout Error:', error);
-        });
-    }
+    const handleLogout = () => {
+        const auth = getAuth()
+        const user = auth.currentUser
+        if(user){
+            auth.signOut().then(()=>navigate('/home'))
+        }
+        axios.post('http://localhost:3001/api/logout', {},{withCredentials: true})
+            .then(() => {
+                localStorage.clear();
+                navigate('/home');
+                window.location.reload();
+            })
+            .catch((error) => {
+                console.error('Logout Error:', error);
+            });
+    };
 
     if(status === 'Invalid' || status === 'Pending'){
-        handleLogout();
-    }
+        setTimeout(()=>{
+            handleLogout()
+        },1000)
 
+        return <div style={{height:'100vh',width:'100vw',display:'flex',justifyContent:'center',alignItems:'center',fontWeight:'bold',fontSize:'30px',color:'red'}}>ACCOUNT INVALID</div>
+    }
 
     return(
         <>
@@ -49,29 +48,21 @@ const Navbar = () => {
                     {(isLoggedIn || status==='Valid') ? (
                         <>
                             <li>
-                                <Link to='/profile' style={{color:"black",textDecoration:'none'}}>{icon}</Link>
+                                <Link to='/profile' style={{color:"black",textDecoration:'none'}}><Avatar size="small" icon={<UserOutlined />}/></Link>
                             </li>
                             {(role === 'admin')?(
                                 <li>
                                     <Link to='/loginreq' style={{color:"black",textDecoration:'none'}}>Login Requests</Link>
                                 </li>
-                            ):(role ==='dormOwner')? (
-                                <>
-                                    <li>
-                                        <Link to='/bookingreq' style={{color:"black",textDecoration:'none'}}>Booking Requests</Link>
-                                    </li>
-                                    <li>
-                                        <Link to='/dorms' style={{color:"black",textDecoration:'none'}}> My Dorms</Link>
-                                    </li>
-                                </>
-                            ): <li>
+                            ):(role !== 'dormOwner' && role !== null)?
+                                <li>
                                 <Link to='/bookings' style={{color:"black",textDecoration:'none'}}>Bookings</Link>
-                            </li>}
+                                </li>:null}
                             <li>
                                 <Link to='/contact' style={{color:"black",textDecoration:'none'}}>Contact Us</Link>
                             </li>
                             <li>
-                                <button onClick={handleLogout}>Logout</button>
+                                <button onClick={handleLogout}><LogoutOutlined /></button>
                             </li>
                         </>
                     ):(
