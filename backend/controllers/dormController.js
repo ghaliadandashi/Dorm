@@ -39,3 +39,14 @@ exports.add = async (req, res) => {
         res.status(500).json({ error: 'Error during adding a new dorm' });
     }
 };
+
+exports.show= async (req,res)=>{
+    try{
+        const dorms = await Dorm.find({})
+        res.status(200).json(dorms)
+    }catch(error){
+        console.error('Failed to retrieve dorms:', error);
+        res.status(500).send('Error retrieving all dorms');
+    }
+
+}

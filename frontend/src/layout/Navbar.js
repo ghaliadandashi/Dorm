@@ -7,6 +7,7 @@ import axios, {get} from "axios";
 import {useAuth} from "../components/Auth/AuthHook";
 import {LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import {Avatar} from "antd";
+import '../styling/navbar.css'
 
 const Navbar = () => {
     const { isLoggedIn, role, status } = useAuth();
@@ -32,7 +33,7 @@ const Navbar = () => {
             });
     };
 
-    if(status === 'Invalid' || status === 'Pending'){
+    if(status === 'Invalid'|| status === 'Pending'){
         setTimeout(()=>{
             handleLogout()
         },1000)
@@ -42,54 +43,56 @@ const Navbar = () => {
 
     return(
         <>
-            <nav style={{display:"flex", flexDirection:"row", justifyContent:"space-between", alignContent:"space-between", width:"100vw"}}>
-                <Link to='/' style={{color:"black",textDecoration:'none'}}><h1>Dorms</h1></Link>
-                <ul style={{display:"flex", flexDirection:"row", listStyle:"none", justifyContent:"space-between", gap:'10px',textDecoration:'none', margin:'25px 5px'}}>
-                    {(isLoggedIn || status==='Valid') ? (
-                        <>
-                            <li>
-                                <Link to='/profile' style={{color:"black",textDecoration:'none'}}><Avatar size="small" icon={<UserOutlined />}/></Link>
-                            </li>
-                            {(role === 'admin')?(
-                                <li>
-                                    <Link to='/loginreq' style={{color:"black",textDecoration:'none'}}>Login Requests</Link>
-                                </li>
-                            ):(role !== 'dormOwner' && role !== null)?
-                                <li>
-                                <Link to='/bookings' style={{color:"black",textDecoration:'none'}}>Bookings</Link>
-                                </li>:null}
-                            <li>
-                                <Link to='/contact' style={{color:"black",textDecoration:'none'}}>Contact Us</Link>
-                            </li>
-                            <li>
-                                <button onClick={handleLogout}><LogoutOutlined /></button>
-                            </li>
-                        </>
-                    ):(
-                        <>
-                            {currentPage === '/register' ? (
-                                <li>
-                                    <Link to='/login' style={{ color: "black", textDecoration: 'none' }}>Login</Link>
-                                </li> ) : currentPage === '/home' || currentPage === '/' ? (
-                                <>
-                                    <li>
-                                        <Link to='/login' style={{ color: "black", textDecoration: 'none' }}>Login</Link>
-                                    </li>
-                                    <li>
-                                        <Link to='/register' style={{ color: "black", textDecoration: 'none' }}>Register As Dorm Owner</Link>
-                                    </li>
-                                </>) : (
-                                <li>
-                                    <Link to='/register' style={{ color: "black", textDecoration: 'none' }}>Register As Dorm Owner</Link>
-                                </li>
-                            )}
-                        </>
-                    )}
-
-                </ul>
-            </nav>
+        <nav className="navbar">
+            <Link to='/' className="navbar-brand"><h3>Dorms</h3></Link>
+            <input className="search-bar" type="search" placeholder="Explore" />
+            <ul className="navbar-nav">
+                {(isLoggedIn || status==='Valid') ? (
+                    <>
+                    <li className="nav-item">
+                    <Link to='/profile' className="nav-link"><Avatar size="small" icon={<UserOutlined />}/></Link>
+                    </li>
+            {(role === 'admin')?(
+                    <li className="nav-item">
+                        <Link to='/loginreq' className="nav-link">Login Requests</Link>
+                    </li>
+                ):(role !== 'dormOwner' && role !== null)?
+                    <li className="nav-item">
+                        <Link to='/bookings' className="nav-link">Bookings</Link>
+                    </li>:null}
+                <li className="nav-item">
+                    <Link to='/contact' className="nav-link">Contact Us</Link>
+                </li>
+                <li className="nav-item">
+                    <button onClick={handleLogout} className="nav-link"><LogoutOutlined /></button>
+                </li>
+            </>
+            ):(
+        <>
+            {currentPage === '/register' ? (
+                <li className="nav-item">
+                    <Link to='/login' className="nav-link">Login</Link>
+                </li>
+            ) : currentPage === '/home' || currentPage === '/' ? (
+                <>
+                    <li className="nav-item">
+                        <Link to='/login' className="nav-link">Login</Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link to='/register' className="nav-link">Register As Dorm Owner</Link>
+                    </li>
+                </>
+            ) : (
+                <li className="nav-item">
+                    <Link to='/register' className="nav-link">Register As Dorm Owner</Link>
+                </li>
+            )}
         </>
-    );
+    )}
+</ul>
+</nav>
+</>
+);
 }
 
 export default Navbar;

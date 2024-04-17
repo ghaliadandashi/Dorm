@@ -7,6 +7,7 @@ const app = express()
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
 const userRoutes = require('./routes/UserRoutes')
+const dormRoutes = require('./routes/DormRoutes')
 const User = require("./models/User");
 
 const corsOptions = {
@@ -20,7 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/api', userRoutes);
-
+app.use('/dorms',dormRoutes);
 
 mongoose.connect(process.env.DB_URI)
     .then(()=>console.log("DATABASE CONNECTED <3"))
