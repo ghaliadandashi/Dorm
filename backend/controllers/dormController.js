@@ -1,4 +1,5 @@
 const Dorm = require('../models/Dorm');
+const User = require('../models/User');
 const { validationResult } = require('express-validator');
 
 exports.add = async (req, res) => {
@@ -19,7 +20,7 @@ exports.add = async (req, res) => {
         // Create new dorm instance
         const dorm = new Dorm({
             dormName,
-            owner,
+            owner: req.user.userId,
             services,
             capacity,
             location: `${req.body.streetName} ${req.body.cityName}`,
