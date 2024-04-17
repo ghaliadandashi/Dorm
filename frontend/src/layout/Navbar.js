@@ -2,16 +2,16 @@ import React, {useEffect, useState} from "react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
-import {getAuth, onAuthStateChanged} from "firebase/auth";
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import {getAuth} from "firebase/auth";
 import axios, {get} from "axios";
 import {useAuth} from "../components/Auth/AuthHook";
-import {LogoutOutlined, UserOutlined} from "@ant-design/icons";
-import {Avatar} from "antd";
+import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import '../styling/navbar.css'
 
 const Navbar = () => {
     const { isLoggedIn, role, status } = useAuth();
-    // const icon = <FontAwesomeIcon icon={faUser} />;
+    const icon = <FontAwesomeIcon icon={faUser} />;
     const currentPage = useLocation().pathname;
     const navigate = useNavigate();
     axios.defaults.withCredentials = true;
@@ -45,12 +45,15 @@ const Navbar = () => {
         <>
         <nav className="navbar">
             <Link to='/' className="navbar-brand"><h3>Dorms</h3></Link>
-            <input className="search-bar" type="search" placeholder="Explore" />
+            <div className='search'>
+                <input className="search-bar" type="search" placeholder="Explore" />
+                <FontAwesomeIcon icon={faSearch} className='nav-link'/>
+            </div>
             <ul className="navbar-nav">
                 {(isLoggedIn || status==='Valid') ? (
                     <>
                     <li className="nav-item">
-                    <Link to='/profile' className="nav-link"><Avatar size="small" icon={<UserOutlined />}/></Link>
+                    <Link to='/profile' className="nav-link">{icon}</Link>
                     </li>
             {(role === 'admin')?(
                     <li className="nav-item">
@@ -64,7 +67,7 @@ const Navbar = () => {
                     <Link to='/contact' className="nav-link">Contact Us</Link>
                 </li>
                 <li className="nav-item">
-                    <button onClick={handleLogout} className="nav-link"><LogoutOutlined /></button>
+                    <button onClick={handleLogout} className="nav-link" style={{backgroundColor:'#2b2b43',border:'none'}}><FontAwesomeIcon icon={faSignInAlt}/></button>
                 </li>
             </>
             ):(

@@ -1,0 +1,50 @@
+.loginForm {
+    background: #fff; /* Background of the form should be white */
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 3px 3px 6px black;
+    width: 100%;
+    max-width: 400px; /* Adjust width as necessary */
+    text-align: left;
+}
+
+.loginForm h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.loginForm input {
+    width: 100%;
+    padding: 10px 0 10px 5px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.loginForm input[type='submit'] {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #047CFC;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.loginForm button{
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #e0effe;
+    color: #1387fa;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.loginForm button:hover {
+    background-color: #A6B0C4;
+}

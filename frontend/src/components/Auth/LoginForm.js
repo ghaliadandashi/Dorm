@@ -5,6 +5,7 @@ import LoadingPage from "../../pages/LoadingPage";
 import {signInWithMicrosoft} from "../../firebase-config";
 import {WindowsFilled} from "@ant-design/icons";
 import {Alert, Spin} from "antd";
+import '../../styling/components/LoginForm.css'
 
 
 const LoginForm = () => {
@@ -53,20 +54,14 @@ const LoginForm = () => {
     }
     return (
         <>
-            <div className='loginform'>
+            <div className='loginForm'>
                 <form onSubmit={handleSubmit}>
-                    <label htmlFor='email'>
-                        Email
-                    </label>
-                    <input type='email' id='email' name='email' value={loginForm.email} onChange={handleInputChange}/>
-                    <label htmlFor='password' id='password'>
-                        Password
-                    </label>
-                    <input type='password' id='password' name='password' value={loginForm.password} onChange={handleInputChange}/>
+                    <h2>Sign in.</h2>
+                    <input type='email' id='email' name='email' placeholder='Enter your email' value={loginForm.email} onChange={handleInputChange}/>
+                    <input type='password' id='password'  placeholder='Enter your password' name='password' value={loginForm.password} onChange={handleInputChange}/>
                     <input type='submit' value='Login' />
                     {error?<Alert type='error' message={error} closable />:null }
                 </form>
-                <h4>or</h4>
                 <MLogin/>
             </div>
         </>
