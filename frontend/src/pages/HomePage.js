@@ -8,10 +8,11 @@ import image2 from '../images/istockphoto-642901636-612x612.jpg'
 import image3 from '../images/Saly-16.png'
 import image4 from '../images/[removal.ai]_74281a78-76c3-42db-925c-2b9637458cb3-saly-37.png'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Link} from "react-router-dom";
 
 const Home = () => {
     const [dorms, setDorms] = useState([]);
-
+    localStorage.clear();
     useEffect(() => {
         axios.get('http://localhost:3001/dorms/show')
             .then(response => {
@@ -53,7 +54,7 @@ const Home = () => {
                             <img src={image2} alt='' width='300' height='200'/>
                         </div>
                         <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start"}}>
-                            <h5 style={{ color: 'black',fontSize:'20px',margin:'10px' }}>{dorm.dormName}</h5>
+                            <h5 style={{ color: 'black',fontSize:'20px',margin:'10px' }}><Link to='/dormDetails' onClick={()=>localStorage.setItem('DormId',dorm._id)} style={{textDecoration:'none',color:'black'}}>{dorm.dormName}</Link></h5>
                             <p style={{margin:'5px' }}><FontAwesomeIcon icon={faMapMarkerAlt}/> {dorm.location}</p>
                         </div>
                     </div>

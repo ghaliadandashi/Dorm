@@ -50,3 +50,13 @@ exports.show= async (req,res)=>{
     }
 
 }
+
+exports.dormDetails = async (req,res)=>{
+    try{
+        const dorm = await Dorm.findById(req.params.dormID)
+        res.status(200).json(dorm)
+    }catch(error){
+        console.error('Failed to retrieve dorm',error);
+        res.status(500).send('Error!')
+    }
+}

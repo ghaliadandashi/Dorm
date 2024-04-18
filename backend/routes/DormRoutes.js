@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { add, show} = require('../controllers/dormController');
+const { add, show, dormDetails} = require('../controllers/dormController');
 const upload = multer({ dest: 'uploads/' });
 
 router.post('/add', upload.fields([
@@ -10,4 +10,5 @@ router.post('/add', upload.fields([
 ]), add);
 
 router.get('/show',show)
+router.get('/dormDetails/:dormID',dormDetails)
 module.exports = router;

@@ -9,6 +9,7 @@ import Register from "./pages/RegisterPage";
 import Profile from "./pages/ProfilePage";
 import {UserProvider} from "./components/Auth/AuthHook";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
+import DormDetails from "./pages/DormDetailsPage";
 
 
 
@@ -24,6 +25,7 @@ function App() {
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/register" element={<Register/>}/>
                     <Route path="/profile" element={<ProtectedRoute element={Profile} />} />
+                    <Route path='/dormDetails' element={<DormDetails/>}/>
                 </Routes>
 
             </Router>
