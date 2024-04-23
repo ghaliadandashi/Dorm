@@ -1,13 +1,10 @@
 .App {
   text-align: center;
+  box-sizing: border-box;
   background-color: #1f203e;
   display: flex;
   flex-direction: column;
-  height:100vh;
-}
-html, body, #root {
   height: 100vh;
-  margin: 0;
-  padding: 0;
 }
+
 

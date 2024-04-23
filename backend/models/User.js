@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
             }},
     dob:{type:Date, required:false},
     booking:{type:mongoose.Schema.Types.ObjectId,ref:'Booking'},
+    roommate:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
     preferences:[{type:String}],
     phoneNo:{type:String},
     languagePreference:{type:String, enum:['turkish','english']},

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch , faCog, faComments, faBell} from '@fortawesome/free-solid-svg-icons';
 import {getAuth} from "firebase/auth";
 import axios, {get} from "axios";
 import {useAuth} from "../components/Auth/AuthHook";
@@ -59,13 +59,16 @@ const Navbar = () => {
                     <li className="nav-item">
                         <Link to='/loginreq' className="nav-link">Login Requests</Link>
                     </li>
-                ):(role !== 'dormOwner' && role !== null)?
-                    <li className="nav-item">
-                        <Link to='/bookings' className="nav-link">Bookings</Link>
-                    </li>:null}
+                ):null}
                 <li className="nav-item">
-                    <Link to='/contact' className="nav-link">Contact Us</Link>
+                    <Link to='/settings' className="nav-link"><FontAwesomeIcon icon={faCog}/></Link>
                 </li>
+                        <li className="nav-item">
+                            <Link to='/chat' className="nav-link"><FontAwesomeIcon icon={faComments}/></Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to='/notifications' className="nav-link"><FontAwesomeIcon icon={faBell}/></Link>
+                        </li>
                 <li className="nav-item">
                     <button onClick={handleLogout} className="nav-link" style={{backgroundColor:'#2b2b43',border:'none'}}><FontAwesomeIcon icon={faSignInAlt}/></button>
                 </li>

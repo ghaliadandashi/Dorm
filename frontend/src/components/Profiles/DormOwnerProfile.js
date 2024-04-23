@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Card, Form, Input, Button, Table, Tabs} from 'antd';
-import TabPane from "antd/es/tabs/TabPane";
+import '../../styling/components/dormOwnerProfile.css'
 import {useAuth} from "../Auth/AuthHook";
 import axios from "axios";
 
@@ -14,35 +13,9 @@ const DormOwnerProfile = () => {
         phone:'',
 
     })
-    const [dorm,setDorm] =useState([])
-    const columns = [
-        {
-            title: 'Dorm Name',
-            dataIndex: 'dormName',
-            key: 'dormName',
-        },
-        {
-            title: 'Location',
-            dataIndex: 'location',
-            key: 'location',
-        },
-        {
-            title: 'Capacity',
-            dataIndex: 'capacity',
-            key: 'capacity',
-        },
-        {
-            title: 'Dorm Type',
-            dataIndex: 'dormType',
-            key: 'dormType',
-        },
-        {
-            title: 'Services',
-            dataIndex: 'services',
-            key: 'services',
-            render: services => services.join(", ")
-        }
-    ];
+    const[bookings,setBookings] = useState([]);
+    const [dorms,setDorm] =useState([])
+    const [activeTab, setActiveTab] = useState('personalInfo');
 
 
     useEffect(() => {
@@ -62,42 +35,84 @@ const DormOwnerProfile = () => {
                     console.log(response)
                     setDorm(response.data);
                 })
+                .catch(error=>{console.error('Failed to get Dorms: ',error)})
+            axios.get('http://localhost:3001/booking/getBooking')
+                .then(response=>{
+                    setBookings(response.data);
+                    console.log(response.data)
+                }).catch(error=>{
+                    console.error('Failed to get Bookings: ',error)
+            })
         }
     }, [user]);
-
+    const handleTabClick = (tab) => {
+        setActiveTab(tab);
+    };
 
     return (
-        <Card title="" style={{margin:'0px 170px'}}>
-            <Tabs defaultActiveKey="1" centered>
-                <TabPane tab="Personal Info" key="1">
-                    <Form layout="vertical">
-                        <Form.Item label="Name">
-                            <Input placeholder="Your Name" value={profile.name} onChange={e => setProfile({ ...profile, name: e.target.value })}/>
-                        </Form.Item>
-                        <Form.Item label="Email">
-                            <Input placeholder="Email Address" value={profile.email} onChange={e => setProfile({ ...profile, email: e.target.value })} />
-                        </Form.Item>
-                        <Form.Item label="Date of Birth" >
-                            <Input placeholder="Your birth date" value={profile.dob} onChange={e => setProfile({ ...profile, dob: e.target.value })}/>
-                        </Form.Item>
-                        <Form.Item label="Phone Number">
-                            <Input placeholder="Your phone number" value={profile.phone} onChange={e => setProfile({ ...profile, phone: e.target.value })}/>
-                        </Form.Item>
-                        <Button type="primary">Update Profile</Button>
-                    </Form>
-                </TabPane>
-                <TabPane tab="Booking Requests" key='2'>
-
-                </TabPane>
-                <TabPane tab="Properties" key="3" >
-                    <Button type='primary'>Add Property</Button>
-                    <Table columns={columns} dataSource={dorm} rowKey="id" />
-                </TabPane>
-                <TabPane tab="Financials" key="4">
-                    <p>Financial Dashboard here</p>
-                </TabPane>
-            </Tabs>
-        </Card>
+        <div className='profile-container'>
+        <div className="profile">
+            <div className="tabs">
+                <button onClick={() => handleTabClick('personalInfo')}
+                        className={activeTab === 'personalInfo' ? 'active' : ''}>
+                    Personal Info
+                </button>
+                <button onClick={() => handleTabClick('bookings')}
+                        className={activeTab === 'bookings' ? 'active' : ''}>
+                    Booking Requests
+                </button>
+                <button onClick={() => handleTabClick('properties')}
+                        className={activeTab === 'properties' ? 'active' : ''}>
+                    Properties
+                </button>
+                <button onClick={() => handleTabClick('financials')}
+                        className={activeTab === 'financials' ? 'active' : ''}>
+                    Financials
+                </button>
+            </div>
+            <div className="tab-content">
+                {activeTab === 'personalInfo' && (
+                    <div>
+                        <p><strong>Name:</strong> {profile.name}</p>
+                        <p><strong>Email:</strong> {profile.email}</p>
+                        <p><strong>Date of Birth:</strong> {profile.dob}</p>
+                        <p><strong>Phone:</strong> {profile.phone}</p>
+                    </div>
+                )}
+                {activeTab === 'bookings' && (
+                    <table style={{display:"flex",flexDirection:"column",gap:'30px'}}>
+                        {bookings.map((booking, index) => (
+                            <tr>
+                                <td key={index}>{booking.user.name.toUpperCase()}</td>
+                                <td>{booking.dorm.dormName}</td>
+                                <td>{booking.room.roomType}</td>
+                                <td>{booking.startDate}</td>
+                                <td>{booking.status}</td>
+                                {(booking.status === 'Booked')?
+                                    (<td><button>Reject</button></td>)
+                                    :<>
+                                        <td><button>Accept</button></td>
+                                        <td><button>Reject</button></td>
+                                    </>}
+                            </tr>
+                        ))}
+                    </table>
+                )}
+                {activeTab === 'properties' && (
+                    <ul>
+                        {dorms.map((dorm, index) => (
+                            <li key={index}>{dorm.dormName} - {dorm.location}</li>
+                        ))}
+                    </ul>
+                )}
+                {activeTab === 'financials' && (
+                    <div>
+                        <p>Financial details here...</p>
+                    </div>
+                )}
+            </div>
+        </div>
+        </div>
     );
 };
 

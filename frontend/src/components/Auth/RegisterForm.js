@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import LoadingPage from "../../pages/LoadingPage";
-
+import '../../styling/components/RegisterForm.css'
 
 const RegisterForm = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -108,6 +108,12 @@ const RegisterForm = () => {
 
     return (
         <>
+            <div className="register-container">
+                <div className="welcome-section">
+                    <h1>Welcome</h1>
+                    <p>Create your account to find and manage dorms easily.</p>
+                </div>
+                <div className="register-form">
             <form onSubmit={handleSubmit} className='form' style={{backgroundColor:"white", padding:'10px',display:'flex',flexDirection:"column"}}>
                 <h4>Personal Info</h4>
                 {errors.length > 0 && (
@@ -185,6 +191,8 @@ const RegisterForm = () => {
                 </div>
                 <input type='submit' value='Register' />
             </form>
+                </div>
+            </div>
         </>
     )
 }
