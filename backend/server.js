@@ -7,7 +7,11 @@ const app = express()
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
 const userRoutes = require('./routes/UserRoutes')
+const dormRoutes = require('./routes/DormRoutes')
+const bookingRoutes = require('./routes/BookingRoutes')
 const User = require("./models/User");
+const Room = require("./models/Room");
+const Dorm = require("./models/Dorm");
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -20,49 +24,66 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/api', userRoutes);
-
+app.use('/dorms',dormRoutes);
+app.use('/booking',bookingRoutes)
 
 mongoose.connect(process.env.DB_URI)
     .then(()=>console.log("DATABASE CONNECTED <3"))
     .catch(err => console.log(err))
 
-const users = [
-    {
-        name: "Alice Johnson",
-        email: "alice@example.com",
-        role: "admin",
-        password: "alice2023",
-        status: "Valid"
-    },
-    {
-        name: "Bob Smith",
-        email: "bob@example.com",
-        role: "student",
-        status: "Pending"
-    },
-    {
-        name: "Charlie Dormowner",
-        email: "charlie@example.com",
-        role: "dormOwner",
-        password: "charlie2023",
-        status: "Valid"
-    }
-];
+//UNCOMMENT THIS TO ADD USER, DORM, AND ROOMS
 
-// const addUsers = async () => {
-//     for (const userData of users) {
-//         const user = new User(userData);
-//         await user.save()
-//             .then(() => console.log(`User ${user.name} added successfully.`))
-//             .catch(err => console.error('Error adding user:', err));
+// const seedDatabase = async () => {
+//     try {
+//         const dormOwner = new User({
+//             name: 'Dorm Owner Name',
+//             email: 'dormowner@example.com',
+//             role: 'dormOwner',
+//             password: 'dormOwnie',
+//             status: 'Valid'
+//         });
+//
+//         const savedDormOwner = await dormOwner.save();
+//         const dorm = new Dorm({
+//             dormName: 'Lotus',
+//             owner: savedDormOwner._id,
+//             services: ['WiFi', 'Laundry'],
+//             capacity: 100,
+//             occupancy: 0,
+//             location: 'Dorm Location',
+//             type: 'off-campus'
+//         });
+//
+//         const savedDorm = await dorm.save();
+//
+//         const rooms = [
+//             { roomName: '101', roomType: 'Single', services: ['Balcony'], price: 500, availability: 1 },
+//             { roomName: '102', roomType: 'Double', services: ['Private Bathroom'], price: 750, availability: 2 },
+//         ];
+//
+//         const roomPromises = rooms.map(async roomData => {
+//             const room = new Room({ ...roomData, dorm: savedDorm._id });
+//             return room.save();
+//         });
+//
+//         const savedRooms = await Promise.all(roomPromises);
+//
+//         savedDorm.rooms = savedRooms.map(room => room._id);
+//         await savedDorm.save();
+//
+//         console.log('Database seeded successfully!');
+//     } catch (error) {
+//         console.error('Error seeding database:', error);
+//     } finally {
+//         mongoose.disconnect();
 //     }
 // };
+//
+// seedDatabase();
 
 app.get('/',(req,res)=>{
     res.send('backend working?')
 })
-
-// addUsers();
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`)

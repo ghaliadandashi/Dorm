@@ -5,7 +5,6 @@ import Header from "../layout/Header";
 const Register =()=>{
     return(
         <>
-            <Header/>
             <RegisterForm/>
         </>
     )

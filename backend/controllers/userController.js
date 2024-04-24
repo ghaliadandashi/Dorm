@@ -312,7 +312,7 @@ exports.profile = async (req, res) => {
 exports.getDorm = async (req,res)=>{
     const userid = req.user.userId;
     const user = await User.findById(userid)
-    console.log(user)
+    // console.log(user)
     try{
         const dorms = await Dorm.find({owner:user._id})
         if(!dorms){

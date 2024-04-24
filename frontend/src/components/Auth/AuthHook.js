@@ -11,30 +11,40 @@ export const UserProvider = ({ children }) => {
     const [status, setStatus] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(getAuth(), user => {
             if(user){
                 setIsLoggedIn(true)
                 setUser(user)
+                setRole('student');
             }else{
                 setIsLoggedIn(false)
+                try{
+
+                    axios.get('http://localhost:3001/api/validate', { withCredentials: true })
+                        .then(response => {
+                            if (response.status === 200) {
+                                setIsLoggedIn(true);
+                                setUser(response.data.user)
+                                setUserId(response.data.user.userId)
+                                setRole(response.data.user.role)
+                                setStatus(response.data.user.status)
+                            }
+                        })
+                        .catch(() => {
+                            setIsLoggedIn(false);
+                            // window.location.reload();
+
+                        });
+                }catch (error){
+                    console.error('Session verification failed:', error);
+                    setIsLoggedIn(false);
+                    setUser(null);
+                }
             }
         })
 
-        axios.get('http://localhost:3001/api/validate', { withCredentials: true })
-            .then(response => {
-                if (response.status === 200) {
-                    setIsLoggedIn(true);
-                    setUser(response.data.user)
-                    setUserId(response.data.user.userId)
-                    setRole(response.data.user.role)
-                    setStatus(response.data.user.status)
-                }
-            })
-            .catch(() => {
-                setIsLoggedIn(false);
-                // handleLogout();
-            });
 
         return () => unsubscribe();
     }, []);
