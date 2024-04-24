@@ -1,0 +1,15 @@
+.left-section {
+    flex: 1;
+    background-color: #004080; /* Dark blue background */
+    color: #ffffff; /* White text */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  .right-section {
+    flex: 1;
+    background-color: #ffffff; /* White background */
+  }
