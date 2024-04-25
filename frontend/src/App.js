@@ -31,6 +31,7 @@ function App() {
             </Router>
         </div>
         </UserProvider>
+        
     );
 }
 

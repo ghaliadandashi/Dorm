@@ -2,11 +2,13 @@ import React, {useEffect, useState} from 'react'
 import Header from "../layout/Header";
 import axios from "axios";
 import {useAuth} from "../components/Auth/AuthHook";
+import {useNavigate} from "react-router-dom";
 
 
 const DormDetails=()=>{
     const [dormInfo,setDormInfo] = useState([]);
     const [roomInfo,setRoomInfo] = useState([]);
+    const navigate = useNavigate()
     const {role} = useAuth();
     const dormID = localStorage.getItem('DormId')
     useEffect(()=>{
@@ -40,7 +42,8 @@ const DormDetails=()=>{
                         <td>{room.price}</td>
                         {(room.availability ===1)?(<td>Available</td>):<td style={{color:"red"}}>Fully Booked!</td>}
                         <td>{room.services}</td>
-                        {(role === 'student')?(<td><button onClick={()=>handleBooking(room._id,dormID)}>Book Room</button></td>):null}
+                        {(role === 'student')?(<td><button onClick={()=>handleBooking(room._id,dormID)}>Book Room</button></td>):
+                            (role === '')?(<td><button onClick={()=>{navigate('/login')}}>Book Room</button></td>):null}
                     </tr>
                 ))}
             </table>

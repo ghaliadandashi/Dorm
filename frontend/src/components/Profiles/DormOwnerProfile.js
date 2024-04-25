@@ -20,7 +20,7 @@ const DormOwnerProfile = () => {
 
     useEffect(() => {
         if (user) {
-            axios.get(`http://localhost:3001/api/profile`)
+            axios.get(`http://localhost:3001/api/profile`,{withCredentials:true})
                 .then(response => {
                     setProfile({
                         name: response.data.user.name,
@@ -30,13 +30,13 @@ const DormOwnerProfile = () => {
                     });
                 })
                 .catch(error => console.error("Failed to fetch user data:", error));
-            axios.get(`http://localhost:3001/api/dorm`)
+            axios.get(`http://localhost:3001/api/dorm`,{withCredentials:true})
                 .then(response=>{
                     console.log(response)
                     setDorm(response.data);
                 })
                 .catch(error=>{console.error('Failed to get Dorms: ',error)})
-            axios.get('http://localhost:3001/booking/getBooking')
+            axios.get('http://localhost:3001/booking/getBooking',{withCredentials:true})
                 .then(response=>{
                     setBookings(response.data);
                     console.log(response.data)
@@ -99,11 +99,14 @@ const DormOwnerProfile = () => {
                     </table>
                 )}
                 {activeTab === 'properties' && (
-                    <ul>
-                        {dorms.map((dorm, index) => (
-                            <li key={index}>{dorm.dormName} - {dorm.location}</li>
-                        ))}
-                    </ul>
+                    <>
+                        <button >Add Dorm</button>
+                        <ul>
+                            {dorms.map((dorm, index) => (
+                                <li key={index}>{dorm.dormName} - {dorm.location}</li>
+                            ))}
+                        </ul>
+                    </>
                 )}
                 {activeTab === 'financials' && (
                     <div>

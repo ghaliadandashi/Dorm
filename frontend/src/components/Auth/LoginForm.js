@@ -1,34 +1,37 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LoadingPage from "../../pages/LoadingPage";
-import {signInWithMicrosoft} from "../../firebase-config";
-import {WindowsFilled} from "@ant-design/icons";
-import {Alert, Spin} from "antd";
-import '../../styling/components/LoginForm.css'
-
+import { signInWithMicrosoft } from "../../firebase-config";
+import { WindowsFilled } from "@ant-design/icons";
+import { Alert, Spin } from "antd";
+import "../../styling/loginForm.css"
 
 const LoginForm = () => {
-    const MLogin= () => {
+    const MLogin = () => {
         return (
             <button onClick={signInWithMicrosoft} className='Mloginbtn'><WindowsFilled /> Login in with Microsoft</button>
         );
     }
-    const [loginForm , setLoginForm] = useState({
+
+    const [loginForm, setLoginForm] = useState({
         email: '',
         password: ''
-    })
-    const navigate = useNavigate()
+    });
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const handleInputChange = (e)=>{
-        const {name, value} = e.target;
-        setLoginForm(prevData =>({
+    const [showPopup, setShowPopup] = useState(false);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setLoginForm(prevData => ({
             ...prevData,
-            [name] :value
+            [name]: value
         }));
     }
-    const handleSubmit = (event)=>{
+
+    const handleSubmit = (event) => {
         event.preventDefault();
         setIsLoading(true);
 
@@ -49,20 +52,42 @@ const LoginForm = () => {
             });
     }
 
+    const handlePopupClose = () => {
+        setShowPopup(false);
+    };
+
+    const handleLoginPopupOpen = () => {
+        setShowPopup(true);
+    };
+
     if (isLoading) {
         return <Spin />;
     }
+
     return (
         <>
-            <div className='loginForm'>
-                <form onSubmit={handleSubmit}>
-                    <h2>Sign in.</h2>
-                    <input type='email' id='email' name='email' placeholder='Enter your email' value={loginForm.email} onChange={handleInputChange}/>
-                    <input type='password' id='password'  placeholder='Enter your password' name='password' value={loginForm.password} onChange={handleInputChange}/>
-                    <input type='submit' value='Login' />
-                    {error?<Alert type='error' message={error} closable />:null }
-                </form>
-                <MLogin/>
+            <div className='loginform'>
+                <button onClick={handleLoginPopupOpen}>Login</button>
+                {showPopup && (
+                    <div className="popup-container">
+                        <div className="popup">
+                            <form onSubmit={handleSubmit}>
+                                <label htmlFor='email'>
+                                    Email
+                                </label>
+                                <input type='email' id='email' name='email' value={loginForm.email} onChange={handleInputChange} />
+                                <label htmlFor='password' id='password'>
+                                    Password
+                                </label>
+                                <input type='password' id='password' name='password' value={loginForm.password} onChange={handleInputChange} />
+                                <input type='submit' value='Login' />
+                                {error ? <Alert type='error' message={error} closable /> : null}
+                            </form>
+                        </div>
+                    </div>
+                )}
+                <h4>or</h4>
+                <MLogin />
             </div>
         </>
     )
