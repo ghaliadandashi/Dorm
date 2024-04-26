@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import axios from 'axios';
+import {useNavigate} from "react-router-dom";
 
 const UserContext = createContext();
 
@@ -10,7 +11,6 @@ export const UserProvider = ({ children }) => {
     const [role, setRole] = useState('');
     const [status, setStatus] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(getAuth(), user => {

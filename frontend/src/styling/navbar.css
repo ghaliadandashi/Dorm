@@ -13,7 +13,7 @@
 
 .navbar-brand {
     font-weight: bold;
-    font-size: 20px;
+    font-size: 17px;
     color: #fff;
     text-decoration: none;
     margin-left:10px
@@ -24,7 +24,6 @@
     margin-left:20px;
 }
 .search-bar {
-    flex-grow: 1;
     padding: 8px 120px;
     border: none;
     border-radius: 20px;
