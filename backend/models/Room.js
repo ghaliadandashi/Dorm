@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
 const roomSchema = new mongoose.Schema({
+    user:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
     roomName:{type:String,required:true},
     roomType:{type:String,required:true},
     services: [{ type: String, required:true}],

@@ -49,6 +49,10 @@ const DormOwnerProfile = () => {
         setActiveTab(tab);
     };
 
+    const handleStatus = ()=>{
+
+    }
+
     return (
         <div className='profile-container'>
         <div className="profile">
@@ -89,10 +93,10 @@ const DormOwnerProfile = () => {
                                 <td>{booking.startDate}</td>
                                 <td>{booking.status}</td>
                                 {(booking.status === 'Booked')?
-                                    (<td><button>Reject</button></td>)
+                                    (<td><button onClick={handleStatus}>Reject</button></td>)
                                     :<>
-                                        <td><button>Accept</button></td>
-                                        <td><button>Reject</button></td>
+                                        <td><button onClick={handleStatus}>Accept</button></td>
+                                        <td><button onClick={handleStatus}>Reject</button></td>
                                     </>}
                             </tr>
                         ))}
