@@ -7,7 +7,8 @@ const bookingSchema = new mongoose.Schema({
     room:{type:mongoose.Schema.Types.ObjectId,ref:'Room'},
     startDate:{type:Date,required: true},
     endDate:{type:Date,required:true},
-    status:{type:String,enum: ['Reserved','Booked']},
+    isActive:{type:Boolean,required:true},
+    status:{type:String,enum: ['Reserved','Booked','Rejected']},
     stayDuration:{type:Number,required:true}
 })
 
