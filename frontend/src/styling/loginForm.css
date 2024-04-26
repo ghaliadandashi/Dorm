@@ -1,22 +1,91 @@
-
 .popup-container {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.5);
-    width: 100vw;
-    height: 100vh;
-    z-index: 999;
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width of the viewport */
+    height: 100%; /* Full height of the viewport */
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background for overlay */
+    display: flex; /* Enable flex layout */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+  }
+  
+  .popup {
+    background: linear-gradient(135deg, #f9f9f9, #e6e6e6); /* Stylish gradient background */
+    padding: 40px; /* Sufficient padding for inner content */
+    border-radius: 15px; /* Smooth rounded corners */
+    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.5); /* Deeper shadow for better contrast */
+    width: 400px; /* Fixed width for the popup */
+    text-align: center; /* Center text alignment */
+  }
+  
+  .popup .login-form {
     display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.popup {
-    background-color: black;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-}
-
+    flex-direction: column; /* Vertical stacking of elements */
+    align-items: center; /* Center-align form elements */
+    width: 100%; /* Ensure form fields occupy full width */
+  }
+  
+  .popup .form-field {
+    width: 100%; /* Form field width should be consistent */
+    margin-bottom: 15px; /* Space between form fields */
+  }
+  
+  .popup label {
+    font-weight: bold; /* Bold text for emphasis */
+    color: #161E54; /* Darker text for visibility */
+    text-transform: uppercase; /* All-uppercase text for labels */
+    text-align: left; /* Align labels to the left */
+  }
+  
+  .popup input {
+    padding: 15px; /* Larger padding for inputs */
+    border-radius: 10px; /* Rounded corners */
+    border: 1px solid #ccc; /* Light border */
+    width: 100%; /* Inputs should occupy full width */
+    box-sizing: border-box; /* Ensure padding doesn't affect size */
+  }
+  
+  .popup input[type="submit"],
+  .popup .microsoft-login-btn {
+    padding: 15px; /* Consistent padding for buttons */
+    border-radius: 10px; /* Rounded corners for buttons */
+    width: 100%; /* Full width for buttons */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transitions */
+  }
+  
+  .popup input[type="submit"] {
+    background-color: #161E54; /* Distinctive blue color */
+    color: white; /* White text for contrast */
+    cursor: pointer; /* Change cursor on hover */
+  }
+  
+  .popup input[type="submit"]:hover {
+    background-color: #004a99; /* Darker shade on hover */
+    transform: scale(1.05); /* Slight scaling on hover */
+  }
+  
+  .popup .microsoft-login-btn {
+    background-color: #161E54; /* Color for Microsoft login button */
+    color: white; /* White text */
+  }
+  
+  .popup .microsoft-login-btn:hover {
+    background-color: #0057a3; /* Darker shade on hover */
+    transform: scale(1.05); /* Scaling effect */
+  }
+  
+  .popup-close-btn {
+    background-color: transparent; /* Transparent background */
+    color: #333; /* Dark gray text */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer on hover */
+    transition: opacity 0.3s, transform 0.3s; /* Smooth transitions */
+    margin-top: 15px; /* Spacing to avoid overlap */
+  }
+  
+  .popup-close-btn:hover {
+    opacity: 0.7; /* Semi-transparent on hover */
+    transform: scale(1.05); /* Scale on hover */
+  }
+  
