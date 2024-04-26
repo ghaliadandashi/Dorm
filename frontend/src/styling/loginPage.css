@@ -1,15 +1,60 @@
+.login-page {
+  display: flex; /* Divide the page into two sections */
+  height: 100vh; /* Full viewport height */
+}
+
 .left-section {
-    flex: 1;
-    background-color: #004080; /* Dark blue background */
-    color: #ffffff; /* White text */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-  }
-  
-  .right-section {
-    flex: 1;
-    background-color: #ffffff; /* White background */
-  }
+  flex: 1; /* Takes half the page width */
+  background: #161E54; /* Dark blue background */
+  color: white; /* White text color */
+  padding: 40px; /* Padding within the section */
+  display: flex; /* Flex container for alignment */
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+}
+
+.intro-content {
+  text-align: left; /* Align text to the left */
+}
+
+.title {
+  font-size: 4rem; /* Large title font size */
+  font-weight: bold; /* Bold text */
+}
+
+.subtitle {
+  font-size: 2rem; /* Subtitle font size */
+  color: #999999; /* Light gray color */
+}
+
+.actions {
+  display: flex; /* Flex layout for alignment */
+  flex-direction: column; /* Align buttons vertically */
+  margin-top: 20px; /* Space above the buttons */
+}
+
+.action-btn {
+  text-decoration: none; /* No underline */
+  color: white; /* White text color */
+  padding: 12px 24px; /* Padding for the buttons */
+  border: 3px solid white; /* White border */
+  border-radius: 5px; /* Rounded corners */
+  background-color: transparent; /* Transparent background */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 1.1rem; /* Font size */
+  text-align: center; /* Center text */
+  margin-bottom: 10px; /* Space between buttons */
+  width: 200px; /* Fixed width for consistency */
+}
+
+.action-btn:hover {
+  background-color: #4f59a1; /* Darker blue on hover */
+}
+
+.right-section {
+  flex: 1; /* Takes half the page width */
+  background-color: white; /* White background */
+  display: flex; /* Flex container for alignment */
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+}
