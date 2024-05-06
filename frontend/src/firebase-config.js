@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import {getAuth, signInWithRedirect, OAuthProvider, getRedirectResult} from 'firebase/auth';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
 import axios from "axios";
@@ -16,6 +17,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const storage = getStorage(app);
+export { storage };
 
 export const signInWithMicrosoft = () => {
     const microsoftProvider = new OAuthProvider('microsoft.com');

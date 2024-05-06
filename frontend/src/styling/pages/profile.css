@@ -1,0 +1,64 @@
+.profile {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    margin-top:-40px;
+}
+.tabs{
+    display: flex;
+    flex-direction: column;
+    background-color: #2b2c48;
+    gap:20px;
+    padding:20px;
+}
+
+.tabs button {
+    padding: 10px 20px;
+    color: white;
+    background-color:#2b2c48 ;
+    border: none;
+    border-radius: 20px;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    outline: none;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.tabs button.active {
+    background-color: #3a3a52;
+    border-bottom: 2px solid #46418d;
+}
+.tab-content{
+    background-color: #1f203e;
+    width: 100vw;
+    /*border:1px solid white*/
+}
+
+.tab-content .personalInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #1f203e;
+    gap:20px;
+    color:white;
+    margin-top: 40px;
+    margin-left:100px;
+}
+.tab-content .profilePicSection{
+    display: flex;
+    flex-direction: row;
+    gap:20px;
+    align-items: center;
+}
+
+.tab-content ul {
+    list-style: none;
+}
+
+.tab-content li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+

@@ -24,6 +24,9 @@ const userSchema = new mongoose.Schema({
     preferences:[{type:String}],
     phoneNo:{type:String},
     languagePreference:{type:String, enum:['turkish','english']},
+    personalFiles:[{type:String}],
+    ownershipFiles:[{type:String}],
+    profilePic:{type:String},
     dorm:{type:mongoose.Schema.Types.ObjectId,ref:'Dorm'},
     status:{type:String,enum:['Valid','Invalid','Pending']}
 })

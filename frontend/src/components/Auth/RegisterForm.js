@@ -3,7 +3,8 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import LoadingPage from "../../pages/LoadingPage";
 import '../../styling/components/RegisterForm.css'
-
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import { storage } from '../../firebase-config';
 const RegisterForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -21,29 +22,30 @@ const RegisterForm = () => {
         streetName:'',
         cityName:'',
         capacity:'',
-        dormType:'',
+        dormType:'on-campus',
         services: selectedServices,
-        personalFile: null,
-        ownershipFile: null,
-        dormPics: null,
+        personalFile: [],
+        ownershipFile: [],
+        dormPics: [],
         langPref:''
     });
 
     const handleInputChange = (e) => {
-        const { name, type, value, files } = e.target;
-
-        if (type === "file" && files.length) {
+        const { name, type, files } = e.target;
+        if (type === "file") {
             setFormData(prevFormData => ({
                 ...prevFormData,
-                [name]: Array.from(files).map(file => file.name)
+                [name]: prevFormData[name] ? [...prevFormData[name], ...files] : [...files]
             }));
         } else {
+            const { value } = e.target;
             setFormData(prevFormData => ({
                 ...prevFormData,
                 [name]: value
             }));
         }
     };
+
     const services = [
         { id: 'wifi', label: 'Wi-Fi' },
         { id: 'laundry', label: 'Laundry' },
@@ -62,45 +64,77 @@ const RegisterForm = () => {
             checked ? [...prev, id] : prev.filter(serviceId => serviceId !== id)
         );
     };
+    function printFormData(formData) {
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+    }
+    const sanitizeFileName = (fileName) => {
+        return fileName.replace(/[^a-zA-Z0-9.]/g, "_");
+    };
+    const uploadFileToFirebase = async (file) => {
+        if (!file) {
+            console.error('No file provided for upload');
+            return;
+        }
+        const sanitizedFileName = sanitizeFileName(file.name);
+        const fileRef = ref(storage, `uploads/${sanitizedFileName}`);
+        try {
+            await uploadBytes(fileRef, file);
+            return await getDownloadURL(fileRef);
+        } catch (error) {
+            console.error(`Error uploading file to Firebase: ${error.message}`);
+            throw error;
+        }
+    };
 
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         setIsLoading(true);
-        const submissionData = new FormData();
 
-        Object.entries(formData).forEach(([key, value]) => {
-            if (key === 'personalFile' || key === 'ownershipFile' || key === 'dormPics') {
-                if (value !== null) submissionData.append(key, value);
-            } else if (key !== 'services') {
-                submissionData.append(key, value);
+        const uploadPromises = [];
+        const fileLabels = {};
+        ['personalFile', 'ownershipFile', 'dormPics'].forEach(key => {
+            const files = formData[key];
+            if (files) {
+                Array.from(files).forEach(file => {
+                    const promise = uploadFileToFirebase(file).then(url => ({ url, label: key }));
+                    uploadPromises.push(promise);
+                    fileLabels[key] = fileLabels[key] ? [...fileLabels[key], promise] : [promise];
+                });
             }
         });
-        selectedServices.forEach(serviceId => {
-            submissionData.append('services', serviceId);
-        });
 
-
-        axios.post('http://localhost:3001/api/register', submissionData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
-            .then(response => {
-                console.log('Form submitted successfully:', response.data);
-                setTimeout(() => {
-                    navigate('/home');
-                }, 3000);
-            })
-            .catch(error => {
-                if (error.response && error.response.data && error.response.data.errors) {
-                    setErrors(error.response.data.errors);
-                } else {
-                    setErrors([]);
+        try {
+            const results = await Promise.all(uploadPromises);
+            const submissionData = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                if (!['personalFile', 'ownershipFile', 'dormPics', 'services'].includes(key)) {
+                    submissionData.append(key, value);
                 }
-                setIsLoading(false);
             });
+
+            results.forEach(({url, label}) => {
+                submissionData.append(`files[${label}]`, url);
+            });
+
+            selectedServices.forEach(serviceId => {
+                submissionData.append('services', serviceId);
+            });
+
+            const response = await axios.post('http://localhost:3001/api/register', submissionData);
+            console.log('Form submitted successfully:', response.data);
+            setTimeout(() => navigate('/home'), 3000);
+        } catch (error) {
+            console.error('Failed during the registration process:', error);
+            setErrors(error.response && error.response.data && error.response.data.errors ? error.response.data.errors : ['Failed to process the form.']);
+        } finally {
+            setIsLoading(false);
+        }
     };
+
+
 
     if (isLoading) {
         return <LoadingPage />;
@@ -142,9 +176,6 @@ const RegisterForm = () => {
                 </select>
                 <label htmlFor='personalFile'>Upload Personal Identification Documents</label>
                 <input type='file' id='personalFile' name='personalFile' onChange={handleInputChange} multiple/>
-                {formData.personalFile && formData.personalFile.map((fileName, index) => (
-                    <div key={index}>{fileName}</div>
-                ))}
                 <h4>Dorm Info</h4>
                 <label htmlFor='dormname'>Dorm Name</label>
                 <input type='text' id='dormName' name='dormName' value={formData.dormName} onChange={handleInputChange}/>
@@ -166,9 +197,7 @@ const RegisterForm = () => {
                 {(formData.capacity >1500)? <div style={{padding:'10px',backgroundColor:'rgba(255, 0, 0, 0.2)',color:'#FF0000'}}>INVALID INPUT</div>: null}
                 <label htmlFor='dormPics'>Upload Dorm Pictures</label>
                 <input type='file' id='dormPics' name='dormPics' onChange={handleInputChange} multiple />
-                {formData.dormPics && formData.dormPics.map((fileName, index) => (
-                    <div key={index}>{fileName}</div>
-                ))}
+
                 <label htmlFor='dormType'>Dorm Type</label>
                 <select id='dormType' value={formData.dormType} name='dormType' onChange={handleInputChange}>
                     <option>On-Campus</option>

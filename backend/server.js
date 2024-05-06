@@ -6,18 +6,31 @@ const cors = require('cors');
 const app = express()
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
+const cron = require('node-cron');
 const userRoutes = require('./routes/UserRoutes')
 const dormRoutes = require('./routes/DormRoutes')
 const bookingRoutes = require('./routes/BookingRoutes')
 const User = require("./models/User");
 const Room = require("./models/Room");
 const Dorm = require("./models/Dorm");
+const Booking = require('./models/Booking')
 
 const corsOptions = {
     origin: 'http://localhost:3000',
     credentials: true,
     optionsSuccessStatus: 200
 };
+
+cron.schedule('0 0 * * *', async () => { // This runs at midnight every day
+    console.log('Running a daily check to update booking statuses...');
+    const today = new Date();
+    await Booking.updateMany({
+        endDate: { $lt: today },
+        isActive: true
+    }, {
+        $set: { isActive: false }
+    });
+});
 
 app.use(cors(corsOptions));
 app.use(express.json());

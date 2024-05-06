@@ -1,14 +1,13 @@
 .body{
-    flex:80%;
+    display: flex;
     background-color: #1F203C;
     height: auto;
+
 }
 
 .ax{
     display: flex;
     margin-top: 5px;
-    
-    
 }
 
 .imageContainer{
@@ -20,13 +19,13 @@
     margin-left: 5vh;
     margin-top: 6vh;
     flex: 30%;
-    
 }
 
 .bigImage{
     height:50vh;
     width: 50vh;
     border-radius: 5px;
+    object-fit: cover;
 }
 
 .smallImage{
@@ -62,6 +61,7 @@
 
 .upsidebody{
     display: flex;
+    flex-direction: row;
 }
 
 .dormp{
@@ -101,18 +101,13 @@ margin-top: 3vh;
     background-color: #2D2E44;
     color:#afaeaead;
     font-size: smaller;
-    width: 90%;
-    height: 40px;
     border-radius: 14px;
-    border:none;
-    display: flex;
-    align-items: center;
+    padding:10px 15px 10px 0px;
+}
+.serviceInput ul{
+    text-align: left;
 }
 
-.serviceInput p{
-    
-    margin-left: 1vh;
-}
 
 .abouttheroomInput{
     background-color: #2D2E44;

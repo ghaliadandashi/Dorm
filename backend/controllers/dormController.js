@@ -44,7 +44,7 @@ exports.add = async (req, res) => {
 
 exports.show= async (req,res)=>{
     try{
-        const dorms = await Dorm.find({})
+        const dorms = await Dorm.find({}).populate('owner')
         res.status(200).json(dorms)
     }catch(error){
         console.error('Failed to retrieve dorms:', error);

@@ -2,25 +2,18 @@ const User = require('../models/User')
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
 const { check, validationResult } = require('express-validator');
 const Dorm = require("../models/Dorm");
+const admin = require('firebase-admin');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    }
+const serviceAccount = require('../dorm-2aa81-firebase-adminsdk-88ye5-597ead691c.json');
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: 'https://console.firebase.google.com/u/0/project/dorm-2aa81/storage/dorm-2aa81.appspot.com'
 });
+const bucket = admin.storage().bucket();
 
-const upload = multer({ storage: storage });
-exports.upload = upload.fields([
-    { name: 'personalFile', maxCount: 3 },
-    { name: 'ownershipFile', maxCount: 1 },
-    { name: 'dormPics', maxCount: 10 }
-]);
+
 exports.register = async (req, res) => {
     const validationRules = [
         check('email').isEmail().withMessage('Enter a valid email address'),
@@ -44,7 +37,11 @@ exports.register = async (req, res) => {
         return res.status(422).json({ errors: formattedErrors });
     }
 
+    const { files } = req.body;
+    const { personalFile, ownershipFile, dormPics } = files || {};
+
     try {
+
         const newUser = new User({
             name: `${req.body.firstName} ${req.body.lastName}`,
             email: req.body.email,
@@ -53,6 +50,8 @@ exports.register = async (req, res) => {
             phoneNo: req.body.phoneNo,
             role: 'dormOwner',
             status: 'Pending',
+            personalFiles: personalFile,
+            ownershipFiles: ownershipFile
         });
 
         const savedUser = await newUser.save();
@@ -63,7 +62,8 @@ exports.register = async (req, res) => {
             services: req.body.services,
             capacity: req.body.capacity,
             location: `${req.body.streetName} ${req.body.cityName}`,
-            type: req.body.dormType.toLowerCase()
+            type: req.body.dormType.toLowerCase(),
+            dormPics: dormPics
         });
 
         await dorm.save();
@@ -91,7 +91,7 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        if (!user) {
+        if (!user || user.status !== 'Valid') {
             return res.status(404).json({ message: 'User not found' });
         }
 
@@ -293,14 +293,15 @@ exports.profile = async (req, res) => {
     try {
         const owner = await User.findById(userId);
         if (!owner) {
-            return res.status(404).send('Dorm owner not found');
+            return res.status(404).send('User not found');
         }
         res.json({
             user: {
                 name: owner.name,
                 email: owner.email,
                 dob: owner.dob,
-                phoneNo: owner.phoneNo
+                phoneNo: owner.phoneNo,
+                profilePic:owner.profilePic
             }
         });
     } catch (error) {

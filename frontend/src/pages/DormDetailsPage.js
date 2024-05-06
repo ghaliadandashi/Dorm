@@ -4,13 +4,16 @@ import axios from "axios";
 import {useAuth} from "../components/Auth/AuthHook";
 import '../styling/pages/dormDetails.css'
 import {useNavigate} from "react-router-dom";
+import avatar
+    from "../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp";
 
 
 const DormDetails=()=>{
     const [dormInfo,setDormInfo] = useState([]);
     const [roomInfo,setRoomInfo] = useState([]);
     const navigate = useNavigate()
-    const {role} = useAuth();
+    const {role,isLoggedIn,user} = useAuth();
+    const [stay, setStay]=useState(0);
     const dormID = localStorage.getItem('DormId')
     useEffect(()=>{
         axios.get(`http://localhost:3001/dorms/dormDetails/${dormID}`,{withCredentials:true})
@@ -21,17 +24,32 @@ const DormDetails=()=>{
             console.error('Failed to get data',error)
         })
     },[])
+    const handleChange=(e)=>{
+        const { name, value } = e.target;
+        setStay(parseFloat(value));
+    }
     const handleBooking=(roomID,dormID)=>{
-        axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}`)
+        axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}/${stay}`)
             .then(response=>{
                 console.log(response.data)
             }).catch(error=>{
                 console.error('Failed to get data',error)
         })
     }
-    //Open console to see the array of dormInfo it gives you, so you can use it
-    console.log(dormInfo)
-    console.log(roomInfo)
+    const getPrice = (room, stay) => {
+        switch(Number(stay)) {
+            case 9:
+                return room.pricePerSemester * 2;
+            case 12:
+                return (room.pricePerSemester * 2) + (room.summerPrice * 3);
+            case 4.5:
+                return room.pricePerSemester;
+            case 3:
+                return room.summerPrice;
+            default:
+                return room.pricePerSemester;
+        }
+    };
     return(
         <>
             <Header/>
@@ -44,12 +62,12 @@ const DormDetails=()=>{
                    {dormInfo.dorm.dormName}
                 </p>
                 <div className="ax">
-                    <img src="/assets/popart/p1.jpg" alt="" className="bigImage" />
+                    <img src={dormInfo.dorm.dormPics[0]} alt="" className="bigImage" />
                     <div className="small">
-                    <img src="/assets/popart/p2.jpeg" alt="" className="smallImage" />
+                    <img src={dormInfo.dorm.dormPics[1]} alt="" className="smallImage" />
                     <div className="lastpic">
                         <img
-                        src="/assets/popart/p3.jpg"
+                        src={dormInfo.dorm.dormPics[2]}
                         alt=""
                         className="smallImage"
                         />
@@ -71,7 +89,11 @@ const DormDetails=()=>{
                     <div className="serviceInput">
                     <span>
                         <p>
-                        {dormInfo.dorm.services}
+                        {dormInfo.dorm.services.map(service=>
+                            <ul>
+                                <li>{service.toUpperCase()}</li>
+                            </ul>
+                        )}
                         </p>
                     </span>
                     </div>
@@ -124,23 +146,31 @@ const DormDetails=()=>{
             </div>*/}
             </div> 
             <div className='tablediv'>
-                <table>
+                <table style={{color:'white'}}>
                 <tr className="tableHeader">
                     <th className="borderingTheTable">Room type</th>
-                    <th className="borderingTheTable">Price</th>
                     <th className="borderingTheTable">Room available</th>
                     
                     <th className='borderingTheTable'>Per room type</th>
-                    <th>Book Room</th>
+                    <th>Stay Duration</th>
+                    <th className="borderingTheTable">Price</th>
+                    {(role === 'student' || isLoggedIn == false)?<><th>Book Room</th></>:null}
                     </tr>
                     {roomInfo.map((room,index)=>(
                         
-                        <tr id="a">
-                            <td className="" key={index}>{room.roomType}</td>
-                            <td>{room.price}</td>
-                            {(room.availability ===1)?(<td>Available</td>):<td style={{color:"red"}}>Fully Booked!</td>}
+                        <tr id="a" key={room._id ||index}>
+                            <td className="">{room.roomType}</td>
+                            {(room.availability ===0 )?(<td style={{color:'darkred'}}>Fully Booked!</td>):(room.availability>20)?<td>Available</td>:<td style={{color:'orangered'}}>Almost Out!</td>}
                             <td>{room.services}</td>
-                            {(role === 'student')?(<td><button className="tableBtn" onClick={()=>handleBooking(room._id,dormID)}>Book Room</button></td>):null}
+                            <td><select value={stay} onChange={handleChange}>
+                                <option value='4.5'>1 semester</option>
+                                <option value='9'> 2 semesters</option>
+                                <option value='12'>1 year</option>
+                                <option value='2'>Summer</option>
+                            </select></td>
+                            <td>{getPrice(room,stay)}</td>
+                            {(role === 'student')?(<td><button className="tableBtn" onClick={()=>handleBooking(room._id,dormID)}>Book Room</button></td>):(isLoggedIn === false)?
+                            <td><button onClick={()=>{navigate('/login')}}>Book Room</button></td>:null}
                         </tr>
                     ))}
                 </table>
