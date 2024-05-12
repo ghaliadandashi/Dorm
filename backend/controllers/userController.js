@@ -315,18 +315,18 @@ exports.getDorm = async (req,res)=>{
     const user = await User.findById(userid)
     // console.log(user)
     try{
-        const dorms = await Dorm.find({owner:user._id})
+        const dorms = await Dorm.find({owner:user._id}).populate('rooms')
         if(!dorms){
             res.status(200).send('Owner doesnt own any dorms!')
         }
-        const responseDorms = dorms.map(dorm => ({
-            dormName: dorm.dormName,
-            services: dorm.services,
-            capacity: dorm.capacity,
-            location: dorm.location,
-            dormType: dorm.type
-        }));
-        res.json(responseDorms);
+        // const responseDorms = dorms.map(dorm => ({
+        //     dormName: dorm.dormName,
+        //     services: dorm.services,
+        //     capacity: dorm.capacity,
+        //     location: dorm.location,
+        //     dormType: dorm.type
+        // }));
+        res.json(dorms);
     }catch (error){
         console.error('Database error:',error);
         res.status(500).send('Error retrieving dorm data')

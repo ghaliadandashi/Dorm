@@ -9,8 +9,7 @@ exports.add = async (req, res) => {
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-
-    const { dormName, owner, services, capacity, location, dormType } = req.body;
+    const { dormName, owner, services, capacity, type } = req.body;
 
     try {
         // Check if dorm with the same name already exists
@@ -25,8 +24,9 @@ exports.add = async (req, res) => {
             owner: req.user.userId,
             services,
             capacity,
-            location: `${req.body.streetName} ${req.body.cityName}`,
-            type: dormType.toLowerCase()
+            location: `${req.body.streetName} ${req.body.city}`,
+            type: type.toLowerCase(),
+            dormPics:req.body.dormPics
         });
 
         // Save dorm to db
@@ -41,6 +41,30 @@ exports.add = async (req, res) => {
         res.status(500).json({ error: 'Error during adding a new dorm' });
     }
 };
+
+exports.addRoom = async (req,res)=>{
+
+    try {
+        const room = new Room({
+            roomType: req.body.roomType,
+            services: req.body.services,
+            pricePerSemester: req.body.pricePerSemester,
+            summerPrice: req.body.summerPrice,
+            extraFee: req.body.extraFee,
+            availability: req.body.noOfRooms,
+            viewType: req.body.viewType,
+            space: req.body.space,
+            roomPics: req.body.roomPics
+        })
+        const savedRoom = await room.save();
+
+        const dorm = await Dorm.findOneAndUpdate({dormName: req.body.dorm}, {$push: {rooms: savedRoom._id}})
+        res.status(201).json({ message: "Room added successfully", dorm });
+    }catch (error) {
+        console.error('Error adding room to dorm:', error);
+        res.status(500).json({ message: "Error adding room", error });
+    }
+}
 
 exports.show= async (req,res)=>{
     try{
@@ -66,5 +90,17 @@ exports.dormDetails = async (req, res) => {
     } catch (error) {
         console.error('Failed to retrieve dorm', error);
         res.status(500).send('Error retrieving dorm details');
+    }
+}
+
+exports.getRooms = async (req,res) =>{
+    try{
+        const dorm = await Dorm.findById(req.params.dormID);
+        const rooms = dorm.rooms;
+
+        res.status(200).json(rooms)
+    }catch (error){
+        console.error('Failed to retrieve rooms',error);
+        res.status(500).send('Error retrieving rooms')
     }
 }

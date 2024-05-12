@@ -62,3 +62,11 @@
     border-bottom: 1px solid #eee;
 }
 
+.properties{
+    margin-top:40px;
+    color:white;
+}
+
+.properties li{
+    border-bottom: none;
+}

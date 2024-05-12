@@ -25,10 +25,12 @@
 
 }
 .modal-form{
-    max-height: 350px;
+    max-height: 380px;
+    width: fit-content;
     display: flex;
     flex-flow: column wrap;
-    gap:10px
+    gap:10px;
+    /*border:1px solid pink;*/
 }
 
 .modalNav{
@@ -55,10 +57,16 @@
     border:none;
     box-shadow: 2px 2px 2px black;
     border-radius: 10px;
-    width:150px
+    width:150px;
 }
 .modal button{
     align-self: center;
 }
-
-
+.modal-services{
+    display: flex;
+    flex-direction: row;
+}
+.modal-services input{
+    box-shadow: none;
+    width: auto;
+}

@@ -6,6 +6,8 @@ import avatar from '../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral,
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTimes,faBed,faHouse,faPlus } from '@fortawesome/free-solid-svg-icons';
 import Modal from "../Modal";
+import DormList from "./dormList";
+import RoomList from "./roomList";
 const DormOwnerProfile = () => {
     const {user, setUser} = useAuth()
     const [profile,setProfile] = useState({
@@ -16,16 +18,17 @@ const DormOwnerProfile = () => {
         profilePic:''
     })
     const[bookings,setBookings] = useState([]);
-    const [dorms,setDorm] =useState([])
     const [activeTab, setActiveTab] = useState('personalInfo');
+    const [dorms,setDorm] =useState([])
+    const [currentAction, setCurrentAction] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalContent, setModalContent] = useState(null); // Start with null to indicate no content is ready
+    const [modalContent, setModalContent] = useState(null);
 
     const handleOpenModal = (type) => {
         const contents = {
             room: {
                 title: 'Add Room',
-                initialData: { dorm: '', roomType: 'Double', pricePerSemester: '', summerPrice: '', viewType: 'Hall', numberOfRooms: '' },
+                initialData: { dorm: dorms[0].dormName, roomType: 'Double', pricePerSemester: '', summerPrice: '', viewType: 'CityView', noOfRooms: '' },
                 fields: [
                     { name: 'dorm', label: 'Dorm: ', type: 'select', options: dorms.map(dorm=>({
                             value:dorm.dormName,label:dorm.dormName
@@ -47,29 +50,83 @@ const DormOwnerProfile = () => {
                             {value: 'SeaView',label:'Sea View'},
                             {value: 'CampusView',label:'Campus View'}
                         ]},
-                    {name:'space',label:'Room space:(m^2)',type:'number'},
                     {name:'extraFee',label:'Extra fee for View($): ',type: 'number'},
-                    {name:'noOfRooms',label:'Number of Rooms: ',type: 'number'}
+                    {name:'space',label:'Room space:(m^2)',type:'number'},
+                    {name:'noOfRooms',label:'Number of Rooms: ',type: 'number'},
+                    {
+                        name: "services",
+                        label: "Services:",
+                        type: "checkbox",
+                        options: [
+                            {id: "ac", name: "ac", label: "Air Conditioning"},
+                            {id: "heating", name: "heating", label: "Heating"},
+                            {id: "furniture", name: "furniture", label: "Furnished"},
+                            {id: "linens", name: "linens", label: "Linens Provided"},
+                            {id: "electricity", name: "electricity", label: "Electricity Included"},
+                            {id: "water", name: "water", label: "Water Included"},
+                            {id: "gas", name: "gas", label: "Gas Included"},
+                            {id: "internetSupport", name: "internetSupport", label: "Internet Troubleshooting"},
+                            {id: "cableTv", name: "cableTv", label: "Cable TV Support"},
+                            {id: "smokeDetector", name: "smokeDetector", label: "Smoke Detector"},
+                            {id: "fireExtinguisher", name: "fireExtinguisher", label: "Fire Extinguisher"},
+                            {id: "roomSafe", name: "roomSafe", label: "In-Room Safe"}
+                        ]
+                    },
+                    {name:'roomPics',label:' Room Pictures',type:'file'}
                 ]
             },
             dorm: {
                 title: 'Add Dorm',
-                initialData: { dormName: '', location: '' },
+                initialData: { dormName: '', city:'Famagusta',streetName:'',capacity:'',type:'on-campus',dormPics:''},
                 fields: [
-                    { name: 'dormName', label: 'Dorm Name', type: 'text' },
-                    { name: 'location', label: 'Location', type: 'text' }
+                    { name: 'dormName', label: 'Dorm Name: ', type: 'text' },
+                    { name: 'streetName', label: 'Street Name: ', type: 'text' },
+                    { name: 'city',label:'City',type: 'select',options:[
+                            {value:'Famagusta',label:'Famagusta'},
+                            {value:'Kyrenia',label:'Kyrenia'},
+                            {value:'Nicosia',label: 'Nicosia'},
+                            {value:'Lefke',label: 'Lefke'},
+                            {value: 'Iskele',label:'Iskele'},
+                            {value:'Guzelyurt',label:'Guzelyurt'}
+                        ]},
+                    { name:'capacity', label:'Capacity: ',type:'number'},
+                    { name: 'type', label:'Type: ',type: 'select',options:[{
+                        value:'on-campus', label:'On-campus'},
+                            {value:'off-campus',label:'Off-campus'}
+                        ]},
+                    {name:'services',label: 'Services:',type:'checkbox',options:[
+                            { id: 'wifi',name:'wifi', label: 'Wi-Fi' },
+                            { id: 'laundry',name:'laundry', label: 'Laundry' },
+                            { id: 'market',name:'market' ,label: 'Market' },
+                            { id: 'sharedKitchen',name:'sharedKitchen', label:'Shared Kitchen'},
+                            { id: 'restaurant',name:'restaurant', label: 'Restaurant' },
+                            { id: 'gym',name:'gym', label: 'Gym Access' },
+                            { id: 'studyRoom',name:'studyRoom', label: 'Study Rooms'},
+                            { id: 'cleaning',name:'cleaning', label: 'Weekly Cleaning Services' },
+                            { id: 'security',name:'security', label: '24/7 Security' },
+                            { id: 'elevator',name:'elevator', label: 'Elevator'}
+                        ]},
+                    { name: 'dormPics', label: 'Dorm Pictures: ',type:'file'}
                 ]
-            }
+            },
         };
 
         setModalContent(contents[type]);
+        setCurrentAction(type);
         setIsModalOpen(true);
     };
 
-    const handleSubmit = (formData) => {
-        console.log(formData);
-        setIsModalOpen(false);
-        setModalContent(null); // Reset modal content
+    const handleSubmit = async (formData) => {
+        const endpoint = currentAction === 'dorm' ? 'http://localhost:3001/dorms/add' : 'http://localhost:3001/dorms/addRoom';
+        try {
+            const response = await axios.post(endpoint, formData, { withCredentials: true });
+            console.log('Success:', response.data);
+            setIsModalOpen(false);
+            setCurrentAction(null);
+            window.location.reload()
+        } catch (error) {
+            console.error(`Failed to submit ${currentAction}:`, error);
+        }
     };
     useEffect(() => {
         if (user) {
@@ -178,14 +235,8 @@ const DormOwnerProfile = () => {
                     </table>
                 )}
                 {activeTab === 'properties' && (
-                    <>
-                        <ul>
-                            {dorms.map((dorm, index) => (
-                                <li key={index}>{dorm.dormName} - {dorm.location}</li>
-                            ))}
-                        </ul>
-                        <button onClick={() => handleOpenModal('room')}><FontAwesomeIcon icon={faPlus}/> <FontAwesomeIcon icon={faBed}/></button>
-                        <button onClick={() => handleOpenModal('dorm')}><FontAwesomeIcon icon={faPlus}/> <FontAwesomeIcon icon={faHouse}/></button>
+                    <div className='properties'>
+
                         {modalContent && isModalOpen && (
                             <Modal
                                 isOpen={isModalOpen}
@@ -198,7 +249,11 @@ const DormOwnerProfile = () => {
                                 initialData={modalContent.initialData}
                                 fields={modalContent.fields}
                             />)}
-                    </>
+
+                        <div>
+                            <DormList handleModalOpen={handleOpenModal}/>
+                        </div>
+                    </div>
                 )}
                 {activeTab === 'financials' && (
                     <div>

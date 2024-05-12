@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const roomSchema = new mongoose.Schema({
-    roomName:{type:String,required:true},
+    roomName:{type:String,required:false},
     roomType:{type:String,required:true},
     services: [{ type: String, required:true}],
     pricePerSemester:{type:Number,required:true},

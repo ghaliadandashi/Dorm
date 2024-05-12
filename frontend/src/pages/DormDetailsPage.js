@@ -45,7 +45,7 @@ const DormDetails=()=>{
             case 4.5:
                 return room.pricePerSemester;
             case 3:
-                return room.summerPrice;
+                return room.summerPrice*3;
             default:
                 return room.pricePerSemester;
         }
@@ -166,7 +166,7 @@ const DormDetails=()=>{
                                 <option value='4.5'>1 semester</option>
                                 <option value='9'> 2 semesters</option>
                                 <option value='12'>1 year</option>
-                                <option value='2'>Summer</option>
+                                <option value='3'>Summer</option>
                             </select></td>
                             <td>{getPrice(room,stay)}</td>
                             {(role === 'student')?(<td><button className="tableBtn" onClick={()=>handleBooking(room._id,dormID)}>Book Room</button></td>):(isLoggedIn === false)?

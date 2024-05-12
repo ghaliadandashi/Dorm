@@ -92,9 +92,14 @@ const Navbar = () => {
                                     </li>
                                 </>
                             ) : (
-                                <li className="nav-item">
-                                    <Link to='/register' className="nav-link">Register As Dorm Owner</Link>
-                                </li>
+                                <>
+                                    <li className="nav-item">
+                                        <Link to='/login' className="nav-link">Login</Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link to='/register' className="nav-link">Register As Dorm Owner</Link>
+                                    </li>
+                                </>
                             )}
                         </>
                     )}
