@@ -19,6 +19,14 @@ const Navbar = () => {
     axios.defaults.withCredentials = true;
     const [showLoginForm, setShowLoginForm] = useState(false);
 
+
+    useEffect(() => {
+        if (sessionStorage.getItem('reloadAfterLogout')) {
+          sessionStorage.removeItem('reloadAfterLogout');
+          navigate('/home');
+        }
+      }, [navigate]);
+
     const handleLogout = () => {
         const auth = getAuth()
         const user = auth.currentUser
@@ -28,7 +36,7 @@ const Navbar = () => {
         axios.post('http://localhost:3001/api/logout', {}, { withCredentials: true })
             .then(() => {
                 localStorage.clear();
-                navigate('/home');
+                sessionStorage.setItem('reloadAfterLogout', 'true');
                 window.location.reload();
             })
             .catch((error) => {

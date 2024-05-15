@@ -1,0 +1,55 @@
+.dormListContainer{
+    display:flex;
+    flex-direction: column;
+    gap:10px;
+
+}
+.dormList{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left:50px;
+    margin-right:50px;
+}
+.dormss{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:40px;
+}
+
+.dorm{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap:10px;
+    color:black;
+    background-color:white;
+    border-radius:10px 0px 0px 10px;
+    box-shadow: 1px 2px 2px black;
+}
+
+.dorm img{
+    border-radius:10px 0px 0px 10px
+}
+
+.middleNav{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    gap:50px;
+    border-bottom: 1px solid white;
+}
+.middleNav h3{
+    /* margin-left: 50px;
+    margin-right: 50px; */
+}
+.addingBtns{
+    display: flex;
+    justify-content: center;
+    gap:10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid white;
+}
+.addingBtns button{
+    padding:10px 10px
+}

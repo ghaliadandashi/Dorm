@@ -95,12 +95,51 @@ exports.dormDetails = async (req, res) => {
 
 exports.getRooms = async (req,res) =>{
     try{
-        const dorm = await Dorm.findById(req.params.dormID);
-        const rooms = dorm.rooms;
-
+        const dorm = await Dorm.findById(req.params.dormID).populate('rooms');
+        const rooms = [];
+        if(dorm.rooms.length >0) {
+            rooms.push(dorm.rooms)
+        }
         res.status(200).json(rooms)
     }catch (error){
         console.error('Failed to retrieve rooms',error);
         res.status(500).send('Error retrieving rooms')
+    }
+}
+
+exports.editRoom = async (req,res) =>{
+    const roomDetails = req.body
+    const cleanRoomDetails = Object.entries(roomDetails).reduce((acc, [key, value]) => {
+        if (value !== null && value !== '') { 
+            acc[key] = value;
+        }
+        return acc;
+    }, {});
+    try{
+        const editedRoom = await Room.findByIdAndUpdate(req.params.roomID,cleanRoomDetails,{ new: true, runValidators: true })
+        res.status(200).json({message:'Room Edited!',editedRoom})
+
+    }catch(error){
+        console.error('Failed to edit room',error)
+        res.status(500).send('Error editing room')
+    }
+}
+
+exports.editDorm = async (req,res)=>{
+    const dormDetails = req.body
+    const location = `${req.body.city} ${req.body.streetName}`
+    dormDetails.location = location
+    const cleanDormDetails = Object.entries(dormDetails).reduce((acc, [key, value]) => {
+        if (value !== null && value !== '') { 
+            acc[key] = value;
+        }
+        return acc;
+    }, {});
+    try{
+        const editedDorm = await Dorm.findByIdAndUpdate(req.params.dormID,cleanDormDetails,{new:true,runValidators:true})
+        res.status(200).json({message:'Dorm Edited',editedDorm})
+    }catch(error){
+        console.error('Failed to edit Dorm',error)
+        res.status(500).send('Error editing Dorm')
     }
 }

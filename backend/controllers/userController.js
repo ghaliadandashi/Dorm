@@ -309,6 +309,26 @@ exports.profile = async (req, res) => {
         res.status(500).send('Error retrieving dorm owner data');
     }
 };
+exports.changeProfilePic = async (req,res)=>{
+    const {pictureUrl} = req.body
+    try{
+        const user = await User.findByIdAndUpdate(req.user.userId,{profilePic:pictureUrl},{new:true,runValidators:true})
+        res.status(200).send('Profile picture successfully changed/added!')
+    }catch(error){
+        console.error('Database error:',error);
+        res.status(500).send('Error changing picture')
+    }
+}
+
+exports.deleteProfilePic = async (req,res)=>{
+    try{
+        const user = await User.findByIdAndUpdate(req.user.userId,{profilePic:''},{new:true,runValidators:true})
+        res.status(200).send('Profile picture has been deleted!')
+    }catch(error){
+        console.error('Database Error:',error);
+        res.status(500).send('Error Deleting picture')
+    }
+}
 
 exports.getDorm = async (req,res)=>{
     const userid = req.user.userId;
