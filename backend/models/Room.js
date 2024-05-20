@@ -8,6 +8,7 @@ const roomSchema = new mongoose.Schema({
     summerPrice:{type:Number,required:true},
     extraFee:{type:Number,required:false},
     availability:{type:Number,required:true},
+    occupancy:{type:Number,required:true},
     viewType:{type:String,required:true},
     space:{type:Number,required:true},
     roomPics:[{type:String,required:true}]

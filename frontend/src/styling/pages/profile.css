@@ -46,11 +46,30 @@
     margin-top: 40px;
     margin-left:100px;
 }
-.tab-content .profilePicSection{
+.tab-content .profile{
     display: flex;
     flex-direction: row;
     gap:20px;
     align-items: center;
+}
+
+.profileNav .updatePicSection{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    gap:10px;
+}
+
+.profileNav .updatePicSection button{
+    padding:8px 5px;
+    border-radius:15px;
+    border:none;
+    color:white;
+    font-weight: bold;
+    font-size:medium;
+    background-color:#6565a5;
+    cursor: pointer;
+    box-shadow: #2b2c48 2px 2px 1px;
 }
 
 .tab-content ul {
@@ -60,6 +79,47 @@
 .tab-content li {
     padding: 8px 0;
     border-bottom: 1px solid #eee;
+}
+
+/* Booking Requests Tab*/
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top:80px;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.table-container table th, td {
+    text-align: center;
+    border: 1px solid #a1a1ae;
+}
+
+.table-container table th {
+    background-color: #1F203C;
+    color: #a1a1ae;
+    font-weight: bold;
+    font-size: 18px;
+    padding:9px;
+}
+
+.table-container table td {
+    background-color: #2D2E44;
+    padding:5px;
+}
+
+.table-container table tr:nth-child(even) td {
+    background-color: #3F405E;
+}
+
+.table-container table tr:hover td {
+    background-color: #45465f;
 }
 
 .properties{

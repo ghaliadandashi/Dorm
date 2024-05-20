@@ -14,6 +14,7 @@ const User = require("./models/User");
 const Room = require("./models/Room");
 const Dorm = require("./models/Dorm");
 const Booking = require('./models/Booking')
+const getSemesterStartDate = require('../backend/middleware/calenderIntegration');
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -31,6 +32,8 @@ cron.schedule('0 0 * * *', async () => { // This runs at midnight every day
         $set: { isActive: false }
     });
 });
+
+
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -95,6 +98,8 @@ mongoose.connect(process.env.DB_URI)
 // };
 
 // seedDatabase();
+
+
 
 app.get('/',(req,res)=>{
     res.send('backend working?')
