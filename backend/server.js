@@ -10,10 +10,19 @@ const cron = require('node-cron');
 const userRoutes = require('./routes/UserRoutes')
 const dormRoutes = require('./routes/DormRoutes')
 const bookingRoutes = require('./routes/BookingRoutes')
+const chatRoutes = require('./routes/ChatRoutes')
+
 const User = require("./models/User");
 const Room = require("./models/Room");
 const Dorm = require("./models/Dorm");
 const Booking = require('./models/Booking')
+const Chat = require('./models/Chat');
+
+const http = require('http');
+const socketIo = require('socket.io');
+const server = http.createServer(app);
+const io = socketIo(server);
+
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -39,6 +48,9 @@ app.use(cookieParser());
 app.use('/api', userRoutes);
 app.use('/dorms',dormRoutes);
 app.use('/booking',bookingRoutes)
+app.use('/chat',chatRoutes)
+
+
 
 mongoose.connect(process.env.DB_URI)
     .then(()=>console.log("DATABASE CONNECTED <3"))
@@ -94,7 +106,39 @@ mongoose.connect(process.env.DB_URI)
 //     }
 // };
 
-// seedDatabase();
+
+// Socket.IO setup
+io.on('connection', (socket) => {
+    console.log('a user connected');
+  
+    socket.on('chat message', async (msg) => {
+      const chat = new Chat({ content: msg, user: 'SULAIMON INOMOV' }); // Adjust to include actual user data
+      await chat.save();
+      io.emit('chat message', msg);
+    });
+  
+    socket.on('disconnect', () => {
+      console.log('user disconnected');
+    });
+  });
+  
+  // Seed database with initial messages
+const seedDatabase = async () => {
+    try {
+      const initialMessages = [
+        { content: 'Welcome to the chat!', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
+        { content: 'Feel free to start a conversation.', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
+      ];
+  
+      await Chat.insertMany(initialMessages);
+      console.log('Database seeded with initial messages');
+    } catch (error) {
+      console.error('Error seeding database:', error);
+    }
+  };
+
+seedDatabase();
+
 
 app.get('/',(req,res)=>{
     res.send('backend working?')
