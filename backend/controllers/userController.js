@@ -330,6 +330,18 @@ exports.deleteProfilePic = async (req,res)=>{
     }
 }
 
+
+exports.getUsers = async (req,res)=>{
+    try{
+        const users = await User.find({})
+        res.status(200).json(users)
+    }catch(error){
+        console.error('Failed to retrieve users:', error);
+        res.status(500).send('Error retrieving all users');
+    }
+
+}
+
 exports.getDorm = async (req,res)=>{
     const userid = req.user.userId;
     const user = await User.findById(userid)
