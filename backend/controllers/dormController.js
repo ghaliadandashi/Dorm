@@ -111,22 +111,6 @@ exports.searchDormByName = async (req, res) => {
     }
 }
 
-exports.searchDormByName = async (req, res) => {
-    try {
-        const dorm = await Dorm.findOne({ dormName: req.params.dormName }).populate('rooms');
-        if (!dorm) {
-            return res.status(404).send('Dorm not found');
-        }
-        res.status(200).json({
-            dorm,
-        });
-
-    } catch (error) {
-        console.error('Failed to retrieve dorm', error);
-        res.status(500).send('Error retrieving dorm details');
-    }
-}
-
 exports.getRooms = async (req,res) =>{
     try{
         const dorm = await Dorm.findById(req.params.dormID).populate('rooms');
