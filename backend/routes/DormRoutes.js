@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { add, show, dormDetails, addRoom, getRooms,editRoom,editDorm,deleteRoom, deleteDorm} = require('../controllers/dormController');
+const { add, show, dormDetails,searchDormByName, addRoom, getRooms,editRoom,editDorm,deleteRoom, deleteDorm} = require('../controllers/dormController');
 const authenticateToken = require("../middleware/auth");
 const upload = multer({ dest: 'uploads/' });
 
@@ -13,6 +13,7 @@ router.post('/addRoom',authenticateToken,addRoom)
 router.get('/show',show)
 router.get('/rooms/getRooms/:dormID',getRooms)
 router.get('/dormDetails/:dormID',dormDetails)
+router.get('/searchDorm/:dormName',searchDormByName)
 router.post('/editRoom/:roomID',editRoom)
 router.post('/editDorm/:dormID',editDorm)
 router.delete('/deleteDorm/:dormID',deleteDorm)
