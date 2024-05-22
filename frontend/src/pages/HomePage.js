@@ -10,6 +10,7 @@ import image4 from '../images/[removal.ai]_74281a78-76c3-42db-925c-2b9637458cb3-
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Link} from "react-router-dom";
 import {useAuth} from "../components/Auth/AuthHook";
+import Search from '../layout/Search';
 
 const Home = () => {
     const [dorms, setDorms] = useState([]);
@@ -48,6 +49,7 @@ const Home = () => {
             <Header />
             <div className='homeContent'>
                 <div className='homeFirst'>
+                    <Search/>
                 </div>
                 <div className='homeMiddle'>
                     <div className='comfortsign'>

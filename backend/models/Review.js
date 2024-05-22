@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose')
 
 const ReviewSchema = new mongoose.Schema({
     dorm: {type:mongoose.Schema.Types.ObjectId,ref:'Dorm'},
@@ -9,4 +9,4 @@ const ReviewSchema = new mongoose.Schema({
 })
 
 const Review = mongoose.model('Review',ReviewSchema);
-module.exports(Review);
+module.exports = Review

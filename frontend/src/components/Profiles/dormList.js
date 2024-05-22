@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faPlus, faEdit, faTrash, faHouse, faBed} from '@fortawesome/free-solid-svg-icons';
 import '../../styling/components/dormList.css'
 import { useNavigate } from 'react-router-dom';
+import noImage from '../../images/1554489-200.png'
 
 const DormList = ({ handleModalOpen }) => {
     const nagivate = useNavigate();
@@ -21,7 +22,7 @@ const DormList = ({ handleModalOpen }) => {
     };
 
     const handleDelete = async (dormId) => {
-        await axios.delete(`http://localhost:3001/api/dorms/${dormId}`);
+        await axios.delete(`http://localhost:3001/dorms/deleteDorm/${dormId}`);
         fetchDorms();
     };
 
@@ -41,7 +42,10 @@ const DormList = ({ handleModalOpen }) => {
             {dorms.map(dorm => (
                 <div key={dorm._id} >
                     <div className='dorm'>
-                        <img src={dorm.dormPics[0]} width='100' height='100' style={{objectFit:'cover'}}/>
+                        {dorm.dormPics.length != 0?<img src={dorm.dormPics[0]} width='100' height='100' style={{objectFit:'cover'}}/>:
+                            <img src={noImage} width='100' height='100' style={{objectFit:'cover'}}/>
+                        }
+                        
                     <span style={{display:'flex',flexDirection:'column'}}>
                     <h3 onClick={()=>setDormId(dorm._id)} style={{textDecoration:'underline',cursor:'pointer',color:'#2b2c48'}}>{dorm.dormName}</h3>
                     <span style={{color:'#2b2c48'}}>Occupancy: {dorm.occupancy}</span>
@@ -77,7 +81,7 @@ const RoomList = ({ dormId, handleModalOpen }) => {
     };
 
     const handleDelete = async (roomId) => {
-        await axios.delete(`http://localhost:3001/api/rooms/${roomId}`);
+        await axios.delete(`http://localhost:3001/dorms/deleteRoom/${dormId}/${roomId}`);
         fetchRooms();
     };
 
@@ -85,7 +89,10 @@ const RoomList = ({ dormId, handleModalOpen }) => {
         <div>
             {rooms? rooms.map(room => (
                 <div className='dorm' key={room._id}>
-                    <img src={room.roomPics} width='100' height='100' style={{objectFit:'cover'}}/>
+                    {room.roomPics.length!==0?<img src={room.roomPics[0]} width='100' height='100' style={{objectFit:'cover'}}/>:
+                        <img src={noImage} width='100' height='100' style={{objectFit:'cover'}}/>
+                    }
+                    
                     <h4>{room.roomType}</h4>
                     <button onClick={() => handleModalOpen('editRoom', room, dormId)}>
                         <FontAwesomeIcon icon={faEdit} /> Edit

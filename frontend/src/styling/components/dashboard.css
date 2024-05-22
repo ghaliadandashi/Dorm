@@ -1,0 +1,40 @@
+.dashboard {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.insights {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.insight {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    width: 45%;
+}
+
+.review {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.review textarea {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.review button {
+    margin-top: 10px;
+}
+
+h2 {
+    margin-top: 30px;
+}

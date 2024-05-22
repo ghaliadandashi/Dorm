@@ -23,6 +23,7 @@ const socketIo = require('socket.io');
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const getSemesterStartDate = require('../backend/middleware/calenderIntegration');
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -40,6 +41,8 @@ cron.schedule('0 0 * * *', async () => { // This runs at midnight every day
         $set: { isActive: false }
     });
 });
+
+
 
 app.use(cors(corsOptions));
 app.use(express.json());

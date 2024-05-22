@@ -8,6 +8,7 @@ import { faCheck, faTimes, } from '@fortawesome/free-solid-svg-icons';
 import Modal from "../Modal";
 import DormList from "./dormList";
 import { uploadFileToFirebase,deleteFileFromFirebase } from '../../firbase-storage';
+import Dashboard from './dashboard';
 
 const DormOwnerProfile = () => {
     const {user, setUser} = useAuth()
@@ -15,7 +16,7 @@ const DormOwnerProfile = () => {
         name:'',
         email:'',
         dob:'',
-        phone:'',
+        phoneNo:'',
         profilePic:''
     })
     const[bookings,setBookings] = useState([]);
@@ -26,10 +27,13 @@ const DormOwnerProfile = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [editMode, setEditMode] = useState(false);
+    const d = new Date();
 
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
     };
+    
 
     const handleChangePicture = async () => {
         if (!selectedFile) return;
@@ -224,6 +228,17 @@ const DormOwnerProfile = () => {
             console.error(`Failed to submit ${currentAction}:`, error);
         }
     };
+
+    const getBooking = async()=>{
+        axios.get('http://localhost:3001/booking/getBooking',{withCredentials:true})
+                .then(response=>{
+                    setBookings(response.data);
+                    // console.log(response.data)
+                }).catch(error=>{
+                    console.error('Failed to get Bookings: ',error)
+            })
+    }
+
     useEffect(() => {
         if (user) {
             axios.get(`http://localhost:3001/api/profile`,{withCredentials:true})
@@ -233,7 +248,7 @@ const DormOwnerProfile = () => {
                         name: response.data.user.name,
                         email: response.data.user.email,
                         dob:response.data.user.dob,
-                        phone:response.data.user.phoneNo,
+                        phoneNo:response.data.user.phoneNo,
                         profilePic:response.data.user.profilePic
                     });
                 })
@@ -244,22 +259,54 @@ const DormOwnerProfile = () => {
                     setDorm(response.data);
                 })
                 .catch(error=>{console.error('Failed to get Dorms: ',error)})
-            axios.get('http://localhost:3001/booking/getBooking',{withCredentials:true})
-                .then(response=>{
-                    setBookings(response.data);
-                    // console.log(response.data)
-                }).catch(error=>{
-                    console.error('Failed to get Bookings: ',error)
-            })
+            getBooking()
         }
     }, [user]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setProfile(prevProfile => ({ ...prevProfile, [name]: value }));
+    };
+
+    const handleSubmitPersonalInfo = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.put('http://localhost:3001/api/profileEdit', profile, { withCredentials: true });
+            setProfile(response.data);
+            setEditMode(false);
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+        }
+    };
+
     const handleTabClick = (tab) => {
         setActiveTab(tab);
     };
 
-    const handleStatus = ()=>{
-
+    const handleStatus = async (id)=>{
+        try{
+            const response = await axios.put(`http://localhost:3001/booking/handleStatus/${id}`,{})
+            window.location.reload()
+            
+        }catch(error){
+            console.error('Failed to update Booking status',error)
+        }
     }
+
+    const getPrice = (room, stay) => {
+        switch(Number(stay)) {
+            case 9:
+                return room.pricePerSemester * 2;
+            case 12:
+                return (room.pricePerSemester * 2) + (room.summerPrice * 3);
+            case 4.5:
+                return room.pricePerSemester;
+            case 3:
+                return room.summerPrice*3;
+            default:
+                return room.pricePerSemester;
+        }
+    };
 
     return (
         <div className="profile">
@@ -289,29 +336,69 @@ const DormOwnerProfile = () => {
             </div>
             <div className="tab-content">
                 {activeTab === 'personalInfo' && (
-                    <div className='personalInfo'>
+                    <div className="personalInfo">
+                    <div className="profileNav">
                         <div className='profilePicSection'>
-                            {(profile.profilePic)?
-                                <img src={profile.profilePic} width='150' height='150' style={{objectFit:"cover",borderRadius:'55px'}} id='profilePic'/>:
-                                <img src={avatar} width='150' height='150' style={{objectFit:"cover",borderRadius:'55px'}} id='profilePic'/>}
+                        {(profile.profilePic) ?
+                            <img src={profile.profilePic} width="150" height="150" style={{ objectFit: "cover" }} id="profilePic" alt="Profile" /> :
+                            <img src={avatar} width="150" height="150" style={{ objectFit: "cover" }} id="profilePic" alt="Profile" />}
+                        <div className="updatePicSection">
                             <input type="file" onChange={handleFileChange} />
                             <button onClick={handleChangePicture}>Change Picture</button>
                             <button onClick={handleDeletePicture}>Delete Picture</button>
                         </div>
-                        <p><strong>Name:</strong> {profile.name}</p>
-                        <p><strong>Email:</strong> {profile.email}</p>
-                        <p><strong>Phone:</strong> {profile.phone}</p>
+                        </div>
+                        <div className='editBtn'>
+                            <button onClick={() => setEditMode(true)}>Edit Info</button>
+                        </div>
                     </div>
+                    {editMode ? (
+                        <form onSubmit={handleSubmitPersonalInfo}>
+                            <input
+                                type="text"
+                                name="name"
+                                value={profile.name}
+                                onChange={handleInputChange}
+                                placeholder="Name"
+                            />
+                            <input
+                                type="email"
+                                name="email"
+                                value={profile.email}
+                                onChange={handleInputChange}
+                                placeholder="Email"
+                            />
+                            <input
+                                type="text"
+                                name="phoneNo"
+                                value={profile.phoneNo}
+                                onChange={handleInputChange}
+                                placeholder="Phone"
+                            />
+                            <button type="submit">Save Changes</button>
+                        </form>
+                    ) : (
+                        <div>
+                            <p><strong>Name:</strong> {profile.name}</p>
+                            <p><strong>Email:</strong> {profile.email}</p>
+                            <p><strong>Phone:</strong> {profile.phoneNo}</p>
+                        </div>
+                    )}
+                </div>
                 )}
                 {activeTab === 'bookings' && (
+                    <div className='table-container'>
                     <table style={{color:'white'}}>
                         <tr>
                             <th style={{color:'#a1a1ae'}}>Student Name</th>
                             <th>Dorm Name</th>
                             <th >Room Type</th>
-                            <th>Date</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Semester</th>
+                            <th>Stay Duration</th>
+                            <th>Price</th>
                             <th>Status</th>
-                            <th>Active</th>
                         </tr>
                         {bookings.map((booking, index) => (
                             <tr>
@@ -319,17 +406,27 @@ const DormOwnerProfile = () => {
                                 <td>{booking.dorm.dormName}</td>
                                 <td>{booking.room.roomType}</td>
                                 <td>{booking.startDate.substring(0,booking.startDate.indexOf('T')).split('-').reverse().join('-')}</td>
+                                <td>{booking.endDate.substring(0,booking.startDate.indexOf('T')).split('-').reverse().join('-')}</td>
+                                <td>{d.getFullYear()}- {d.getFullYear()+1} {booking.semester.toUpperCase()}</td>
+                                <td>{booking.stayDuration===9?'2 Semesters':
+                                    booking.stayDuration ===4.5?'1 Semester':
+                                    booking.stayDuration ===12?'1 Year':
+                                    booking.stayDuration ===3?'Summer':
+                                    '-----'
+                                }</td>
+                                <td>{getPrice(booking.room,booking.stayDuration)}</td>
                                 <td>{booking.status}</td>
-                                <td>{booking.isActive.toString()}</td>
-                                {(booking.status === 'Booked')?
-                                    (<td><button onClick={handleStatus}>Reject</button></td>)
+                                {(booking.status === 'Requested')?
+                                    (<><td><button onClick={()=>handleStatus(booking._id)}>Confirm Reservation</button></td></>)
                                     :<>
-                                        <td><FontAwesomeIcon icon={faCheck}/></td>
-                                        <td><FontAwesomeIcon icon={faTimes}/></td>
+                                        {booking.status === 'Reserved'?<td><button onClick={()=>handleStatus(booking._id)}>Confirm Booking</button></td>:null
+                                        }
                                     </>}
+                                    {booking.status !== 'Booked'?<td><FontAwesomeIcon icon={faTimes}/></td>:null}
                             </tr>
                         ))}
                     </table>
+                    </div>
                 )}
                 {activeTab === 'properties' && (
                     <div className='properties'>
@@ -354,7 +451,8 @@ const DormOwnerProfile = () => {
                 )}
                 {activeTab === 'financials' && (
                     <div>
-                        <p>Financial details here...</p>
+                        {console.log(dorms[1]._id)}
+                        <Dashboard dormId={dorms[1]._id}/>
                     </div>
                 )}
             </div>

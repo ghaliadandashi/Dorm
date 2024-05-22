@@ -1,6 +1,7 @@
 const Dorm = require('../models/Dorm');
 const User = require('../models/User');
-const Room = require('../models/Room')
+const Room = require('../models/Room');
+const Booking = require('../models/Booking')
 const { validationResult } = require('express-validator');
 
 
@@ -51,6 +52,7 @@ exports.addRoom = async (req,res)=>{
             pricePerSemester: req.body.pricePerSemester,
             summerPrice: req.body.summerPrice,
             extraFee: req.body.extraFee,
+            occupancy:0,
             availability: req.body.noOfRooms,
             viewType: req.body.viewType,
             space: req.body.space,
@@ -141,5 +143,36 @@ exports.editDorm = async (req,res)=>{
     }catch(error){
         console.error('Failed to edit Dorm',error)
         res.status(500).send('Error editing Dorm')
+    }
+}
+
+exports.deleteDorm = async (req, res) => {
+    try {
+        const dorm = await Dorm.findById(req.params.dormID);
+
+        if (dorm) {
+            await Room.deleteMany({ _id: { $in: dorm.rooms } });
+            await Booking.deleteMany({ dorm: req.params.dormID });
+            await Dorm.findByIdAndDelete(req.params.dormID);
+            res.status(200).json({ message: 'Dorm and associated rooms deleted!' });
+        } else {
+            res.status(404).json({ message: 'Dorm not found!' });
+        }
+    } catch (error) {
+        console.error('Failed to delete Dorm', error);
+        res.status(500).send('Error deleting Dorm');
+    }
+};
+
+
+exports.deleteRoom = async (req,res)=>{
+    try{
+        await Booking.findOneAndDelete({ room: req.params.roomID });
+        const room = await Room.findByIdAndDelete(req.params.roomID);
+        await Dorm.findByIdAndUpdate(req.params.dormID, { $pull: { rooms: room._id } });
+        res.status(200).json({message:'Room Deleted!',room})
+    }catch(error){
+        console.error('Failed to delete Room',error)
+        res.status(500).send('Error deleting Dorm')
     }
 }
