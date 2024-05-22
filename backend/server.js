@@ -14,6 +14,7 @@ const User = require("./models/User");
 const Room = require("./models/Room");
 const Dorm = require("./models/Dorm");
 const Booking = require('./models/Booking')
+const getSemesterStartDate = require('../backend/middleware/calenderIntegration');
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -32,6 +33,8 @@ cron.schedule('0 0 * * *', async () => { // This runs at midnight every day
     });
 });
 
+
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -49,13 +52,14 @@ mongoose.connect(process.env.DB_URI)
 // const seedDatabase = async () => {
 //     try {
 //         const dormOwner = new User({
-//             name: 'Dorm Owner Name',
+//             name: 'Dorm Owner',
 //             email: 'dormowner@example.com',
 //             role: 'dormOwner',
 //             password: 'dormOwnie',
-//             status: 'Valid'
+//             status: 'Valid',
+            
 //         });
-//
+
 //         const savedDormOwner = await dormOwner.save();
 //         const dorm = new Dorm({
 //             dormName: 'Lotus',
@@ -64,26 +68,27 @@ mongoose.connect(process.env.DB_URI)
 //             capacity: 100,
 //             occupancy: 0,
 //             location: 'Dorm Location',
-//             type: 'off-campus'
+//             type: 'off-campus',
+   
 //         });
-//
+
 //         const savedDorm = await dorm.save();
-//
+
 //         const rooms = [
-//             { roomName: '101', roomType: 'Single', services: ['Balcony'], price: 500, availability: 1 },
-//             { roomName: '102', roomType: 'Double', services: ['Private Bathroom'], price: 750, availability: 2 },
+//             { roomName: '101', roomType: 'Single', services: ['Balcony'], pricePerSemester: 500,summerPrice: 300,extraFee:50,viewType:'SeaView', availability: 50,space:23 },
+//             { roomName: '102', roomType: 'Double', services: ['Private Bathroom'], pricePerSemester: 1500,summerPrice: 300,extraFee:0,viewType:'CampusView', availability: 120,space:54 },
 //         ];
-//
+
 //         const roomPromises = rooms.map(async roomData => {
 //             const room = new Room({ ...roomData, dorm: savedDorm._id });
 //             return room.save();
 //         });
-//
+
 //         const savedRooms = await Promise.all(roomPromises);
-//
+
 //         savedDorm.rooms = savedRooms.map(room => room._id);
 //         await savedDorm.save();
-//
+
 //         console.log('Database seeded successfully!');
 //     } catch (error) {
 //         console.error('Error seeding database:', error);
@@ -91,8 +96,10 @@ mongoose.connect(process.env.DB_URI)
 //         mongoose.disconnect();
 //     }
 // };
-//
+
 // seedDatabase();
+
+
 
 app.get('/',(req,res)=>{
     res.send('backend working?')

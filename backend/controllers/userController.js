@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 const Dorm = require("../models/Dorm");
 const admin = require('firebase-admin');
+const Booking = require('../models/Booking')
+const Review = require('../models/Review')
 
 const serviceAccount = require('../dorm-2aa81-firebase-adminsdk-88ye5-597ead691c.json');
 admin.initializeApp({
@@ -310,25 +312,119 @@ exports.profile = async (req, res) => {
     }
 };
 
+exports.profileEdit = async(req,res) => {
+    console.log(req.body)
+    try{
+        const user = await User.findByIdAndUpdate(req.user.userId, req.body,{new:true,runValidators:true})
+        res.status(200).json(user)
+    }catch(error){
+        console.error('Database error:',error)
+        res.status(500).send('Error updating profile!')
+    }
+}
+
+exports.changeProfilePic = async (req,res)=>{
+    const {pictureUrl} = req.body
+    try{
+        const user = await User.findByIdAndUpdate(req.user.userId,{profilePic:pictureUrl},{new:true,runValidators:true})
+        res.status(200).send('Profile picture successfully changed/added!')
+    }catch(error){
+        console.error('Database error:',error);
+        res.status(500).send('Error changing picture')
+    }
+}
+
+exports.deleteProfilePic = async (req,res)=>{
+    try{
+        const user = await User.findByIdAndUpdate(req.user.userId,{profilePic:''},{new:true,runValidators:true})
+        res.status(200).send('Profile picture has been deleted!')
+    }catch(error){
+        console.error('Database Error:',error);
+        res.status(500).send('Error Deleting picture')
+    }
+}
+
 exports.getDorm = async (req,res)=>{
     const userid = req.user.userId;
     const user = await User.findById(userid)
     // console.log(user)
     try{
-        const dorms = await Dorm.find({owner:user._id})
+        const dorms = await Dorm.find({owner:user._id}).populate('rooms')
         if(!dorms){
             res.status(200).send('Owner doesnt own any dorms!')
         }
-        const responseDorms = dorms.map(dorm => ({
-            dormName: dorm.dormName,
-            services: dorm.services,
-            capacity: dorm.capacity,
-            location: dorm.location,
-            dormType: dorm.type
-        }));
-        res.json(responseDorms);
+        // const responseDorms = dorms.map(dorm => ({
+        //     dormName: dorm.dormName,
+        //     services: dorm.services,
+        //     capacity: dorm.capacity,
+        //     location: dorm.location,
+        //     dormType: dorm.type
+        // }));
+        res.json(dorms);
     }catch (error){
         console.error('Database error:',error);
         res.status(500).send('Error retrieving dorm data')
     }
 }
+
+exports.getInsights= async (req, res) => {
+    try {
+        const dormId = req.params.dormId;
+
+       
+        const dorm = await Dorm.findById(dormId).populate('rooms');
+        if (!dorm) {
+            return res.status(404).json({ message: 'Dormitory not found' });
+        }
+
+        
+        const totalOccupancy = await Booking.countDocuments({ dorm: dormId, status: { $in: ['Reserved', 'Booked'] } });
+        const occupancyRate = (totalOccupancy / dorm.capacity) * 100;
+
+        
+        const bookings = await Booking.find({ dorm: dormId, status: 'Booked' }).populate('room');
+        const totalRevenue = bookings.reduce((sum, booking) => {
+            const stayDuration = booking.stayDuration;
+            const room = booking.room;
+            const semesterRevenue = room.pricePerSemester;
+        
+            const additionalRevenue = 
+                (stayDuration === 4.5) ? 0 :
+                (stayDuration === 9) ? semesterRevenue :
+                (stayDuration === 12) ? semesterRevenue + room.summerPrice * 3 :
+                (stayDuration === 3) ? room.summerPrice * 3 : 0;
+        
+            return sum + (stayDuration !== 3)?semesterRevenue:0 + additionalRevenue;
+        }, 0);
+
+        const reviews = await Review.find({ dorm: dormId }).populate('student');
+
+        res.json({
+            occupancyRate,
+            totalRevenue,
+            reviews
+        });
+    } catch (error) {
+        console.error('Error fetching insights:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.search=  async (req, res) => {
+    try {
+        const { location, minPrice, maxPrice, services } = req.query;
+
+        const query = {
+            ...(location && { location }),
+            ...(minPrice && { 'rooms.pricePerSemester': { $gte: minPrice } }),
+            ...(maxPrice && { 'rooms.pricePerSemester': { $lte: maxPrice } }),
+            ...(services && { services: { $all: services.split(',') } })
+        };
+
+        const dorms = await Dorm.find(query).populate('rooms');
+        res.json(dorms);
+    } catch (error) {
+        console.error('Error searching dormitories:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

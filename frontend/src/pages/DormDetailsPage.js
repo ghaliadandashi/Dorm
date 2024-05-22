@@ -13,7 +13,9 @@ const DormDetails=()=>{
     const [roomInfo,setRoomInfo] = useState([]);
     const navigate = useNavigate()
     const {role,isLoggedIn,user} = useAuth();
-    const [stay, setStay]=useState(0);
+    const [stay, setStay]=useState(4.5);
+    const [semester,setSemester] = useState('')
+    const d = new Date()
     const dormID = localStorage.getItem('DormId')
     useEffect(()=>{
         axios.get(`http://localhost:3001/dorms/dormDetails/${dormID}`,{withCredentials:true})
@@ -26,10 +28,14 @@ const DormDetails=()=>{
     },[])
     const handleChange=(e)=>{
         const { name, value } = e.target;
-        setStay(parseFloat(value));
+        if (name === 'stay') {
+            setStay(value);
+        } else if (name === 'semester') {
+            setSemester(value);
+        }
     }
     const handleBooking=(roomID,dormID)=>{
-        axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}/${stay}`)
+        axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}/${stay}/${semester}`)
             .then(response=>{
                 console.log(response.data)
             }).catch(error=>{
@@ -45,7 +51,7 @@ const DormDetails=()=>{
             case 4.5:
                 return room.pricePerSemester;
             case 3:
-                return room.summerPrice;
+                return room.summerPrice*3;
             default:
                 return room.pricePerSemester;
         }
@@ -98,52 +104,8 @@ const DormDetails=()=>{
                     </span>
                     </div>
                 </div>
-                {/* <div className="aboutTheRoom">
-                    <p className="dormpp">About the room:</p>
-                    <div className="abouttheroomInput">
-                    <span>
-                        <p>
-                        Our Wifi speed is 30 mgps, a kitchen is included in every
-                        room,our hot water is 24h there
-                        </p>
-                    </span>
-                    </div>
-                </div> */}
                 </div>
             </div>
-            {/* <div className="rooms">
-                <p className="roomsp">
-                <b>Rooms:</b>
-                </p>
-                <div className="tablediv">
-                <table className="roomTable">
-                    <tr className="tableHeader" id="a">
-                    <th className="borderingTheTable">Room type</th>
-                    <th className="borderingTheTable">Room available</th>
-                    <th className="borderingTheTable">Price</th>
-                    <th>Per room type</th>
-                    </tr>
-                    <tr className="roomBody" id="b">
-                    <td className="leftB">Double room</td>
-                    <td className="leftB">Almost out!</td>
-                    <td className="leftB">2750$</td>
-                    <td>
-                        Our double room includes 2 beds, 2 closets, 2 desks, lamp on
-                        each desk, 32 inch TV, 2 couches, kitchen inside the room
-                    </td>
-                    </tr>
-                    <tr className="roomBody">
-                    <td className="leftB">Single room</td>
-                    <td className="leftB">Sold out!</td>
-                    <td className="leftB">3100$</td>
-                    <td>
-                        Our single room includes 1 bed, 2 closet, 1 desk, lamp on each
-                        desk, 32 inch TV, 2 couches, kitchen inside the room
-                    </td>
-                    </tr>
-                </table>
-                </div>
-            </div>*/}
             </div> 
             <div className='tablediv'>
                 <table style={{color:'white'}}>
@@ -153,7 +115,8 @@ const DormDetails=()=>{
                     
                     <th className='borderingTheTable'>Per room type</th>
                     <th>Stay Duration</th>
-                    <th className="borderingTheTable">Price</th>
+                    <th className="borderingTheTable">Semester</th>
+                    <th className='borderingTheTable'>Price</th>
                     {(role === 'student' || isLoggedIn == false)?<><th>Book Room</th></>:null}
                     </tr>
                     {roomInfo.map((room,index)=>(
@@ -162,12 +125,25 @@ const DormDetails=()=>{
                             <td className="">{room.roomType}</td>
                             {(room.availability ===0 )?(<td style={{color:'darkred'}}>Fully Booked!</td>):(room.availability>20)?<td>Available</td>:<td style={{color:'orangered'}}>Almost Out!</td>}
                             <td>{room.services}</td>
-                            <td><select value={stay} onChange={handleChange}>
+                            <td><select name='stay' value={stay} onChange={handleChange}>
                                 <option value='4.5'>1 semester</option>
                                 <option value='9'> 2 semesters</option>
                                 <option value='12'>1 year</option>
-                                <option value='2'>Summer</option>
+                                <option value='3'>Summer</option>
                             </select></td>
+                            <td>
+                                <select name='semester' value={semester} onChange={handleChange}>
+                                    <option value='spring'>
+                                        {d.getFullYear()} - {d.getFullYear()+1} Spring Term
+                                    </option>
+                                    <option value='fall'>
+                                        {d.getFullYear()} - {d.getFullYear()+1} Fall Term
+                                    </option>
+                                    <option value='summer'>
+                                        {d.getFullYear()} - {d.getFullYear()+1} Summer Term
+                                    </option>
+                                </select>
+                            </td>
                             <td>{getPrice(room,stay)}</td>
                             {(role === 'student')?(<td><button className="tableBtn" onClick={()=>handleBooking(room._id,dormID)}>Book Room</button></td>):(isLoggedIn === false)?
                             <td><button onClick={()=>{navigate('/login')}}>Book Room</button></td>:null}

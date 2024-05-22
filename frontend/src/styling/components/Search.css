@@ -1,0 +1,30 @@
+/* Search.css */
+.search {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.search-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.search-filters input,
+.search-filters button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search-results {
+    margin-top: 20px;
+}
+
+.dorm-card {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}

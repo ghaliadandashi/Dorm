@@ -41,6 +41,7 @@ export const UserProvider = ({ children }) => {
                     console.error('Session verification failed:', error);
                     setIsLoggedIn(false);
                     setUser(null);
+                    
                 }
             }
         })

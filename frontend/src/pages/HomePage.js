@@ -10,6 +10,7 @@ import image4 from '../images/[removal.ai]_74281a78-76c3-42db-925c-2b9637458cb3-
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Link} from "react-router-dom";
 import {useAuth} from "../components/Auth/AuthHook";
+import Search from '../layout/Search';
 
 const Home = () => {
     const [dorms, setDorms] = useState([]);
@@ -48,6 +49,7 @@ const Home = () => {
             <Header />
             <div className='homeContent'>
                 <div className='homeFirst'>
+                    <Search/>
                 </div>
                 <div className='homeMiddle'>
                     <div className='comfortsign'>
@@ -90,10 +92,10 @@ const Home = () => {
                 {(isLoggedIn? (<div className='homeLast'>
                     {(role !== 'student')?
                         <div style={{marginTop:'40px'}}>
-                            {currUser.user.profilePic? <img src={currUser.user.profilePic} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}} />:
-                                <img src={avatar} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}} />}
+                            {(currUser.user.profilePic)? <img src={currUser.user.profilePic} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}} />:(currUser.user.profilePic === undefined || currUser.user.profilePic === '')?
+                                <img src={avatar} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}} />:null}
                             <p style={{color:"white",fontWeight:"bold"}}>{currUser.user.name.toUpperCase()}</p>
-                        </div>:<div style={{marginTop:'40px'}}> {user.photoURL?<img src={user.photoURL} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}}/>:
+                        </div>:<div style={{marginTop:'40px'}}> {(user.photoURL || user.photoURL !== null)?<img src={user.photoURL} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}}/>:
                             <img src={avatar} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}}/>}
                         <p style={{color:"white",fontWeight:"bold"}}>{user.displayName.toUpperCase()}</p></div>}
                 </div>):null)}
