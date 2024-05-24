@@ -16,6 +16,7 @@ const Home = () => {
     const [dorms, setDorms] = useState([]);
     const [currUser, setCUser] = useState(JSON.parse(localStorage.getItem('currUser')) || []);
     const { isLoggedIn, user, role } = useAuth();
+    const [booking,setBooking] = useState([])
 
     useEffect(() => {
         axios.get('http://localhost:3001/dorms/show')
@@ -26,12 +27,21 @@ const Home = () => {
             .catch(error => {
                 console.error("Failed to fetch data:", error);
             });
+        axios.get('http://localhost:3001/booking/getBooking',{withCredentials:true})
+            .then(response=>{
+                if(role === 'student') {
+                    setBooking(response.data)
+                }
+            })
+            .catch(error=>{
+                console.error('Failed to fetch booking')
+            })
         if(role !== 'student') {
             axios.get('http://localhost:3001/api/profile',{withCredentials:true})
                 .then(response => {
                     // console.log(response.data)
                     setCUser(response.data)
-                    // user.photoURL = response.data.user.profilePic
+                    user.photoURL = response.data.user.profilePic
                     localStorage.setItem('currUser', JSON.stringify(response.data));
                 })
                 .catch(error => {
@@ -43,13 +53,12 @@ const Home = () => {
         }
     }, [user,role]);
 
-
     return (
         <div className='body'>
             <Header />
             <div className='homeContent'>
                 <div className='homeFirst'>
-                    <Search/>
+                    <Search setDorms={setDorms}/>
                 </div>
                 <div className='homeMiddle'>
                     <div className='comfortsign'>
@@ -92,12 +101,20 @@ const Home = () => {
                 {(isLoggedIn? (<div className='homeLast'>
                     {(role !== 'student')?
                         <div style={{marginTop:'40px'}}>
-                            {(currUser.user.profilePic)? <img src={currUser.user.profilePic} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}} />:(currUser.user.profilePic === undefined || currUser.user.profilePic === '')?
-                                <img src={avatar} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}} />:null}
+                            {currUser?.user?.profilePic ? (
+                                <img src={currUser.user.profilePic} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}} />
+                            ) : (
+                                <img src={avatar} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}} />
+                            )}
                             <p style={{color:"white",fontWeight:"bold"}}>{currUser.user.name.toUpperCase()}</p>
-                        </div>:<div style={{marginTop:'40px'}}> {(user.photoURL || user.photoURL !== null)?<img src={user.photoURL} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}}/>:
+                        </div>:<div style={{marginTop:'40px'}}>
+                            {user?.photoURL?(<img src={user.photoURL} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}}/>):
                             <img src={avatar} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}}/>}
                         <p style={{color:"white",fontWeight:"bold"}}>{user.displayName.toUpperCase()}</p></div>}
+                    <div className='bookingStatus-container'>
+                        <label htmlFor='bookingStatus'>Booking Status</label>
+                        <p id='bookingStatus' className='bookingStatus' style={booking[0]?.status == 'Booked'?{color:'green'}:{color:'#f8c200'}}>{booking.length !== 0? booking[0].status:'No booking yet'}</p>
+                    </div>
                 </div>):null)}
             </div>
         </div>

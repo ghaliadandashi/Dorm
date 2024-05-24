@@ -9,6 +9,8 @@ import Modal from "../Modal";
 import DormList from "./dormList";
 import { uploadFileToFirebase,deleteFileFromFirebase } from '../../firbase-storage';
 import Dashboard from './dashboard';
+import noImage from '../../images/1554489-200.png'
+import ProfilePicSection from "./profilePicSection";
 
 const DormOwnerProfile = () => {
     const {user, setUser} = useAuth()
@@ -22,44 +24,14 @@ const DormOwnerProfile = () => {
     const[bookings,setBookings] = useState([]);
     const [activeTab, setActiveTab] = useState('personalInfo');
     const [dorms,setDorm] =useState([])
+    const [tempID,setTempID] = useState(null);
     const [currentAction, setCurrentAction] = useState(null);
     const [currentObj,setCurrentObj] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState(null);
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [editMode, setEditMode] = useState(false);
     const d = new Date();
 
-    const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
-    };
-    
 
-    const handleChangePicture = async () => {
-        if (!selectedFile) return;
-
-        try {
-            const downloadURL = await uploadFileToFirebase(selectedFile);
-            const response = await axios.post('http://localhost:3001/api/profile/profilePic', { pictureUrl: downloadURL }, { withCredentials: true });
-            setProfile(prevProfile => ({ ...prevProfile, profilePic: response.data.pictureUrl }));
-            window.location.reload()
-        } catch (error) {
-            console.error('Failed to update picture URL in the backend:', error);
-        }
-    };
-
-    const handleDeletePicture = async () => {
-        if (!profile.profilePic) return;
-
-        try {
-            await deleteFileFromFirebase(profile.profilePic);
-            await axios.delete('http://localhost:3001/api/profile/profilePic', { withCredentials: true });
-            setProfile(prevProfile => ({ ...prevProfile, profilePic: '' }));
-            window.location.reload()
-        } catch (error) {
-            console.error('Failed to delete picture URL in the backend:', error);
-        }
-    };
 
     const handleOpenModal = (type,object) => {
         const contents = {
@@ -263,21 +235,7 @@ const DormOwnerProfile = () => {
         }
     }, [user]);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setProfile(prevProfile => ({ ...prevProfile, [name]: value }));
-    };
 
-    const handleSubmitPersonalInfo = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.put('http://localhost:3001/api/profileEdit', profile, { withCredentials: true });
-            setProfile(response.data);
-            setEditMode(false);
-        } catch (error) {
-            console.error('Failed to update profile:', error);
-        }
-    };
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
@@ -298,14 +256,20 @@ const DormOwnerProfile = () => {
             case 9:
                 return room.pricePerSemester * 2;
             case 12:
-                return (room.pricePerSemester * 2) + (room.summerPrice * 3);
+                return (room?.pricePerSemester * 2) + (room?.summerPrice * 3);
             case 4.5:
-                return room.pricePerSemester;
+                return room?.pricePerSemester;
             case 3:
-                return room.summerPrice*3;
+                return room?.summerPrice*3;
             default:
-                return room.pricePerSemester;
+                return room?.pricePerSemester;
         }
+    };
+    const handleDormClick = (id) => {
+        setTempID(null);
+        setTimeout(() => {
+            setTempID(id);
+        }, 0);
     };
 
     return (
@@ -336,55 +300,7 @@ const DormOwnerProfile = () => {
             </div>
             <div className="tab-content">
                 {activeTab === 'personalInfo' && (
-                    <div className="personalInfo">
-                    <div className="profileNav">
-                        <div className='profilePicSection'>
-                        {(profile.profilePic) ?
-                            <img src={profile.profilePic} width="150" height="150" style={{ objectFit: "cover" }} id="profilePic" alt="Profile" /> :
-                            <img src={avatar} width="150" height="150" style={{ objectFit: "cover" }} id="profilePic" alt="Profile" />}
-                        <div className="updatePicSection">
-                            <input type="file" onChange={handleFileChange} />
-                            <button onClick={handleChangePicture}>Change Picture</button>
-                            <button onClick={handleDeletePicture}>Delete Picture</button>
-                        </div>
-                        </div>
-                        <div className='editBtn'>
-                            <button onClick={() => setEditMode(true)}>Edit Info</button>
-                        </div>
-                    </div>
-                    {editMode ? (
-                        <form onSubmit={handleSubmitPersonalInfo}>
-                            <input
-                                type="text"
-                                name="name"
-                                value={profile.name}
-                                onChange={handleInputChange}
-                                placeholder="Name"
-                            />
-                            <input
-                                type="email"
-                                name="email"
-                                value={profile.email}
-                                onChange={handleInputChange}
-                                placeholder="Email"
-                            />
-                            <input
-                                type="text"
-                                name="phoneNo"
-                                value={profile.phoneNo}
-                                onChange={handleInputChange}
-                                placeholder="Phone"
-                            />
-                            <button type="submit">Save Changes</button>
-                        </form>
-                    ) : (
-                        <div>
-                            <p><strong>Name:</strong> {profile.name}</p>
-                            <p><strong>Email:</strong> {profile.email}</p>
-                            <p><strong>Phone:</strong> {profile.phoneNo}</p>
-                        </div>
-                    )}
-                </div>
+                    <ProfilePicSection/>
                 )}
                 {activeTab === 'bookings' && (
                     <div className='table-container'>
@@ -403,8 +319,8 @@ const DormOwnerProfile = () => {
                         {bookings.map((booking, index) => (
                             <tr>
                                 <td key={index}>{booking.user.name.toUpperCase()}</td>
-                                <td>{booking.dorm.dormName}</td>
-                                <td>{booking.room.roomType}</td>
+                                <td>{booking.dorm.dormName || '----'}</td>
+                                <td>{booking.room?.roomType?? '-----'}</td>
                                 <td>{booking.startDate.substring(0,booking.startDate.indexOf('T')).split('-').reverse().join('-')}</td>
                                 <td>{booking.endDate.substring(0,booking.startDate.indexOf('T')).split('-').reverse().join('-')}</td>
                                 <td>{d.getFullYear()}- {d.getFullYear()+1} {booking.semester.toUpperCase()}</td>
@@ -451,8 +367,15 @@ const DormOwnerProfile = () => {
                 )}
                 {activeTab === 'financials' && (
                     <div>
-                        {console.log(dorms[1]._id)}
-                        <Dashboard dormId={dorms[1]._id}/>
+                        <div className='dorms-container-f'>
+                            {dorms.map((dorm,index)=>(
+                                <div key={index} className='dorms-financials'>
+                                    <img src={dorm.dormPics[0] || noImage} width='100px' height='100px'/>
+                                    <p onClick={() => handleDormClick(dorm._id)}>{dorm.dormName}</p>
+                            </div>))}
+                        </div>
+                        {tempID? <Dashboard dormId={tempID}/>:<h3 style={{color:"white",fontWeight:'bold'}}>Select Dorm to view insights!</h3>}
+
                     </div>
                 )}
             </div>

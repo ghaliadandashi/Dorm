@@ -49,8 +49,9 @@ exports.getBooking=async (req,res)=>{
             const bookings = await Booking.find({
                 user:userid
             }).populate('dorm').populate('room')
+
             res.json(bookings)
-        }else{
+        }else if(role === 'dormOwner'){
             const userDorms = await Dorm.find({owner: userid})
             const dormIds = userDorms.map(dorm => dorm._id);
             // console.log("Dorm IDs:", dormIds);
@@ -60,6 +61,9 @@ exports.getBooking=async (req,res)=>{
                 // status:'Reserved'
             }).populate('user').populate('dorm').populate('room');
             res.json(bookings);
+        }else{
+            const bookings = await Booking.find({isActive:'true'})
+            res.status(200).json(bookings)
         }
 
     }catch (error){

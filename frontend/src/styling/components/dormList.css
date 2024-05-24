@@ -1,55 +1,168 @@
-.dormListContainer{
-    display:flex;
+.dormListContainer {
+    display: flex;
     flex-direction: column;
-    gap:10px;
-
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    background-color: #1f203e;
+    color: white;
+    border-radius: 10px;
 }
-.dormList{
-    display:flex;
+.cardNav{
+    display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-left:50px;
-    margin-right:50px;
-}
-.dormss{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:40px;
+    align-items: center;
+    border-bottom: 1px solid white;
 }
 
-.dorm{
-    display:flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap:10px;
-    color:black;
-    background-color:white;
-    border-radius:10px 0px 0px 10px;
-    box-shadow: 1px 2px 2px black;
+.cardNav button{
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #4a4aff;
+    align-self: center;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.dorm img{
-    border-radius:10px 0px 0px 10px
+
+.cardNav button:hover {
+    background-color: #6a6aff;
 }
 
-.middleNav{
+
+.dormList {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    gap:50px;
-    border-bottom: 1px solid white;
 }
-.middleNav h3{
-    /* margin-left: 50px;
-    margin-right: 50px; */
-}
-.addingBtns{
+
+.dormss {
     display: flex;
-    justify-content: center;
-    gap:10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid white;
+    flex-direction: column;
+    gap: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #1b1c3d;
+    padding:20px;
 }
-.addingBtns button{
-    padding:10px 10px
+.dorms{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.dormCard {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.dorm {
+    display: flex;
+    flex-direction: row;
+    color: black;
+}
+
+.dorm img {
+    border-radius: 10px 0 0 10px;
+}
+
+.dormDetails {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-left: 2px solid #2b2c48;
+    padding:10px 25px;
+    flex: 1;
+}
+
+.dormName {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #2b2c48;
+    margin: 0;
+}
+
+.occupancy {
+    color: #2b2c48;
+}
+
+.dormActions {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.dormActions button {
+    font-weight: bold;
+    align-items: center;
+    padding: 5px 10px;
+    width: 100%;
+    height: 100%;
+    background-color: #2b2c48;
+    color: white;
+    border: 1px solid #2b2c48;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dormActions button:hover {
+    background-color: #3b3c58;
+}
+
+.roomList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #1b1c3d;
+
+    padding: 20px;
+}
+
+.roomCard {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    color:black
+}
+
+.room img {
+    border-radius: 10px 0 0 10px;
+}
+
+.roomDetails {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-left:2px solid #2b2c48;
+}
+.roomActions {
+    display: flex;
+}
+
+.roomActions button {
+    font-weight: bold;
+    padding: 10px 15px;
+    background-color: #2b2c48;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.roomActions button:hover {
+    background-color: #3b3c58;
+}
+.rooms{
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
 }

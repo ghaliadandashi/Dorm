@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 
 const ChatSchema =  new mongoose.Schema({
-    participants:[{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
-    messages:[{type:String,required:'true'}],
+    sender:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
+    receiver:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
+    content:[{type:String,required:'true'}],
     timestamps:[{type:Date}]
 })
 

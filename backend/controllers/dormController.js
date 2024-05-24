@@ -1,7 +1,8 @@
 const Dorm = require('../models/Dorm');
 const User = require('../models/User');
 const Room = require('../models/Room');
-const Booking = require('../models/Booking')
+const Booking = require('../models/Booking');
+const PriceHistory = require('../models/PriceHistory');
 const { validationResult } = require('express-validator');
 
 
@@ -44,7 +45,6 @@ exports.add = async (req, res) => {
 };
 
 exports.addRoom = async (req,res)=>{
-
     try {
         const room = new Room({
             roomType: req.body.roomType,
@@ -59,9 +59,18 @@ exports.addRoom = async (req,res)=>{
             roomPics: req.body.roomPics
         })
         const savedRoom = await room.save();
+        const updatedDorm = await Dorm.findOneAndUpdate({dormName: req.body.dorm}, {$push: {rooms: savedRoom._id}})
+        const dorm = await Dorm.find({dormName:req.body.dorm})
+        const priceHistory = new PriceHistory({
+            dorm: dorm[0]._id,
+            room: savedRoom._id,
+            pricePerSemester: req.body.pricePerSemester,
+            summerPrice: req.body.summerPrice,
+            date: new Date()
+        });
+        await priceHistory.save();
 
-        const dorm = await Dorm.findOneAndUpdate({dormName: req.body.dorm}, {$push: {rooms: savedRoom._id}})
-        res.status(201).json({ message: "Room added successfully", dorm });
+        res.status(201).json({ message: "Room added successfully", updatedDorm });
     }catch (error) {
         console.error('Error adding room to dorm:', error);
         res.status(500).json({ message: "Error adding room", error });
@@ -192,3 +201,14 @@ exports.deleteRoom = async (req,res)=>{
         res.status(500).send('Error deleting Dorm')
     }
 }
+
+exports.getPriceTrends = async (req, res) => {
+    try {
+        const { dormId } = req.params;
+        const priceHistory = await PriceHistory.find({ dorm: dormId }).sort({ date: 1 });
+        res.json(priceHistory);
+    } catch (error) {
+        res.status(500).send('Server Error');
+    }
+};
+
