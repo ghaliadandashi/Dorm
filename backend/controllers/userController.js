@@ -104,7 +104,7 @@ exports.login = async (req, res) => {
         }
 
         const accessToken = jwt.sign(
-            { userId: user._id, role: user.role, status: user.status },
+            { userId: user._id, role: user.role, status: user.status, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -286,6 +286,7 @@ exports.validate = (req, res) => {
                 userId: decoded.userId,
                 role: decoded.role,
                 status: decoded.status,
+                email: decoded.email
             }
         });
     });

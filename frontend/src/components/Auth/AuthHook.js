@@ -9,6 +9,7 @@ export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [userId,setUserId]=useState('');
     const [role, setRole] = useState('');
+    const [email, setEmail] = useState('');
     const [status, setStatus] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -30,6 +31,7 @@ export const UserProvider = ({ children }) => {
                                 setUserId(response.data.user.userId)
                                 setRole(response.data.user.role)
                                 setStatus(response.data.user.status)
+                                setEmail(response.data.user.email)
                             }
                         })
                         .catch(() => {
