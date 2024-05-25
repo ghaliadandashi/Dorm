@@ -10,11 +10,20 @@ const cron = require('node-cron');
 const userRoutes = require('./routes/UserRoutes')
 const dormRoutes = require('./routes/DormRoutes')
 const bookingRoutes = require('./routes/BookingRoutes')
+const chatRoutes = require('./routes/ChatRoutes')
+
 const reviewRoutes = require('./routes/ReviewRoutes')
 const User = require("./models/User");
 const Room = require("./models/Room");
 const Dorm = require("./models/Dorm");
 const Booking = require('./models/Booking')
+const Chat = require('./models/Chat');
+
+const http = require('http');
+
+
+const server = http.createServer(app);
+
 const getSemesterStartDate = require('../backend/middleware/calenderIntegration');
 
 const corsOptions = {
@@ -44,6 +53,8 @@ app.use('/api', userRoutes);
 app.use('/dorms',dormRoutes);
 app.use('/booking',bookingRoutes);
 app.use('/reviews',reviewRoutes);
+
+
 
 mongoose.connect(process.env.DB_URI)
     .then(()=>console.log("DATABASE CONNECTED <3"))
@@ -99,7 +110,91 @@ mongoose.connect(process.env.DB_URI)
 //     }
 // };
 
+
+// Socket.IO setup
+// io.on('connection', (socket) => {
+//     console.log('a user connected');
+  
+//     socket.on('chat message', async (msg) => {
+//       const chat = new Chat({ content: msg, user: 'SULAIMON INOMOV' }); // Adjust to include actual user data
+//       await chat.save();
+//       io.emit('chat message', msg);
+//     });
+  
+//     socket.on('disconnect', () => {
+//       console.log('user disconnected');
+//     });
+//   });
+  
+  // Seed database with initial messages
+const seedDatabase = async () => {
+    try {
+      const initialMessages = [
+        { content: 'Welcome to the chat!', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
+        { content: 'Feel free to start a conversation.', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
+      ];
+  
+      await Chat.insertMany(initialMessages);
+      console.log('Database seeded with initial messages');
+    } catch (error) {
+      console.error('Error seeding database:', error);
+    }
+  };
+
 // seedDatabase();
+
+// app.use(bodyParser.json());
+
+
+// chat endpoints.
+// TODo: migrate the code to its own directory 
+app.get('/api/getMessages', async (req, res) => {
+  console.log("get messages: Called")
+  const { userId, otherUserId } = req.query;
+  try {
+    const messages = await Chat.find({
+      $or: [
+        { sender: userId, receiver: otherUserId },
+        { sender: otherUserId, receiver: userId },
+      ],
+    }).sort({ timestamp: 1 });
+    res.json({ messages });
+  } catch (error) {
+    res.status(500).send('Error fetching messages');
+  }
+});
+
+// Post a new message
+app.post('/chat', async (req, res) => {
+  console.log("chat: Called")
+
+  const { content, sender, receiver } = req.body;
+  try {
+    const newMessage = new Chat({ content, sender, receiver });
+    await newMessage.save();
+    res.status(201).send('Message saved');
+  } catch (error) {
+    res.status(500).send('Error saving message');
+  }
+});
+
+// Express route to fetch chat messages
+app.get('/api/getChat', async (req, res) => {
+  console.log("getChat: Called")
+
+  const { sender, receiver } = req.query;
+  try {
+      const messages = await Chat.find({ $or: [
+        { sender: sender, receiver: receiver },
+        { sender: receiver, receiver: sender },
+      ],
+    }).sort({ timestamp: 1 });
+      res.json(messages);
+  } catch (error) {
+      console.error('Error fetching chat messages:', error);
+      res.status(500).json({ error: 'Failed to fetch chat messages' });
+  }
+});
 
 
 
