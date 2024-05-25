@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import './Chat.css';
 import { useAuth } from '../Auth/AuthHook';
-
+import avatar from '../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp'
+import axios from "axios";
 const Chat = () => {
   const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [activeUser, setActiveUser] = useState(null);
+  const [activeUser, setActiveUser] = useState(user);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/getUsers');
-        if (response.ok) {
-          const data = await response.json();
-          setUsers(data);
-          setActiveUser(data[0]);
-        } else {
-          throw new Error('Failed to fetch users');
-        }
+        const response = await axios.get('http://localhost:3001/api/getUsers');
+        setUsers(response.data)
       } catch (error) {
         console.error(error);
       }
@@ -27,18 +22,13 @@ const Chat = () => {
 
     fetchUsers();
   }, []);
-
+console.log(users)
   useEffect(() => {
     const fetchMessages = async () => {
       if (activeUser) {
         try {
-          const response = await fetch(`http://localhost:3001/api/getChat?sender=${user.email}&receiver=${activeUser.email}`);
-          if (response.ok) {
-            const data = await response.json();
-            setMessages(data);
-          } else {
-            throw new Error('Failed to fetch chat messages');
-          }
+          const response = await axios.get(`http://localhost:3001/chat/getChat/${user.email}/${activeUser.email}`);
+          setMessages(response.data)
         } catch (error) {
           console.error(error);
         }
@@ -58,16 +48,7 @@ const Chat = () => {
       };
 
       try {
-        const response = await fetch('http://localhost:3001/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newMessage),
-        });
-        if (!response.ok) {
-          throw new Error('Error saving chat message');
-        }
+        const response = await axios.post('http://localhost:3001/chat/chat', newMessage,{withCredentials:true})
 
         // Add the new message to the current state
         const messageWithTimestamp = {
@@ -91,13 +72,15 @@ const Chat = () => {
     return `${hours}:${minutes.toString().padStart(2, '0')} ${amOrPm}`;
   };
 
+
   return (
     <div className="chat-container">
       <div className="user-list">
         <ul>
           {users.map((user) => (
             <li key={user.id} onClick={() => setActiveUser(user)}>
-              {user.name}
+              <img src={user?.profilePic || user?.photoURL || avatar} width='50' height='50' style={{objectFit:'cover',borderRadius:'10px'}}/> {user.name.toUpperCase()}
+
             </li>
           ))}
         </ul>
@@ -115,11 +98,11 @@ const Chat = () => {
           ))}
         </ul>
         <form id="form" onSubmit={handleSubmit}>
-          <input 
-            id="input" 
-            autoComplete="off" 
-            value={input} 
-            onChange={(e) => setInput(e.target.value)} 
+          <input
+            id="input"
+            autoComplete="off"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
           />
           <button type="submit">Send</button>
         </form>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Chat from '../components/Chat/Chat';
+import Header from "../layout/Header";
 
 const ChatPage = () => {
   const [users, setUsers] = useState([]);
@@ -25,8 +26,8 @@ const ChatPage = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Welcome to the Chat</h1>
+    <div className='chatPage'>
+      <Header/>
       {users.length > 0 && (
         <Chat
           user={users[0]} // Assume the first user in the list is the logged-in user
