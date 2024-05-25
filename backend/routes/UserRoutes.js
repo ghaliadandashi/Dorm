@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { register, login, validate, user, logout,profile,getDorm, changeProfilePic ,deleteProfilePic,profileEdit, getInsights, search, getUsers} = require('../controllers/userController');
+const { register, login, validate, user, logout,profile,getDorm, changeProfilePic ,deleteProfilePic,profileEdit, getInsights, search, getUsers,
+    getLogins
+} = require('../controllers/userController');
 const upload = multer({ storage: multer.memoryStorage() });
 const authenticateToken = require('../middleware/auth')
 const checkRole = require("../middleware/auth");
@@ -25,4 +27,5 @@ router.get('/insights/:dormId',getInsights)
 router.get('/search',search)
 router.get('/getUsers', getUsers)
 
+router.get('/getLogins',getLogins)
 module.exports = router;

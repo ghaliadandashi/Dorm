@@ -53,7 +53,8 @@ exports.register = async (req, res) => {
             role: 'dormOwner',
             status: 'Pending',
             personalFiles: personalFile,
-            ownershipFiles: ownershipFile
+            ownershipFiles: ownershipFile,
+            profilePic:''
         });
 
         const savedUser = await newUser.save();
@@ -284,7 +285,7 @@ exports.validate = (req, res) => {
             user: {
                 userId: decoded.userId,
                 role: decoded.role,
-                status: decoded.status
+                status: decoded.status,
             }
         });
     });
@@ -303,7 +304,8 @@ exports.profile = async (req, res) => {
                 email: owner.email,
                 dob: owner.dob,
                 phoneNo: owner.phoneNo,
-                profilePic:owner.profilePic
+                profilePic:owner.profilePic,
+                role:owner.role
             }
         });
     } catch (error) {
@@ -395,18 +397,20 @@ exports.getInsights= async (req, res) => {
 
         
         const bookings = await Booking.find({ dorm: dormId, status: 'Booked' }).populate('room');
+        console.log(bookings)
         const totalRevenue = bookings.reduce((sum, booking) => {
             const stayDuration = booking.stayDuration;
             const room = booking.room;
             const semesterRevenue = room.pricePerSemester;
-        
-            const additionalRevenue = 
+
+            const additionalRevenue =
                 (stayDuration === 4.5) ? 0 :
-                (stayDuration === 9) ? semesterRevenue :
-                (stayDuration === 12) ? semesterRevenue + room.summerPrice * 3 :
-                (stayDuration === 3) ? room.summerPrice * 3 : 0;
-        
-            return sum + (stayDuration !== 3)?semesterRevenue:0 + additionalRevenue;
+                    (stayDuration === 9) ? semesterRevenue :
+                        (stayDuration === 12) ? semesterRevenue + room.summerPrice * 3 : 0;
+
+            const totalRoomRevenue = (stayDuration === 3) ? room.summerPrice * 3 : semesterRevenue + additionalRevenue;
+
+            return sum + totalRoomRevenue;
         }, 0);
 
         const reviews = await Review.find({ dorm: dormId }).populate('student');
@@ -424,19 +428,58 @@ exports.getInsights= async (req, res) => {
 
 exports.search=  async (req, res) => {
     try {
-        const { location, minPrice, maxPrice, services } = req.query;
+        const { dormName, service, type, roomType, minPrice, maxPrice, minSpace, maxSpace, viewType } = req.query;
+        let query = {};
 
-        const query = {
-            ...(location && { location }),
-            ...(minPrice && { 'rooms.pricePerSemester': { $gte: minPrice } }),
-            ...(maxPrice && { 'rooms.pricePerSemester': { $lte: maxPrice } }),
-            ...(services && { services: { $all: services.split(',') } })
-        };
+        if (dormName) {
+            query['dormName'] = { $regex: dormName, $options: 'i' };
+        }
+        if (service) {
+            query['services'] = { $in: [service] };
+        }
+        if (type) {
+            query['type'] = type;
+        }
+
+        // let roomQuery = {};
+        // if (roomType) {
+        //     roomQuery['roomType'] = roomType;
+        // }
+        // if (minPrice) {
+        //     roomQuery['pricePerSemester'] = { $gte: Number(minPrice) };
+        // }
+        // if (maxPrice) {
+        //     roomQuery['pricePerSemester'] = { ...roomQuery['pricePerSemester'], $lte: Number(maxPrice) };
+        // }
+        // if (minSpace) {
+        //     roomQuery['space'] = { $gte: Number(minSpace) };
+        // }
+        // if (maxSpace) {
+        //     roomQuery['space'] = { ...roomQuery['space'], $lte: Number(maxSpace) };
+        // }
+        // if (viewType) {
+        //     roomQuery['viewType'] = viewType;
+        // }
+        //
+        // if (Object.keys(roomQuery).length > 0) {
+        //     query['rooms'] = { $elemMatch: roomQuery };
+        // }
 
         const dorms = await Dorm.find(query).populate('rooms');
+        console.log(dorms)
         res.json(dorms);
     } catch (error) {
         console.error('Error searching dormitories:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).send('Server error');
     }
 };
+
+exports.getLogins = async (req,res)=>{
+    try{
+        const users = await User.find({status:'Pending'})
+        res.status(200).json(users)
+    }catch (error){
+        console.error('Error getting users:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}

@@ -66,11 +66,6 @@ const Navbar = () => {
                             <li className="nav-item">
                                 <Link to='/profile' className="nav-link">{icon}</Link>
                             </li>
-                            {(role === 'admin')?(
-                                <li className="nav-item">
-                                    <Link to='/loginreq' className="nav-link">Login Requests</Link>
-                                </li>
-                            ):null}
                             <li className="nav-item">
                                 <Link to='/settings' className="nav-link"><FontAwesomeIcon icon={faCog}/></Link>
                             </li>

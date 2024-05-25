@@ -64,7 +64,7 @@ const Dashboard = ({ dormId }) => {
 
     return (
         <div className="dashboard">
-            <h1>Dormitory Dashboard</h1>
+            {/*<h1>Dormitory Dashboard</h1>*/}
             <div className="insights">
                 <div className="insight">
                     <h2>Occupancy Rate</h2>

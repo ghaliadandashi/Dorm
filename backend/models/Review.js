@@ -4,7 +4,7 @@ const ReviewSchema = new mongoose.Schema({
     dorm: {type:mongoose.Schema.Types.ObjectId,ref:'Dorm'},
     student:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
     rating:{type:Number},
-    comment:{type:String,required:'true'},
+    comment:{type:String,required:true},
     timestamps:[{type: Date, default: Date.now}]
 })
 

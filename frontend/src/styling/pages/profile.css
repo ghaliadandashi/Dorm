@@ -13,6 +13,7 @@
     padding:20px;
 }
 
+
 .tabs button {
     padding: 10px 20px;
     color: white;
@@ -30,46 +31,208 @@
     background-color: #3a3a52;
     border-bottom: 2px solid #46418d;
 }
+.tabs button:hover{
+    background-color: #46418d;
+}
 .tab-content{
     background-color: #1f203e;
     width: 100vw;
     /*border:1px solid white*/
 }
 
-.tab-content .personalInfo {
+.personalInfo {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     background-color: #1f203e;
-    gap:20px;
-    color:white;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    gap: 20px;
     margin-top: 40px;
-    margin-left:100px;
-}
-.tab-content .profile{
-    display: flex;
-    flex-direction: row;
-    gap:20px;
-    align-items: center;
+    margin-left:50px;
+    margin-right: 50px;
 }
 
-.profileNav .updatePicSection{
-    display:flex;
+.profileNav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.profilePicSection {
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-left:30px;
+    flex:1;
+}
+
+.profilePicSection img {
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.updatePicSection {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.custom-file-upload {
+    padding: 10px 20px;
+    border-radius: 15px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: medium;
+    background-color: #6565a5;
+    cursor: pointer;
+    box-shadow: #2b2c48 2px 2px 1px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-file-upload:hover {
+    background-color: #575795;
+}
+
+.custom-file-upload input[type="file"] {
+    display: none;
+}
+
+.updatePicSection button {
+    padding: 10px 20px;
+    border-radius: 15px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: medium;
+    background-color: #f44336;
+    cursor: pointer;
+    box-shadow: #2b2c48 2px 2px 1px;
+    transition: background-color 0.3s ease;
+}
+
+.updatePicSection button:hover {
+    background-color: #e53935;
+}
+
+.editBtn {
+    display: flex;
     justify-content: center;
+    align-self: flex-start;
+}
+
+.editBtn button {
+    padding: 10px 20px;
+    border-radius: 15px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: medium;
+    background-color: #4caf50;
+    cursor: pointer;
+    box-shadow: #2b2c48 2px 2px 1px;
+    transition: background-color 0.3s ease;
+}
+
+.editBtn button:hover {
+    background-color: #45a049;
+}
+
+.personalInfo form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width:80%;
+    align-self: center;
+}
+
+.personalInfo form input {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    background-color: #2d2e44;
+    color: white;
+    font-size: medium;
+}
+
+.personalInfo form button[type="submit"] {
+    padding: 10px 20px;
+    border-radius: 15px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: medium;
+    background-color: #4caf50;
+    cursor: pointer;
+    box-shadow: #2b2c48 2px 2px 1px;
+    transition: background-color 0.3s ease;
+}
+
+.personalInfo form button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.personalInfo form button {
+    width: 100%;
+    padding: 10px 20px;
+    border-radius: 15px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: medium;
+    background-color: #f44336;
+    cursor: pointer;
+    box-shadow: #2b2c48 2px 2px 1px;
+    transition: background-color 0.3s ease;
+    align-self: center;
+}
+
+.personalInfo form button:hover {
+    background-color: #e53935;
+}
+
+.personalInfo form button[type="button"] {
+    background-color: #f44336;
+}
+
+.personalInfo form button[type="button"]:hover {
+    background-color: #e53935;
+}
+
+.profile-info {
+    text-align: left;
+    margin-top: 20px;
+    background-color: #2d2e44;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width:80%;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
     gap:10px;
 }
 
-.profileNav .updatePicSection button{
-    padding:8px 5px;
-    border-radius:15px;
-    border:none;
-    color:white;
-    font-weight: bold;
-    font-size:medium;
-    background-color:#6565a5;
-    cursor: pointer;
-    box-shadow: #2b2c48 2px 2px 1px;
+.profile-info p {
+    margin: 10px 0;
+    font-size: 1.2rem;
+    color: #e0e0e0;
+    border:2px solid white;
+    padding:15px;
+    z-index: 1;
+}
+
+.profile-info p strong {
+    color: #9696e7;
+    position: relative;
+    top:-30px;
+    z-index: 0;
+    background-color:#2d2e44 ;
 }
 
 .tab-content ul {
@@ -129,4 +292,33 @@
 
 .properties li{
     border-bottom: none;
+}
+.dorms-container-f {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.dorms-financials {
+    cursor: pointer;
+    text-align: center;
+    border: 2px solid #ddd;
+    color: white;
+    background-color: #2b2c43;
+    padding: 10px;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+}
+
+.dorms-financials:hover {
+    background-color: #f0f0f0;
+    color:black;
+    font-weight: bold;
+}
+
+.dorms-financials img{
+    border-radius: 10px;
+    border:2px solid black;
 }

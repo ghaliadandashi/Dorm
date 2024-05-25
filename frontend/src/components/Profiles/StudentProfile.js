@@ -5,6 +5,7 @@ import  '../../styling/pages/profile.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import avatar from '../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp'
+import ProfilePicSection from "./profilePicSection";
 const StudentProfile = () =>{
     const [profile,setProfile] = useState({
         name:'',
@@ -33,7 +34,6 @@ const StudentProfile = () =>{
             axios.get('http://localhost:3001/booking/getBooking',{withCredentials:true})
                 .then(response=>{
                     setBookings(response.data);
-                    console.log(response.data)
                 }).catch(error=>{
                 console.error('Failed to get Bookings: ',error)
             })
@@ -90,18 +90,7 @@ const StudentProfile = () =>{
                 </div>
                 <div className="tab-content">
                     {activeTab === 'personalInfo' && (
-                        <div className='personalInfo'>
-                            <div className='profilePicSection'>
-                                {profile.profilePic?
-                                    <img src={profile.profilePic} width='150' height='150' style={{objectFit:"cover",borderRadius:'55px'}} id='profilePic'/>:
-                                    <img src={avatar} width='150' height='150' style={{objectFit:"cover",borderRadius:'55px'}} id='profilePic'/>}
-                                <button>Change Picture</button>
-                                <button>Delete Picture</button>
-                            </div>
-                            <p><strong>Name:</strong> {profile.name}</p>
-                            <p><strong>Email:</strong> {profile.email}</p>
-                            <p><strong>Phone:</strong> {profile.phone}</p>
-                        </div>
+                        <ProfilePicSection/>
                     )}
                     {activeTab === 'bookings' && (
                         <div style={{display:"grid",gridTemplateColumns:'1fr 1fr',gap:'40px',margin:'40px 40px 0px 40px'}}>
@@ -147,11 +136,15 @@ const StudentProfile = () =>{
                                                 <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{getPrice(booking)}</p>
                                             </div>
                                             <div style={{ display: 'flex',flexDirection:"column", alignItems:"flex-start"}}>
-                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Booking Date: </span>
-                                                <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{booking.bookingDate.substring(0, booking.bookingDate.indexOf('T')).split('-').reverse().join('-')}</p>
+                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Start Date: </span>
+                                                <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{booking.startDate.substring(0, booking.bookingDate.indexOf('T')).split('-').reverse().join('-')}</p>
+                                            </div>
+                                            <div style={{ display: 'flex',flexDirection:"column", alignItems:"flex-start"}}>
+                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Start Date: </span>
+                                                <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{booking.endDate.substring(0, booking.bookingDate.indexOf('T')).split('-').reverse().join('-')}</p>
                                             </div>
                                         </div>
-                                        <FontAwesomeIcon onClick={handleCancellation} style={{color:"darkred",padding:'0px 10px',fontSize:'35px',alignSelf:"flex-end",backgroundColor:"white",borderRadius:'50px',cursor:"pointer"}} icon={faTimes}/>
+                                        {booking.status !== 'Booked'?<FontAwesomeIcon onClick={handleCancellation} style={{color:"darkred",padding:'0px 10px',fontSize:'35px',alignSelf:"flex-end",backgroundColor:"white",borderRadius:'50px',cursor:"pointer"}} icon={faTimes}/>:null}
                                     </div>
                                 </div>
 

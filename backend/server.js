@@ -12,6 +12,7 @@ const dormRoutes = require('./routes/DormRoutes')
 const bookingRoutes = require('./routes/BookingRoutes')
 const chatRoutes = require('./routes/ChatRoutes')
 
+const reviewRoutes = require('./routes/ReviewRoutes')
 const User = require("./models/User");
 const Room = require("./models/Room");
 const Dorm = require("./models/Dorm");
@@ -50,14 +51,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/api', userRoutes);
 app.use('/dorms',dormRoutes);
-app.use('/booking',bookingRoutes)
+app.use('/booking',bookingRoutes);
+app.use('/reviews',reviewRoutes);
 app.use('/chat',chatRoutes)
 
 
 
 mongoose.connect(process.env.DB_URI)
     .then(()=>console.log("DATABASE CONNECTED <3"))
-    .catch(err => console.log(err))
+    .catch(err => console.error('MongoDB connection error:', err));
 
 //UNCOMMENT THIS TO ADD USER, DORM, AND ROOMS
 
