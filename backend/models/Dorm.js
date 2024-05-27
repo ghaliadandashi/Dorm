@@ -9,7 +9,9 @@ const dormSchema = new mongoose.Schema({
     occupancy:{type:Number},
     location:{type:String,required:true},
     type:{type:String,enum:['on-campus','off-campus']},
-    dormPics:[{type:String}]
+    dormPics:[{type:String}],
+    ownershipFiles:[{type:String}],
+    isActive:{type:Boolean,required:true}
 })
 
 const Dorm = mongoose.model('Dorm', dormSchema);

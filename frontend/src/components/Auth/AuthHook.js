@@ -17,8 +17,14 @@ export const UserProvider = ({ children }) => {
         const unsubscribe = onAuthStateChanged(getAuth(), user => {
             if(user){
                 setIsLoggedIn(true)
-                setUser(user)
-                setRole('student');
+                try{
+                    axios.get(`http://localhost:3001/api/getStudentUser/${user.uid}`,{withCredentials:true})
+                        .then(response=> {
+                            setUser(response.data)
+                            setRole('student')
+                        })
+                }catch(error){console.error(error)}
+
             }else{
                 setIsLoggedIn(false)
                 try{

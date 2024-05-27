@@ -30,8 +30,10 @@ const DormList = ({ handleModalOpen }) => {
             <div className='dormList'>
                 <div className='dormss'>
                     <div className='cardNav'>
+                        <div style={{display:"flex",flexDirection:'column',alignItems:'flex-start'}}>
                         <h2>Dorms</h2>
-                        <h6>Click dorm name to view rooms.</h6>
+                        <h6 style={{marginTop:'-10px'}}>Click dorm name to view rooms.</h6>
+                        </div>
                         <button onClick={() => handleModalOpen('dorm')}>
                             <FontAwesomeIcon icon={faPlus} /> <FontAwesomeIcon icon={faHouse}/> Add Dorm
                         </button>

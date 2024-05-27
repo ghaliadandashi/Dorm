@@ -2,8 +2,9 @@ import { initializeApp } from 'firebase/app';
 import {getAuth, signInWithRedirect, OAuthProvider, getRedirectResult} from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {useNavigate} from "react-router-dom";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
 import axios from "axios";
+import LoadingPage from "./pages/LoadingPage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDaFEUXYBDVw6V2cn6Wsq7kKyJf3MurorA",
@@ -38,7 +39,6 @@ export const RedirectHandler = () => {
                     name: displayName,
                 },{withCredentials:true})
                     .then(response => {
-                        console.log('User saved to database:', response.data);
                         navigate('/home');
                     })
                     .catch(error => {

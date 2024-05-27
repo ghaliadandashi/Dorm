@@ -55,3 +55,35 @@ exports.deleteReview = async(req,res) =>{
         res.status(500).json({ message: 'Failed to get reviews', error });
     }
 }
+
+exports.respondToReview = async (req, res) => {
+    try {
+        const {reviewId} = req.params;
+        const {response} = req.body;
+
+        const review = await Review.findById(reviewId);
+        if (!review) {
+            return res.status(404).json({message: 'Review not found'});
+        }
+
+        review.response = response;
+        await review.save();
+
+        res.json({message: 'Response submitted successfully'});
+    } catch (error) {
+        console.error('Error responding to review:', error);
+        res.status(500).send('Server error');
+    }
+};
+
+
+exports.deleteResponse = async (req,res)=>{
+    try{
+        const review = await Review.findById(req.params.reviewID)
+        review.response = ''
+        review.save()
+    }catch (error) {
+        console.error('Error deleting response:', error);
+        res.status(500).send('Server error');
+    }
+}

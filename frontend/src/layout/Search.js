@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../styling/components/Search.css';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+const servicesList = ['wifi', 'market', 'laundry', 'gym','sharedKitchen','resturant','studyRoom','cleaning','security','elevator'];
 
 const Search = ({ setDorms }) => {
-    const [service, setService] = useState('');
+    const [selectedServices, setSelectedServices] = useState([]);
     const [type, setType] = useState('');
     const [roomType, setRoomType] = useState('');
     const [minPrice, setMinPrice] = useState('');
@@ -11,12 +14,20 @@ const Search = ({ setDorms }) => {
     const [minSpace, setMinSpace] = useState('');
     const [maxSpace, setMaxSpace] = useState('');
     const [viewType, setViewType] = useState('');
+    const [showServices, setShowServices] = useState(false);
+    const handleServiceChange = (service) => {
+        setSelectedServices(prevState =>
+            prevState.includes(service)
+                ? prevState.filter(s => s !== service)
+                : [...prevState, service]
+        );
+    };
 
     const handleSearch = async () => {
         try {
             const response = await axios.get('http://localhost:3001/api/search', {
                 params: {
-                    service,
+                    service: selectedServices.join(','),
                     type,
                     roomType,
                     minPrice,
@@ -35,12 +46,6 @@ const Search = ({ setDorms }) => {
     return (
         <div className="search">
             <div className="search-filters">
-                <input
-                    type="text"
-                    placeholder="Service"
-                    value={service}
-                    onChange={(e) => setService(e.target.value)}
-                />
                 <select value={type} onChange={(e) => setType(e.target.value)}>
                     <option value="">Type</option>
                     <option value="on-campus">On-campus</option>
@@ -66,6 +71,23 @@ const Search = ({ setDorms }) => {
                         onChange={(e) => setMaxPrice(e.target.value)}
                     />
                 </div>
+                <div className="services-toggle" onClick={() => setShowServices(!showServices)}>
+                    Services <FontAwesomeIcon icon={faChevronDown}/>
+                </div>
+                {showServices && (
+                    <div className="services">
+                        {servicesList.map(service => (
+                            <label key={service}>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedServices.includes(service)}
+                                    onChange={() => handleServiceChange(service)}
+                                />
+                                {service}
+                            </label>
+                        ))}
+                    </div>
+                )}
                 <input
                     type="number"
                     placeholder="Min Space (m sq)"
@@ -82,6 +104,7 @@ const Search = ({ setDorms }) => {
                     placeholder="View Type"
                     value={viewType}
                     onChange={(e) => setViewType(e.target.value)}>
+                    <option value="">View Type</option>
                     <option value='CityView'>City View</option>
                     <option value='StreetView'>Street View</option>
                     <option value='SeaView'>Sea View</option>

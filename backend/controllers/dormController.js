@@ -11,11 +11,13 @@ exports.add = async (req, res) => {
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const { dormName, owner, services, capacity, type } = req.body;
+    const { dormName, services, capacity, type } = req.body;
 
     try {
         // Check if dorm with the same name already exists
         const existingDorm = await Dorm.findOne({ dormName });
+
+
         if (existingDorm) {
             return res.status(409).send('Dorm already exists.');
         }
@@ -28,11 +30,16 @@ exports.add = async (req, res) => {
             capacity,
             location: `${req.body.streetName} ${req.body.city}`,
             type: type.toLowerCase(),
-            dormPics:req.body.dormPics
+            dormPics:req.body.dormPics,
+            ownershipFiles:req.body.ownershipFiles,
+            isActive:false
         });
-
         // Save dorm to db
         const savedDorm = await dorm.save();
+
+        const owner = await User.findById(req.user.userId);
+        owner.ownershipFiles = owner.ownershipFiles.concat(req.body.ownershipFiles);
+        await owner.save();
 
         res.status(201).json({
             message: "Dorm added successfully",
@@ -79,7 +86,7 @@ exports.addRoom = async (req,res)=>{
 
 exports.show= async (req,res)=>{
     try{
-        const dorms = await Dorm.find({}).populate('owner')
+        const dorms = await Dorm.find({isActive:'true'}).populate('owner')
         res.status(200).json(dorms)
     }catch(error){
         console.error('Failed to retrieve dorms:', error);
@@ -212,3 +219,30 @@ exports.getPriceTrends = async (req, res) => {
     }
 };
 
+exports.getDormRequests = async (req,res)=>{
+    try{
+         const dorms = await Dorm.find({isActive:false}).populate('owner')
+         res.status(200).json(dorms)
+    }catch (error){
+        console.error('Failed to delete Room',error)
+        res.status(500).send('Error retrieving Dorms')
+    }
+}
+
+exports.acceptDorm = async (req,res)=>{
+    try{
+        const dorm = await Dorm.findByIdAndUpdate(req.params.dormID,{isActive:true})
+    }catch (error){
+        console.error('Failed to delete Room',error)
+        res.status(500).send('Error accepting Dorm')
+    }
+}
+
+exports.rejectDorm = async (req,res)=>{
+    try{
+        const dorm = await Dorm.findByIdAndUpdate(req.params.dormID,{isActive:null})
+    }catch (error){
+        console.error('Failed to delete Room',error)
+        res.status(500).send('Error accepting Dorm')
+    }
+}

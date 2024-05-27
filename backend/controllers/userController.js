@@ -9,6 +9,7 @@ const Booking = require('../models/Booking')
 const Review = require('../models/Review')
 
 const serviceAccount = require('../dorm-2aa81-firebase-adminsdk-88ye5-597ead691c.json');
+const mongoose = require("mongoose");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     storageBucket: 'https://console.firebase.google.com/u/0/project/dorm-2aa81/storage/dorm-2aa81.appspot.com'
@@ -66,7 +67,9 @@ exports.register = async (req, res) => {
             capacity: req.body.capacity,
             location: `${req.body.streetName} ${req.body.cityName}`,
             type: req.body.dormType.toLowerCase(),
-            dormPics: dormPics
+            dormPics: dormPics,
+            isActive:true,
+            ownershipFiles:ownershipFile
         });
 
         await dorm.save();
@@ -193,7 +196,17 @@ exports.logout = async (req, res) => {
     }
 };
 
-
+exports.getStudentUser = async (req,res)=>{
+    try{
+        const user = await User.find({microsoftID:req.params.sID})
+        if(user){
+            res.status(200).json(user)
+        }else{
+            res.status(400).json({message:'User doesnt exist!'})
+        }
+    }catch (err){console.error('Database error:', err);
+        res.status(500).send(err);}
+}
 
 exports.user = async(req,res)=>{
     const { uid, email, name } = req.body;
@@ -386,40 +399,44 @@ exports.getInsights= async (req, res) => {
     try {
         const dormId = req.params.dormId;
 
-       
+
         const dorm = await Dorm.findById(dormId).populate('rooms');
         if (!dorm) {
             return res.status(404).json({ message: 'Dormitory not found' });
         }
 
-        
-        const totalOccupancy = await Booking.countDocuments({ dorm: dormId, status: { $in: ['Reserved', 'Booked'] } });
+
+        const totalOccupancy = await Booking.countDocuments({ dorm: dormId, status: { $in: 'Booked' } });
         const occupancyRate = (totalOccupancy / dorm.capacity) * 100;
 
-        
+
         const bookings = await Booking.find({ dorm: dormId, status: 'Booked' }).populate('room');
-        console.log(bookings)
         const totalRevenue = bookings.reduce((sum, booking) => {
             const stayDuration = booking.stayDuration;
             const room = booking.room;
             const semesterRevenue = room.pricePerSemester;
+            const extraFee = room.extraFee;
 
             const additionalRevenue =
                 (stayDuration === 4.5) ? 0 :
                     (stayDuration === 9) ? semesterRevenue :
                         (stayDuration === 12) ? semesterRevenue + room.summerPrice * 3 : 0;
 
-            const totalRoomRevenue = (stayDuration === 3) ? room.summerPrice * 3 : semesterRevenue + additionalRevenue;
+            const totalRoomRevenue = (stayDuration === 3) ? room.summerPrice * 3 : semesterRevenue + additionalRevenue +extraFee;
 
             return sum + totalRoomRevenue;
         }, 0);
 
         const reviews = await Review.find({ dorm: dormId }).populate('student');
+        const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+        const numReviews = reviews.length;
 
         res.json({
             occupancyRate,
             totalRevenue,
-            reviews
+            reviews,
+            averageRating: averageRating.toFixed(2),
+            numReviews
         });
     } catch (error) {
         console.error('Error fetching insights:', error);
@@ -427,47 +444,237 @@ exports.getInsights= async (req, res) => {
     }
 };
 
+exports.getOccupancyData = async (req, res) => {
+    try {
+        const { dormId } = req.params;
+        const { granularity } = req.query;
+
+        if (!mongoose.Types.ObjectId.isValid(dormId)) {
+            return res.status(400).send('Invalid dorm ID');
+        }
+
+        // Check if the dorm exists
+        const dorm = await Dorm.findById(dormId);
+
+        let groupBy;
+        let sortBy;
+        switch (granularity) {
+            case 'day':
+                groupBy = {
+                    day: { $dayOfMonth: '$bookingDate' },
+                    month: { $month: '$bookingDate' },
+                    year: { $year: '$bookingDate' }
+                };
+                sortBy = { '_id.year': 1, '_id.month': 1, '_id.day': 1 };
+                break;
+            case 'year':
+                groupBy = { year: { $year: '$bookingDate' } };
+                sortBy = { '_id.year': 1 };
+                break;
+            case 'month':
+            default:
+                groupBy = {
+                    month: { $month: '$bookingDate' },
+                    year: { $year: '$bookingDate' }
+                };
+                sortBy = { '_id.year': 1, '_id.month': 1 };
+                break;
+        }
+
+        const occupancyData = await Booking.aggregate([
+            { $match: { dorm: new mongoose.Types.ObjectId(dormId) } },
+            { $addFields: groupBy },
+            {
+                $group: {
+                    _id: groupBy,
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: sortBy
+            }
+        ]);
+
+        const formattedData = occupancyData.map(data => {
+            let date;
+            if (granularity === 'day') {
+                date = `${data._id.year}-${String(data._id.month).padStart(2, '0')}-${String(data._id.day).padStart(2, '0')}`;
+            } else if (granularity === 'year') {
+                date = `${data._id.year}-01-01`;
+            } else {
+                date = `${data._id.year}-${String(data._id.month).padStart(2, '0')}-01`;
+            }
+            return {
+                date,
+                rate: (data.count / dorm.capacity) * 100
+            };
+        });
+
+        res.json(formattedData);
+    } catch (error) {
+        console.error('Error fetching occupancy data:', error);
+        res.status(500).send('Server error');
+    }
+};
+
+
+
+
+exports.getRevenueData = async (req, res) => {
+    try {
+        const { dormId } = req.params;
+        const { granularity } = req.query;
+
+        if (!mongoose.Types.ObjectId.isValid(dormId)) {
+            return res.status(400).send('Invalid dorm ID');
+        }
+
+        // Retrieve bookings and calculate revenue for each booking
+        const bookings = await Booking.find({ dorm: new mongoose.Types.ObjectId(dormId), status: 'Booked' }).populate('room');
+
+        const bookingRevenues = bookings.map(booking => {
+            const pricePerSemester = booking.room.pricePerSemester;
+            const summerPrice = booking.room.summerPrice;
+            const stayDuration = booking.stayDuration;
+            const extraFee = booking.extraFee || 0;
+            let revenue = 0;
+
+            if (stayDuration === 4.5 || stayDuration === 9) {
+                revenue = pricePerSemester * (stayDuration / 4.5) + extraFee;
+            } else if (stayDuration === 12) {
+                revenue = pricePerSemester * 2 + (summerPrice * 3) + extraFee;
+            } else {
+                revenue = summerPrice * 3 + extraFee;
+            }
+
+            return {
+                bookingDate: booking.bookingDate,
+                revenue
+            };
+        });
+
+        let groupBy;
+        let sortBy;
+        switch (granularity) {
+            case 'day':
+                groupBy = {
+                    day: { $dayOfMonth: '$bookingDate' },
+                    month: { $month: '$bookingDate' },
+                    year: { $year: '$bookingDate' }
+                };
+                sortBy = { '_id.year': 1, '_id.month': 1, '_id.day': 1 };
+                break;
+            case 'year':
+                groupBy = { year: { $year: '$bookingDate' } };
+                sortBy = { '_id.year': 1 };
+                break;
+            case 'month':
+            default:
+                groupBy = {
+                    month: { $month: '$bookingDate' },
+                    year: { $year: '$bookingDate' }
+                };
+                sortBy = { '_id.year': 1, '_id.month': 1 };
+                break;
+        }
+
+        const revenueAggregate = await Booking.aggregate([
+            {
+                $match: { dorm: new mongoose.Types.ObjectId(dormId), status: 'Booked' }
+            },
+            {
+                $addFields: groupBy
+            },
+            {
+                $group: {
+                    _id: groupBy,
+                    totalRevenue: { $sum: '$revenue' }
+                }
+            },
+            {
+                $sort: sortBy
+            }
+        ]);
+
+        const formattedData = revenueAggregate.map(data => {
+            let date;
+            if (granularity === 'day') {
+                date = `${data._id.year}-${String(data._id.month).padStart(2, '0')}-${String(data._id.day).padStart(2, '0')}`;
+            } else if (granularity === 'year') {
+                date = `${data._id.year}-01-01`;
+            } else {
+                date = `${data._id.year}-${String(data._id.month).padStart(2, '0')}-01`;
+            }
+            return {
+                date,
+                revenue: data.totalRevenue
+            };
+        });
+
+        res.json(formattedData);
+    } catch (error) {
+        console.error('Error fetching revenue data:', error);
+        res.status(500).send('Server error');
+    }
+};
+
+
+
+
 exports.search=  async (req, res) => {
     try {
-        const { dormName, service, type, roomType, minPrice, maxPrice, minSpace, maxSpace, viewType } = req.query;
+        const {
+            service,
+            type,
+            roomType,
+            minPrice,
+            maxPrice,
+            minSpace,
+            maxSpace,
+            viewType
+        } = req.query;
+
         let query = {};
 
-        if (dormName) {
-            query['dormName'] = { $regex: dormName, $options: 'i' };
-        }
-        if (service) {
-            query['services'] = { $in: [service] };
-        }
         if (type) {
             query['type'] = type;
         }
+        if (service) {
+            query['services'] = { $in: service.split(',') };
+        }
 
-        // let roomQuery = {};
-        // if (roomType) {
-        //     roomQuery['roomType'] = roomType;
-        // }
-        // if (minPrice) {
-        //     roomQuery['pricePerSemester'] = { $gte: Number(minPrice) };
-        // }
-        // if (maxPrice) {
-        //     roomQuery['pricePerSemester'] = { ...roomQuery['pricePerSemester'], $lte: Number(maxPrice) };
-        // }
-        // if (minSpace) {
-        //     roomQuery['space'] = { $gte: Number(minSpace) };
-        // }
-        // if (maxSpace) {
-        //     roomQuery['space'] = { ...roomQuery['space'], $lte: Number(maxSpace) };
-        // }
-        // if (viewType) {
-        //     roomQuery['viewType'] = viewType;
-        // }
-        //
-        // if (Object.keys(roomQuery).length > 0) {
-        //     query['rooms'] = { $elemMatch: roomQuery };
-        // }
+        let roomQuery = {};
+        if (roomType) {
+            roomQuery['roomType'] = roomType;
+        }
+        if (minPrice) {
+            roomQuery['pricePerSemester'] = { $gte: parseFloat(minPrice) };
+        }
+        if (maxPrice) {
+            roomQuery['pricePerSemester'] = roomQuery['pricePerSemester'] || {};
+            roomQuery['pricePerSemester']['$lte'] = parseFloat(maxPrice);
+        }
+        if (minSpace) {
+            roomQuery['space'] = { $gte: parseFloat(minSpace) };
+        }
+        if (maxSpace) {
+            roomQuery['space'] = roomQuery['space'] || {};
+            roomQuery['space']['$lte'] = parseFloat(maxSpace);
+        }
+        if (viewType) {
+            roomQuery['viewType'] = viewType;
+        }
 
-        const dorms = await Dorm.find(query).populate('rooms');
-        console.log(dorms)
+        let dorms = await Dorm.find(query).populate({
+            path: 'rooms',
+            match: roomQuery,
+        });
+
+        if (roomType || minPrice || maxPrice || minSpace || maxSpace || viewType) {
+            dorms = dorms.filter(dorm => dorm.rooms.length > 0);
+        }
+        // dorms = dorms.filter(dorm =>dorm.isActive == true)
+        console.log('Results:', dorms);
         res.json(dorms);
     } catch (error) {
         console.error('Error searching dormitories:', error);
@@ -475,12 +682,30 @@ exports.search=  async (req, res) => {
     }
 };
 
+//ADMIN
 exports.getLogins = async (req,res)=>{
     try{
         const users = await User.find({status:'Pending'})
         res.status(200).json(users)
     }catch (error){
         console.error('Error getting users:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
+exports.acceptLogin = async(req,res)=>{
+    try{
+        const updatedLogin = await User.findByIdAndUpdate(req.params.userID,{status:'Valid'})
+    }catch (error){
+        console.error('Error updating login status:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+exports.rejectLogin = async (req,res)=>{
+    try{
+        const deletedLogin = await User.findByIdAndUpdate(req.params.userID,{status:'Invalid'})
+    }catch (error){
+        console.error('Error updating login status:', error);
         res.status(500).json({ message: 'Server error' });
     }
 }
