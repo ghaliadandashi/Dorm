@@ -4,7 +4,8 @@ import axios from "axios";
 import ProfilePicSection from "./profilePicSection";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons";
-// import '../../styling/pages/profile.css'
+import {useNotification} from "../../layout/Notifications";
+import '../../styling/pages/profile.css'
 
 const AdminProfile = ()=>{
     const [profile,setProfile] = useState({
@@ -15,10 +16,10 @@ const AdminProfile = ()=>{
 
     })
     const [users, setUsers] = useState([]);
-    const[bookings,setBookings] = useState([]);
+    const[dormRequests,setRequests] = useState([]);
     const [activeTab, setActiveTab] = useState('personalInfo');
     const {user} = useAuth();
-
+    const {addNotification} = useNotification()
     useEffect(() => {
         if (user) {
             axios.get(`http://localhost:3001/api/profile`,{withCredentials:true})
@@ -32,12 +33,12 @@ const AdminProfile = ()=>{
                     });
                 })
                 .catch(error => console.error("Failed to fetch user data:", error));
-            axios.get('http://localhost:3001/booking/getBooking',{withCredentials:true})
-                .then(response=>{
-                    setBookings(response.data);
-                }).catch(error=>{
-                console.error('Failed to get Bookings: ',error)
-            })
+            // axios.get('http://localhost:3001/booking/getBooking',{withCredentials:true})
+            //     .then(response=>{
+            //         setBookings(response.data);
+            //     }).catch(error=>{
+            //     console.error('Failed to get Bookings: ',error)
+            // })
             axios.get('http://localhost:3001/api/getLogins',{withCredentials:true})
                 .then(response =>{
                     setUsers(response.data)
@@ -46,37 +47,57 @@ const AdminProfile = ()=>{
                 .catch(error=>{
                     console.error('Failed to get login requests',error)
                 })
+            axios.get('http://localhost:3001/dorms/getDormRequests',{withCredentials:true})
+                .then(response =>{
+                    setRequests(response.data)
+                })
+                .catch(error=>{
+                    console.error('Failed to get dorm requests',error)
+                })
         }
-    }, [user]);
+    }, [user,dormRequests],[users]);
 
-    const getPrice = (booking) => {
-        if (booking.stayDuration === 9) {
-            return booking.room.pricePerSemester * 2;
-        } else if (booking.stayDuration === 12) {
-            return booking.room.pricePerSemester * 2 + (booking.room.summerPrice*3);
-        } else if (booking.stayDuration === 4.5) {
-            return booking.room.pricePerSemester;
-        } else {
-            return booking.room.summerPrice*3;
-        }
-    };
-    const getStayDescription = (stayDuration) => {
-        if (stayDuration === 9) {
-            return '2 semesters';
-        } else if (stayDuration === 12) {
-            return '2 semesters + summer';
-        } else if (stayDuration === 4.5) {
-            return '1 semester';
-        }else{
-            return 'summer'
-        }
-    };
-    const handleCancellation =()=>{
 
-    }
     const handleTabClick = (tab) => {
         setActiveTab(tab);
     };
+
+    const FileLinks = ({ files }) => {
+        return files.map((file, index) => (
+            <div key={index}>
+                <a href={file} target="_blank" rel="noopener noreferrer">
+                    Download File {index + 1}
+                </a>
+            </div>
+        ));
+    };
+
+    const handleAccept = (userID)=>{
+        axios.put(`http://localhost:3001/api/acceptLogin/${userID}`)
+            .then(
+                addNotification('Login request accepted!','success')
+            )
+    }
+    const handleReject = (userID)=>{
+        axios.put(`http://localhost:3001/api/rejectLogin/${userID}`)
+            .then(
+                addNotification('Login request rejected','warning')
+            )
+    }
+
+    const handleDormAccept = (dormID)=>{
+        axios.put(`http://localhost:3001/dorms/acceptDorm/${dormID}`)
+            .then(
+                addNotification('Dorm Addition Request Accepted!','success')
+            )
+    }
+
+    const handleDormReject = (dormID)=>{
+        axios.put(`http://localhost:3001/dorms/rejectDorm/${dormID}`)
+            .then(
+                addNotification('Dorm Addition Request Rejected!','error')
+            )
+    }
     return(
         <>
             <div className='profile'>
@@ -92,9 +113,9 @@ const AdminProfile = ()=>{
                             className={activeTab === 'login' ? 'active' : ''}>
                         Login Requests
                     </button>
-                    <button onClick={() => handleTabClick('bookings')}
-                            className={activeTab === 'bookings' ? 'active' : ''}>
-                        Booking Requests
+                    <button onClick={() => handleTabClick('dormAddition')}
+                            className={activeTab === 'dormAddition' ? 'active' : ''}>
+                        Dorm Addition Requests
                     </button>
                     <button onClick={() => handleTabClick('settings')}
                             className={activeTab === 'settings' ? 'active' : ''}>
@@ -105,64 +126,6 @@ const AdminProfile = ()=>{
                     {activeTab === 'personalInfo' && (
                         <ProfilePicSection/>
                     )}
-                    {activeTab === 'bookings' && (
-                        <div style={{display:"grid",gridTemplateColumns:'1fr 1fr',gap:'40px',margin:'40px 40px 0px 40px'}}>
-                            {bookings.map(booking=>
-                                <div style={{
-                                    backgroundColor: "#46418d",
-                                    borderRadius: '40px 40px 0px 40px',
-                                    boxShadow:'1px 1px 5px #3a3a52',
-                                    display: "grid",
-                                    padding:'10px',
-                                    paddingTop:'15px',
-                                    gridTemplateColumns: '220px 1fr',
-                                    alignItems:'center',
-                                    color:'white',
-                                    gap:'20px'
-                                }}>
-                                    <div style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center",
-                                        justifyContent:'center',
-                                        borderRight:'1px dashed white'
-                                    }}>
-                                         <p style={{fontWeight:'bold',fontSize:'25px'}}>{booking.dorm.dormName}</p>
-                                    </div>
-                                    <div style={{display:"flex",flexDirection:"column"}}>
-                                        <div style={{ display: 'grid',gridTemplateColumns:'1fr 1fr', gap:'10px'}}>
-                                            <div style={{display:"flex",flexDirection:"column",alignItems:'flex-start'}}>
-                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Room: </span>
-                                                <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{booking.room.roomType}</p>
-                                            </div>
-                                            <div style={{ display: 'flex',flexDirection:"column", alignItems:"flex-start"}}>
-                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Status: </span>
-                                                <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{booking.status}</p>
-                                            </div>
-                                            <div style={{ display: 'flex',flexDirection:"column", alignItems:"flex-start"}}>
-                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Duration: </span>
-                                                <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{getStayDescription(booking.stayDuration)}</p>
-                                            </div>
-                                            <div style={{ display: 'flex',flexDirection:"column", alignItems:"flex-start"}}>
-                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Price: </span>
-                                                <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{getPrice(booking)}</p>
-                                            </div>
-                                            <div style={{ display: 'flex',flexDirection:"column", alignItems:"flex-start"}}>
-                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Start Date: </span>
-                                                <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{booking.startDate.substring(0, booking.bookingDate.indexOf('T')).split('-').reverse().join('-')}</p>
-                                            </div>
-                                            <div style={{ display: 'flex',flexDirection:"column", alignItems:"flex-start"}}>
-                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Start Date: </span>
-                                                <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{booking.endDate.substring(0, booking.bookingDate.indexOf('T')).split('-').reverse().join('-')}</p>
-                                            </div>
-                                        </div>
-                                        {booking.status !== 'Booked'?<FontAwesomeIcon onClick={handleCancellation} style={{color:"darkred",padding:'0px 10px',fontSize:'35px',alignSelf:"flex-end",backgroundColor:"white",borderRadius:'50px',cursor:"pointer"}} icon={faTimes}/>:null}
-                                    </div>
-                                </div>
-
-                            )}
-                        </div>
-                    )}
                     {activeTab === 'login' && (
                         <div>
                             <table>
@@ -170,27 +133,45 @@ const AdminProfile = ()=>{
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>Personal Files</th>
+                                    <th>Identification Files</th>
                                     <th>Ownership Files</th>
                                 </tr>
                                 {users.map(use =>
-                                        <tr>
+                                        <tr key={use._id}>
                                             <td>{use.name}</td>
                                             <td>{use.email}</td>
                                             <td>{use.phoneNo}</td>
-                                            <td><a href={use.personalFiles[0]} target="_blank" rel="noopener noreferrer">
-                                                Download File
-                                            </a></td>
-                                            <td><a href={use.ownershipFiles[0]} target="_blank" rel="noopener noreferrer">
-                                                Download File
-                                            </a></td>
-                                            <td><button>Accept</button></td>
-                                            <td><button>Reject</button></td>
+                                            <td><FileLinks files={use.personalFiles}/> </td>
+                                            <td><FileLinks files={use.ownershipFiles}/></td>
+                                            <td><button onClick={()=>handleAccept(use._id)}>Accept</button></td>
+                                            <td><button onClick={()=>handleReject(use._id)}>Reject</button></td>
                                         </tr>
                                 )}
                             </table>
 
                         </div>
+                    )}
+                    {activeTab ==='dormAddition' &&(
+                        <>
+                            <table>
+                                <tr>
+                                    <th>Dorm Name</th>
+                                    <th>Owner</th>
+                                    <th>Identification Files</th>
+                                    <th>Ownership Files</th>
+                                </tr>
+                                {dormRequests.map(request =>
+                                    <tr key={request._id}>
+                                        <td>{request.dormName}</td>
+                                        <td>{request.owner.name}</td>
+                                        <td><FileLinks files={request.owner.personalFiles}/> </td>
+                                        <td><FileLinks files={request.ownershipFiles}/> </td>
+                                        <td><button onClick={()=>handleDormAccept(request._id)}>Accept</button></td>
+                                        <td><button onClick={()=>{handleDormReject(request._id)}}>Reject</button></td>
+                                    </tr>
+                                )}
+                            </table>
+                        </>
                     )}
                 </div>
             </div>

@@ -32,15 +32,33 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 
-cron.schedule('0 0 * * *', async () => { // This runs at midnight every day
-    console.log('Running a daily check to update booking statuses...');
+cron.schedule('0 * * * *', async () => {
+    console.log('Running an hourly check to update booking statuses...');
     const today = new Date();
-    await Booking.updateMany({
-        endDate: { $lt: today },
-        isActive: true
-    }, {
-        $set: { isActive: false }
-    });
+
+    try {
+        const bookingsToUpdate = await Booking.find({
+            endDate: { $lt: today },
+            isActive: true
+        }).populate('dorm room');
+
+        for (const booking of bookingsToUpdate) {
+            await Dorm.findByIdAndUpdate(booking.dorm._id, {
+                $inc: { occupancy: -1 }
+            });
+
+            await Room.findByIdAndUpdate(booking.room._id, {
+                $inc: { availability: 1 }
+            });
+
+            booking.isActive = false;
+            await booking.save();
+        }
+
+        console.log('Hourly check completed. Booking statuses updated successfully.');
+    } catch (error) {
+        console.error('Error updating booking statuses:', error);
+    }
 });
 
 
@@ -62,7 +80,20 @@ mongoose.connect(process.env.DB_URI)
     .catch(err => console.error('MongoDB connection error:', err));
 
 //UNCOMMENT THIS TO ADD USER, DORM, AND ROOMS
-
+const seedDatabase = async ()=>{
+    try{
+        const admin = new User({
+            name:'Admin',
+            email:'admin@mail.com',
+            role:'admin',
+            password:'admin1',
+            status:'Valid'
+        })
+        const savedAdmin = await admin.save()
+    }catch (error){
+        console.error(error)
+    }
+}
 // const seedDatabase = async () => {
 //     try {
 //         const dormOwner = new User({
@@ -83,7 +114,7 @@ mongoose.connect(process.env.DB_URI)
 //             occupancy: 0,
 //             location: 'Dorm Location',
 //             type: 'off-campus',
-   
+//             isActive:true
 //         });
 
 //         const savedDorm = await dorm.save();
@@ -128,19 +159,19 @@ mongoose.connect(process.env.DB_URI)
 //   });
   
   // Seed database with initial messages
-const seedDatabase = async () => {
-    try {
-      const initialMessages = [
-        { content: 'Welcome to the chat!', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
-        { content: 'Feel free to start a conversation.', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
-      ];
-  
-      await Chat.insertMany(initialMessages);
-      console.log('Database seeded with initial messages');
-    } catch (error) {
-      console.error('Error seeding database:', error);
-    }
-  };
+// const seedDatabase = async () => {
+//     try {
+//       const initialMessages = [
+//         { content: 'Welcome to the chat!', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
+//         { content: 'Feel free to start a conversation.', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
+//       ];
+//
+//       await Chat.insertMany(initialMessages);
+//       console.log('Database seeded with initial messages');
+//     } catch (error) {
+//       console.error('Error seeding database:', error);
+//     }
+//   };
 
 // seedDatabase();
 

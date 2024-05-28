@@ -5,10 +5,15 @@ import LoadingPage from "../../pages/LoadingPage";
 import '../../styling/components/RegisterForm.css'
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import { storage } from '../../firebase-config';
+import {useNotification} from "../../layout/Notifications";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faBuilding } from '@fortawesome/free-solid-svg-icons';
+
 const RegisterForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const [errors, setErrors] = useState([]);
+    const {addNotification}= useNotification();
     const [selectedServices, setSelectedServices] = useState([]);
     const [formData, setFormData] = useState({
         firstName: '',
@@ -124,10 +129,11 @@ const RegisterForm = () => {
             });
 
             const response = await axios.post('http://localhost:3001/api/register', submissionData);
-            console.log('Form submitted successfully:', response.data);
+            addNotification('Registration Successful! Await confirmation','success')
             setTimeout(() => navigate('/home'), 3000);
         } catch (error) {
             console.error('Failed during the registration process:', error);
+            addNotification('Registration Failed!','error')
             setErrors(error.response && error.response.data && error.response.data.errors ? error.response.data.errors : ['Failed to process the form.']);
         } finally {
             setIsLoading(false);
@@ -143,13 +149,11 @@ const RegisterForm = () => {
     return (
         <>
             <div className="register-container">
-                <div className="welcome-section">
-                    <h1>Welcome</h1>
-                    <p>Create your account to find and manage dorms easily.</p>
-                </div>
                 <div className="register-form">
-            <form onSubmit={handleSubmit} className='form' style={{backgroundColor:"white", padding:'10px',display:'flex',flexDirection:"column"}}>
-                <h4>Personal Info</h4>
+                    <h1>Register</h1>
+            <form onSubmit={handleSubmit}>
+                <div className='register-personal-info'>
+                <h3><FontAwesomeIcon icon={faUser}/>  Personal Info</h3>
                 {errors.length > 0 && (
                     <div style={{ color: 'red' }}>
                         {errors.map((error, index) => (
@@ -176,7 +180,9 @@ const RegisterForm = () => {
                 </select>
                 <label htmlFor='personalFile'>Upload Personal Identification Documents</label>
                 <input type='file' id='personalFile' name='personalFile' onChange={handleInputChange} multiple/>
-                <h4>Dorm Info</h4>
+                </div>
+                <div className='register-dorm-info'>
+                <h3><FontAwesomeIcon icon={faBuilding}/>  Dorm Info</h3>
                 <label htmlFor='dormname'>Dorm Name</label>
                 <input type='text' id='dormName' name='dormName' value={formData.dormName} onChange={handleInputChange}/>
                 <label htmlFor='file'>Upload ownership documents</label>
@@ -218,7 +224,8 @@ const RegisterForm = () => {
                         </div>
                     ))}
                 </div>
-                <input type='submit' value='Register' />
+                        <input type='submit' value='Register' />
+                </div>
             </form>
                 </div>
             </div>

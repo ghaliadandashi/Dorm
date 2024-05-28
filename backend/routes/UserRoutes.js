@@ -2,7 +2,12 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const { register, login, validate, user, logout,profile,getDorm, changeProfilePic ,deleteProfilePic,profileEdit, getInsights, search, getUsers,
-    getLogins
+    getLogins,
+    getStudentUser,
+    acceptLogin,
+    rejectLogin,
+    getOccupancyData,
+    getRevenueData
 } = require('../controllers/userController');
 const upload = multer({ storage: multer.memoryStorage() });
 const authenticateToken = require('../middleware/auth')
@@ -26,6 +31,10 @@ router.get('/dorm',authenticateToken,getDorm)
 router.get('/insights/:dormId',getInsights)
 router.get('/search',search)
 router.get('/getUsers', getUsers)
-
+router.get('/getStudentUser/:sID',getStudentUser)
 router.get('/getLogins',getLogins)
+router.put('/acceptLogin/:userID',acceptLogin)
+router.put('/rejectLogin/:userID',rejectLogin)
+router.get('/occupancy/:dormId',getOccupancyData)
+router.get('/revenue/:dormId',getRevenueData)
 module.exports = router;

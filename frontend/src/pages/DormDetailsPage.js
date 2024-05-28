@@ -8,6 +8,7 @@ import noImage from '../images/1554489-200.png';
 import PriceTrends from "../components/DormDetail/PriceTrends";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons";
+import {useNotification} from "../layout/Notifications";
 
 
 const DormDetails = () => {
@@ -25,8 +26,10 @@ const DormDetails = () => {
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
     const dormID = localStorage.getItem('DormId');
+    const [currentPage, setCurrentPage] = useState(1);
+    const reviewsPerPage = 3;
     const d = new Date();
-
+    const {addNotification} =useNotification()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,9 +72,11 @@ const DormDetails = () => {
         axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}/${stay}/${semester}`)
             .then(response => {
                 console.log(response.data);
+                addNotification('Booking placed!','success')
             })
             .catch(error => {
                 console.error('Failed to get data', error);
+                addNotification('Already booked a room!','error')
             });
     };
 
@@ -147,6 +152,7 @@ const DormDetails = () => {
         return bookings.some(booking => booking.dorm._id === dormID && booking.status ==='Booked');
     };
 
+    // console.log(user)
 
     return (
         <>
@@ -204,6 +210,7 @@ const DormDetails = () => {
                                     <th></th>
                                     <th>Room Type</th>
                                     <th>Availability</th>
+                                    <th>View Type</th>
                                     <th>Services</th>
                                     <th>Stay Duration</th>
                                     <th>Semester</th>
@@ -226,6 +233,7 @@ const DormDetails = () => {
                                         <td style={{ color: room.availability === 0 ? 'darkred' : room.availability > 20 ? 'green' : 'orangered' }}>
                                             {room.availability === 0 ? 'Fully Booked!' : room.availability > 20 ? 'Available' : 'Almost Out!'}
                                         </td>
+                                        <td>{room.viewType}</td>
                                         <td>{room.services.map(service => capitalizeFirstLetter(service)).join(', ')}</td>
                                         <td>
                                             <select name='stay' value={stay} onChange={handleChange}>
@@ -266,7 +274,7 @@ const DormDetails = () => {
                                                 <div className='review-info'>
                                                     <strong>{review.student.name}  <span style={{color:'violet'}}>{review.student.role !== 'student'?review.student.role:null}</span></strong>
                                                 </div>
-                                                {user?review.student._id == user.userId || user.uid || role === 'admin'?<FontAwesomeIcon icon={faTimes} style={{cursor:'pointer'}} onClick={()=>handleReviewDeletion(review._id)}/>:null:null}
+                                                {user?review.student._id == user[0]?._id  || role === 'admin'?<FontAwesomeIcon icon={faTimes} style={{cursor:'pointer'}} onClick={()=>handleReviewDeletion(review._id)}/>:null:null}
                                             </div>
                                             <div className="review-rating">
                                                 <StarRating rating={review.rating} />
@@ -275,6 +283,12 @@ const DormDetails = () => {
                                             <div className="review-comment">
                                                 <p>{review.comment}</p>
                                             </div>
+                                            {review.response?
+                                                <div className='review-dormOwner-reply'>
+                                                    <span>Dorm owner reply:</span>
+                                                    {review.response}
+                                                </div>:null
+                                            }
                                         </li>
                                     ))}
                                 </ul>

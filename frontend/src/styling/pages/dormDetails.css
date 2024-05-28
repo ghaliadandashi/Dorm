@@ -117,19 +117,19 @@
     overflow-x: auto;
 }
 
-table {
+.rooms-table table {
     width: 100%;
     border-collapse: collapse;
     color: white;
 }
 
-th, td {
+.rooms-table table th, td {
     padding: 15px;
     border: 1px solid #afaeaead;
     text-align: left;
 }
 
-th {
+.rooms-table table th {
     background-color: #1F203C;
     font-weight: bold;
 }
@@ -274,6 +274,17 @@ th {
     color: #ccc;
     text-align: left;
 }
+
+.review-dormOwner-reply{
+    display:flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap:10px;
+    border-left: 2px solid #6a6aff;
+    padding:10px;
+    margin-left:20px;
+}
+
 
 @media (max-width: 768px) {
     .dorm-content {

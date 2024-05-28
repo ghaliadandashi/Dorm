@@ -4,13 +4,14 @@ import {useAuth} from "../Auth/AuthHook";
 import axios from "axios";
 import avatar from '../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTimes, } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import Modal from "../Modal";
 import DormList from "./dormList";
 import { uploadFileToFirebase,deleteFileFromFirebase } from '../../firbase-storage';
 import Dashboard from './dashboard';
 import noImage from '../../images/1554489-200.png'
 import ProfilePicSection from "./profilePicSection";
+import {useNotification} from "../../layout/Notifications";
 
 const DormOwnerProfile = () => {
     const {user, setUser} = useAuth()
@@ -30,7 +31,7 @@ const DormOwnerProfile = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState(null);
     const d = new Date();
-
+    const {addNotification} = useNotification()
 
 
     const handleOpenModal = (type,object) => {
@@ -113,7 +114,8 @@ const DormOwnerProfile = () => {
                             { id: 'security',name:'security', label: '24/7 Security' },
                             { id: 'elevator',name:'elevator', label: 'Elevator'}
                         ]},
-                    { name: 'dormPics', label: 'Dorm Pictures: ',type:'file'}
+                    { name: 'dormPics', label: 'Dorm Pictures: ',type:'file'},
+                    { name: 'ownershipFiles', label: 'Ownership Files: ',type:'file'}
                 ]
             },
             editRoom:{title:'Edit Room',initialData:{services:'',pricePerSemester:'',summerPrice: '',extraFee:'',noOfRooms:'',viewType: 'CityView',space:'',roomPics:''},
@@ -191,7 +193,11 @@ const DormOwnerProfile = () => {
                 : `http://localhost:3001/dorms/editRoom/${currentObj._id}`));
         try {
             const response = await axios.post(endpoint, formData, { withCredentials: true });
-            console.log('Success:', response.data);
+            if(currentAction.includes('dorm'||'Dorm') ){
+                addNotification('Dorm Updated!','success')
+            }else{
+                addNotification('Room Updated!','success')
+            }
             setIsModalOpen(false);
             setCurrentAction(null);
             setCurrentObj(null);
@@ -369,9 +375,9 @@ const DormOwnerProfile = () => {
                     <div>
                         <div className='dorms-container-f'>
                             {dorms.map((dorm,index)=>(
-                                <div key={index} className='dorms-financials'>
-                                    <img src={dorm.dormPics[0] || noImage} width='100px' height='100px'/>
-                                    <p onClick={() => handleDormClick(dorm._id)}>{dorm.dormName}</p>
+                                <div key={index} className='dorms-financials' onClick={() => handleDormClick(dorm._id)}>
+                                    <img src={dorm.dormPics[0] || noImage} width='50px' height='50px'/>
+                                    <p>{dorm.dormName}</p>
                             </div>))}
                         </div>
                         {tempID? <Dashboard dormId={tempID}/>:<h3 style={{color:"white",fontWeight:'bold'}}>Select Dorm to view insights!</h3>}

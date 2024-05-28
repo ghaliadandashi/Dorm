@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import avatar from "../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp";
 import { deleteFileFromFirebase, uploadFileToFirebase } from "../../firbase-storage";
 import axios from "axios";
+import {useAuth} from "../Auth/AuthHook";
 
 const ProfilePicSection = () => {
     const [profile, setProfile] = useState({
@@ -13,6 +14,7 @@ const ProfilePicSection = () => {
     });
     const [selectedFile, setSelectedFile] = useState(null);
     const [editMode, setEditMode] = useState(false);
+    const {role} =useAuth()
 
     useEffect(() => {
         axios.get(`http://localhost:3001/api/profile`, { withCredentials: true })
@@ -101,13 +103,13 @@ const ProfilePicSection = () => {
                         onChange={handleInputChange}
                         placeholder="Name"
                     />
-                    <input
+                    {role !== 'student'?<input
                         type="email"
                         name="email"
                         value={profile.email}
                         onChange={handleInputChange}
                         placeholder="Email"
-                    />
+                    />:null}
                     <input
                         type="text"
                         name="phoneNo"

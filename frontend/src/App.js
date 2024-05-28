@@ -10,11 +10,13 @@ import {UserProvider} from "./components/Auth/AuthHook";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import DormDetails from "./pages/DormDetailsPage";
 import ChatPage  from './pages/ChatPage';
+import {NotificationProvider} from "./layout/Notifications";
 
 
 
 function App() {
     return (
+        <NotificationProvider>
         <UserProvider>
         <div className="App">
             <Router>
@@ -33,6 +35,7 @@ function App() {
             </Router>
         </div>
         </UserProvider>
+        </NotificationProvider>
         
     );
 }

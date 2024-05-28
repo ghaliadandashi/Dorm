@@ -41,7 +41,6 @@ const Home = () => {
                 .then(response => {
                     // console.log(response.data)
                     setCUser(response.data)
-                    user.photoURL = response.data.user.profilePic
                     localStorage.setItem('currUser', JSON.stringify(response.data));
                 })
                 .catch(error => {
@@ -75,7 +74,7 @@ const Home = () => {
                         justifyContent: 'center',
                         gap: '90px',
                     }}>
-                        {dorms.map((dorm, index) => (
+                        {dorms.length>0?dorms.map((dorm, index) => (
                             <div key={index} style={{
                                 backgroundColor: "white",
                                 borderRadius: '10px',
@@ -95,7 +94,7 @@ const Home = () => {
                                     <p style={{margin:'5px' }}><FontAwesomeIcon icon={faMapMarkerAlt}/> {dorm.location}</p>
                                 </div>
                             </div>
-                        ))}
+                        )):<div style={{color:"white",height:'100vh'}}><h1>No dorms</h1></div>}
                     </div>
                 </div>
                 {(isLoggedIn? (<div className='homeLast'>
@@ -108,9 +107,9 @@ const Home = () => {
                             )}
                             <p style={{color:"white",fontWeight:"bold"}}>{currUser.user.name.toUpperCase()}</p>
                         </div>:<div style={{marginTop:'40px'}}>
-                            {user?.photoURL?(<img src={user.photoURL} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}}/>):
+                            {user[0]?.profilePic?(<img src={user[0].profilePic} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}}/>):
                             <img src={avatar} width='150' height='150' style={{objectFit:'cover',borderRadius:'40px'}}/>}
-                        <p style={{color:"white",fontWeight:"bold"}}>{user.displayName.toUpperCase()}</p></div>}
+                        <p style={{color:"white",fontWeight:"bold"}}>{user[0]?.name?.toUpperCase()}</p></div>}
                     <div className='bookingStatus-container'>
                         <label htmlFor='bookingStatus'>Booking Status</label>
                         <p id='bookingStatus' className='bookingStatus' style={booking[0]?.status == 'Booked'?{color:'green'}:{color:'#f8c200'}}>{booking.length !== 0? booking[0].status:'No booking yet'}</p>

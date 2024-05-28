@@ -34,7 +34,7 @@ const Modal = ({ isOpen, onClose, onSubmit, title, initialData, fields }) => {
     const handleSubmit = async () => {
         const formDataCopy = { ...formData };
 
-        const fileFields = ['dormPics', 'roomPics'];
+        const fileFields = ['dormPics', 'roomPics','ownershipFiles'];
         for (const field of fileFields) {
             if (formDataCopy[field] instanceof FileList) {
                 const fileArray = Array.from(formDataCopy[field]);
