@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../styling/components/Search.css';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
-const servicesList = ['wifi', 'market', 'laundry', 'gym','sharedKitchen','resturant','studyRoom','cleaning','security','elevator'];
+
+const servicesList = ['wifi', 'market', 'laundry', 'gym', 'sharedKitchen', 'restaurant', 'studyRoom', 'cleaning', 'security', 'elevator'];
 
 const Search = ({ setDorms }) => {
     const [selectedServices, setSelectedServices] = useState([]);
@@ -15,10 +16,11 @@ const Search = ({ setDorms }) => {
     const [maxSpace, setMaxSpace] = useState('');
     const [viewType, setViewType] = useState('');
     const [showServices, setShowServices] = useState(false);
+
     const handleServiceChange = (service) => {
-        setSelectedServices(prevState =>
+        setSelectedServices((prevState) =>
             prevState.includes(service)
-                ? prevState.filter(s => s !== service)
+                ? prevState.filter((s) => s !== service)
                 : [...prevState, service]
         );
     };
@@ -37,7 +39,7 @@ const Search = ({ setDorms }) => {
                     viewType
                 }
             });
-            setDorms(response.data); // Set the search results to the state in the parent component
+            setDorms(response.data);
         } catch (error) {
             console.error('Error searching dormitories:', error);
         }
@@ -55,8 +57,8 @@ const Search = ({ setDorms }) => {
                     <option value="">Room Type</option>
                     <option value="Single">Single room</option>
                     <option value="Double">Double room</option>
-                    <option value='Triple'>Triple room</option>
-                    <option value='Studio'>Studio</option>
+                    <option value="Triple">Triple room</option>
+                    <option value="Studio">Studio</option>
                     <option value="Quad">Quad room</option>
                     <option value="Suite">Suite</option>
                 </select>
@@ -72,11 +74,11 @@ const Search = ({ setDorms }) => {
                     />
                 </div>
                 <div className="services-toggle" onClick={() => setShowServices(!showServices)}>
-                    Services <FontAwesomeIcon icon={faChevronDown}/>
+                    Services <FontAwesomeIcon icon={faChevronDown} />
                 </div>
                 {showServices && (
                     <div className="services">
-                        {servicesList.map(service => (
+                        {servicesList.map((service) => (
                             <label key={service}>
                                 <input
                                     type="checkbox"
@@ -90,25 +92,25 @@ const Search = ({ setDorms }) => {
                 )}
                 <input
                     type="number"
-                    placeholder="Min Space (m sq)"
+                    placeholder="Min Space (m²)"
                     value={minSpace}
                     onChange={(e) => setMinSpace(e.target.value)}
                 />
                 <input
                     type="number"
-                    placeholder="Max Space (m sq)"
+                    placeholder="Max Space (m²)"
                     value={maxSpace}
                     onChange={(e) => setMaxSpace(e.target.value)}
                 />
                 <select
-                    placeholder="View Type"
                     value={viewType}
-                    onChange={(e) => setViewType(e.target.value)}>
+                    onChange={(e) => setViewType(e.target.value)}
+                >
                     <option value="">View Type</option>
-                    <option value='CityView'>City View</option>
-                    <option value='StreetView'>Street View</option>
-                    <option value='SeaView'>Sea View</option>
-                    <option value='CampusView'>Campus View</option>
+                    <option value="CityView">City View</option>
+                    <option value="StreetView">Street View</option>
+                    <option value="SeaView">Sea View</option>
+                    <option value="CampusView">Campus View</option>
                 </select>
                 <button onClick={handleSearch}>Apply</button>
             </div>

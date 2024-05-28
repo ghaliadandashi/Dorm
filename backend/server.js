@@ -172,7 +172,7 @@ const seedDatabase = async ()=>{
 //     }
 //   };
 
-// seedDatabase();
+//seedDatabase();
 
 // app.use(bodyParser.json());
 
