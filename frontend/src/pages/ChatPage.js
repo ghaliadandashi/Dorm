@@ -17,7 +17,10 @@ const ChatPage = () => {
         try {
           const response = await fetch(`http://localhost:3001/api/getExistingChats?user=${user.email}`);
           if (response.ok) {
-            const data = await response.json();
+            var data = await response.json();
+            if (data.length === 0) {
+              data = [{ email: user.email, name: user.name || 'You', unreadCount: 0 }];
+            }
             // Sort users by the timestamp of the most recent chat
             const sortedUsers = data.sort((a, b) => {
               // Get the most recent chat timestamp for each user
