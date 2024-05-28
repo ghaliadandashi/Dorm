@@ -1,0 +1,11 @@
+.public-profile{
+    color:white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.profile-details{
+    background-color: #0f1460;
+    padding:20px;
+}

@@ -7,6 +7,8 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import avatar from '../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp';
 
 import ProfilePicSection from "./profilePicSection";
+import Settings from "./settings";
+import {Link} from "react-router-dom";
 const StudentProfile = () => {
     const [profile, setProfile] = useState({
         name: '',
@@ -152,6 +154,9 @@ const StudentProfile = () => {
                                 </div>
                             )}
                         </div>
+                    )}
+                    {activeTab === 'settings' &&(
+                        <Settings/>
                     )}
                 </div>
             </div>

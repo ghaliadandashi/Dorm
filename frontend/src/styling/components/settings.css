@@ -1,0 +1,19 @@
+.settings-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin-top: 40px;
+}
+.change-Pass{
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.change-Pass div button{
+    padding:8px;
+    border:none;
+    background-color: #4CAF50;
+    font-weight: bold;
+    color: white;
+}

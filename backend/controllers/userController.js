@@ -143,7 +143,6 @@ exports.login = async (req, res) => {
 
 exports.refreshToken = async (req, res) => {
     const { refreshToken } = req.cookies;
-    // if (!refreshToken) return res.sendStatus(401);
 
     try {
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
@@ -199,7 +198,7 @@ exports.logout = async (req, res) => {
 
 exports.getStudentUser = async (req,res)=>{
     try{
-        const user = await User.find({microsoftID:req.params.sID})
+        const user = await User.findOne({ microsoftID: req.params.sID });
         if(user){
             res.status(200).json(user)
         }else{
@@ -373,13 +372,6 @@ exports.getDorm = async (req,res)=>{
         if(!dorms){
             res.status(200).send('Owner doesnt own any dorms!')
         }
-        // const responseDorms = dorms.map(dorm => ({
-        //     dormName: dorm.dormName,
-        //     services: dorm.services,
-        //     capacity: dorm.capacity,
-        //     location: dorm.location,
-        //     dormType: dorm.type
-        // }));
         res.json(dorms);
     }catch (error){
         console.error('Database error:',error);
@@ -521,7 +513,6 @@ exports.getRevenueData = async (req, res) => {
             return res.status(400).send('Invalid dorm ID');
         }
 
-        // Retrieve bookings and calculate revenue for each booking
         const bookings = await Booking.find({ dorm: new mongoose.Types.ObjectId(dormId), status: 'Booked' }).populate('room');
 
         const bookingRevenues = bookings.map(booking => {
@@ -665,14 +656,41 @@ exports.search=  async (req, res) => {
         if (roomType || minPrice || maxPrice || minSpace || maxSpace || viewType) {
             dorms = dorms.filter(dorm => dorm.rooms.length > 0);
         }
-        // dorms = dorms.filter(dorm =>dorm.isActive == true)
-        console.log('Results:', dorms);
+        dorms = dorms.filter(dorm =>dorm.isActive == true)
+
         res.json(dorms);
     } catch (error) {
         console.error('Error searching dormitories:', error);
         res.status(500).send('Server error');
     }
 };
+exports.changePassword= async(req,res)=>{
+    try {
+        const newPassword = req.body.pass;
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        await User.findByIdAndUpdate(req.user.userId, { password: hashedPassword });
+
+        res.status(200).send('Password updated successfully');
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.status(500).send('Server error');
+    }
+}
+
+exports.getPublicProf = async(req,res)=>{
+    try {
+        const user = await User.findById(req.params.userID).select('name email profilePic bio dob phoneNo');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).send('Server error');
+    }
+}
 
 //ADMIN
 exports.getLogins = async (req,res)=>{

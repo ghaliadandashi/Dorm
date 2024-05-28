@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../styling/components/Search.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
+
 
 const servicesList = ['wifi', 'market', 'laundry', 'gym', 'sharedKitchen', 'restaurant', 'studyRoom', 'cleaning', 'security', 'elevator'];
 
 const Search = ({ setDorms }) => {
+    const { t } = useTranslation();
     const [selectedServices, setSelectedServices] = useState([]);
     const [type, setType] = useState('');
     const [roomType, setRoomType] = useState('');
@@ -44,26 +47,29 @@ const Search = ({ setDorms }) => {
             console.error('Error searching dormitories:', error);
         }
     };
+    const translateService = (service) => {
+        return t(`servicesList.${service}`);
+    };
 
     return (
         <div className="search">
             <div className="search-filters">
                 <select value={type} onChange={(e) => setType(e.target.value)}>
-                    <option value="">Type</option>
-                    <option value="on-campus">On-campus</option>
-                    <option value="off-campus">Off-campus</option>
+                    <option value="">{t('type')}</option>
+                    <option value="on-campus">{t('onCampus')}</option>
+                    <option value="off-campus">{t('offCampus')}</option>
                 </select>
                 <select value={roomType} onChange={(e) => setRoomType(e.target.value)}>
-                    <option value="">Room Type</option>
-                    <option value="Single">Single room</option>
-                    <option value="Double">Double room</option>
-                    <option value="Triple">Triple room</option>
-                    <option value="Studio">Studio</option>
-                    <option value="Quad">Quad room</option>
-                    <option value="Suite">Suite</option>
+                    <option value="">{t('roomTypesTitle')}</option>
+                    <option value="Single">{t('roomTypes.Single')}</option>
+                    <option value="Double">{t('roomTypes.Double')}</option>
+                    <option value='Triple'>{t('roomTypes.Triple')}</option>
+                    <option value='Studio'>{t('roomTypes.Studio')}</option>
+                    <option value="Quad">{t('roomTypes.Quad')}</option>
+                    <option value="Suite">{t('roomTypes.Suite')}</option>
                 </select>
                 <div className="price-slider">
-                    <label>Max Price: {maxPrice}$</label>
+                    <label>{t('maxPrice')}: {maxPrice}$</label>
                     <input
                         type="range"
                         min="0"
@@ -74,7 +80,7 @@ const Search = ({ setDorms }) => {
                     />
                 </div>
                 <div className="services-toggle" onClick={() => setShowServices(!showServices)}>
-                    Services <FontAwesomeIcon icon={faChevronDown} />
+                    {t('servicesTitle')} <FontAwesomeIcon icon={faChevronDown} />
                 </div>
                 {showServices && (
                     <div className="services">
@@ -85,20 +91,20 @@ const Search = ({ setDorms }) => {
                                     checked={selectedServices.includes(service)}
                                     onChange={() => handleServiceChange(service)}
                                 />
-                                {service}
+                                {translateService(service)}
                             </label>
                         ))}
                     </div>
                 )}
                 <input
                     type="number"
-                    placeholder="Min Space (m²)"
+                    placeholder={t('minSpace')}
                     value={minSpace}
                     onChange={(e) => setMinSpace(e.target.value)}
                 />
                 <input
                     type="number"
-                    placeholder="Max Space (m²)"
+                    placeholder={t('maxSpace')}
                     value={maxSpace}
                     onChange={(e) => setMaxSpace(e.target.value)}
                 />
@@ -106,13 +112,13 @@ const Search = ({ setDorms }) => {
                     value={viewType}
                     onChange={(e) => setViewType(e.target.value)}
                 >
-                    <option value="">View Type</option>
-                    <option value="CityView">City View</option>
-                    <option value="StreetView">Street View</option>
-                    <option value="SeaView">Sea View</option>
-                    <option value="CampusView">Campus View</option>
+                    <option value="">{t('viewType')}</option>
+                    <option value='CityView'>{t('viewTypes.CityView')}</option>
+                    <option value='StreetView'>{t('viewTypes.StreetView')}</option>
+                    <option value='SeaView'>{t('viewTypes.SeaView')}</option>
+                    <option value='CampusView'>{t('viewTypes.CampusView')}</option>
                 </select>
-                <button onClick={handleSearch}>Apply</button>
+                <button onClick={handleSearch}>{t('apply')}</button>
             </div>
         </div>
     );

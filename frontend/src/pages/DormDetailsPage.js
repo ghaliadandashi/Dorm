@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Header from "../layout/Header";
 import axios from "axios";
 import { useAuth } from "../components/Auth/AuthHook";
@@ -6,20 +7,20 @@ import '../styling/pages/dormDetails.css';
 import { useNavigate } from "react-router-dom";
 import noImage from '../images/1554489-200.png';
 import PriceTrends from "../components/DormDetail/PriceTrends";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faTimes} from "@fortawesome/free-solid-svg-icons";
-import {useNotification} from "../layout/Notifications";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { useNotification } from "../layout/Notifications";
 
 const DormDetails = () => {
+    const { t } = useTranslation();
     const [dormInfo, setDormInfo] = useState(null);
     const [roomInfo, setRoomInfo] = useState([]);
     const [reviews, setReviews] = useState([]);
-    const [bookings,setBookings] = useState([])
+    const [bookings, setBookings] = useState([]);
     const navigate = useNavigate();
-    const { role, isLoggedIn,user } = useAuth();
+    const { role, isLoggedIn, user } = useAuth();
     const [stay, setStay] = useState(4.5);
-    const [semester, setSemester] = useState('');
+    const [semester, setSemester] = useState('spring');
     const [showModal, setShowModal] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [modalImages, setModalImages] = useState([]);
@@ -29,7 +30,7 @@ const DormDetails = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const reviewsPerPage = 3;
     const d = new Date();
-    const {addNotification} =useNotification()
+    const { addNotification } = useNotification();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -47,8 +48,8 @@ const DormDetails = () => {
             }
         };
 
-         fetchData();
-    }, [user, dormID,reviews]);
+        fetchData();
+    }, [user, dormID, reviews]);
 
     const fetchReviews = async () => {
         try {
@@ -72,11 +73,11 @@ const DormDetails = () => {
         axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}/${stay}/${semester}`)
             .then(response => {
                 console.log(response.data);
-                addNotification('Booking placed!','success')
+                addNotification(t('bookingPlaced'), 'success');
             })
             .catch(error => {
                 console.error('Failed to get data', error);
-                addNotification('Already booked a room!','error')
+                addNotification(t('alreadyBookedRoom'), 'error');
             });
     };
 
@@ -138,8 +139,19 @@ const DormDetails = () => {
         }
     };
 
+    const indexOfLastReview = currentPage * reviewsPerPage;
+    const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
+    const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
 
+    const totalPages = Math.ceil(reviews.length / reviewsPerPage);
 
+    const goToNextPage = () => {
+        setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+    };
+
+    const goToPreviousPage = () => {
+        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+    };
 
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -148,11 +160,14 @@ const DormDetails = () => {
     const formatDate = (date) => {
         return date.substring(0, date.indexOf('T')).split('-').reverse().join('-');
     };
+
     const userHasBookingInDorm = () => {
-        return bookings.some(booking => booking.dorm._id === dormID && booking.status ==='Booked');
+        return bookings.some(booking => booking.dorm._id === dormID && booking.status === 'Booked');
     };
 
-    // console.log(user)
+    const translateService = (service) => {
+        return t(`servicesList.${service}`);
+    };
 
     return (
         <>
@@ -162,40 +177,40 @@ const DormDetails = () => {
                     <div className="dorm-header">
                         <h1>{dormInfo.dormName}</h1>
                         {(role === 'admin' || (role === 'student' && userHasBookingInDorm())) && (
-                            <button className="add-review-btn" onClick={openReviewModal}>Add Review</button>
+                            <button className="add-review-btn" onClick={openReviewModal}>{t('addReview')}</button>
                         )}
                     </div>
                     <div className="dorm-content">
                         <div className="dorm-info">
                             <div className="dorm-image">
                                 {dormInfo.dormPics[0] ? (
-                                    <img src={dormInfo.dormPics[0]} alt="Dorm" className="main-image" onClick={() => openModal(dormInfo.dormPics[0], dormInfo.dormPics)} />
+                                    <img src={dormInfo.dormPics[0]} alt={t('noImageAvailable')} className="main-image" onClick={() => openModal(dormInfo.dormPics[0], dormInfo.dormPics)} />
                                 ) : (
-                                    <img src={noImage} className="main-image" alt="No image available" />
+                                    <img src={noImage} className="main-image" alt={t('noImageAvailable')} />
                                 )}
                                 <div className="small-images">
                                     {dormInfo.dormPics.slice(1, 2).map((pic, index) => (
                                         pic ? (
-                                            <img key={index} src={pic} alt={`Dorm ${index}`} className="small-image" onClick={() => openModal(pic, dormInfo.dormPics)} />
+                                            <img key={index} src={pic} alt={`${t('noImageAvailable')} ${index}`} className="small-image" onClick={() => openModal(pic, dormInfo.dormPics)} />
                                         ) : (
-                                            <img key={index} src={noImage} className="small-image" alt="No image available" />
+                                            <img key={index} src={noImage} className="small-image" alt={t('noImageAvailable')} />
                                         )
                                     ))}
                                     {dormInfo.dormPics.length > 3 && (
                                         <div className="more-images">
-                                            <img src={dormInfo.dormPics[2]} alt="Dorm" className="small-image" onClick={() => openModal(dormInfo.dormPics[2], dormInfo.dormPics)} />
-                                            <div className="more-overlay" onClick={() => openModal(dormInfo.dormPics[2], dormInfo.dormPics)}>+ More</div>
+                                            <img src={dormInfo.dormPics[2]} alt={t('noImageAvailable')} className="small-image" onClick={() => openModal(dormInfo.dormPics[2], dormInfo.dormPics)} />
+                                            <div className="more-overlay" onClick={() => openModal(dormInfo.dormPics[2], dormInfo.dormPics)}>{t('more')}</div>
                                         </div>
                                     )}
                                 </div>
                             </div>
                             <div className="dorm-details-text">
-                                <h2>Location</h2>
+                                <h2>{t('location')}</h2>
                                 <p>{dormInfo.location}</p>
-                                <h2>Services</h2>
+                                <h2>{t('servicesTitle')}</h2> {/* Change here */}
                                 <ul>
                                     {dormInfo.services.map((service, index) => (
-                                        <li key={index}>{capitalizeFirstLetter(service)}</li>
+                                        <li key={index}>{translateService(service)}</li>
                                     ))}
                                 </ul>
                                 <div className="price-trends">
@@ -208,14 +223,14 @@ const DormDetails = () => {
                                 <thead>
                                 <tr>
                                     <th></th>
-                                    <th>Room Type</th>
-                                    <th>Availability</th>
-                                    <th>View Type</th>
-                                    <th>Services</th>
-                                    <th>Stay Duration</th>
-                                    <th>Semester</th>
-                                    <th>Price</th>
-                                    {role === 'student' || !isLoggedIn ? <th>Book Room</th> : null}
+                                    <th>{t('roomTypeTitle')}</th>
+                                    <th>{t('availability')}</th>
+                                    <th>{t('viewType')}</th>
+                                    <th>{t('servicesTitle')}</th>
+                                    <th>{t('stayDuration')}</th>
+                                    <th>{t('semester')}</th>
+                                    <th>{t('price')}</th>
+                                    {role === 'student' || !isLoggedIn ? <th>{t('bookRoom')}</th> : null}
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -223,41 +238,41 @@ const DormDetails = () => {
                                     <tr key={room._id || index}>
                                         <td>
                                             <div className="more-images">
-                                                <img src={room.roomPics[0]} alt="Room" width="70px" height="70px" className="rooms-images" style={{borderRadius:'10px'}} onClick={() => openModal(room.roomPics[0], room.roomPics)} />
+                                                <img src={room.roomPics[0]} alt="Room" width="70px" height="70px" className="rooms-images" style={{ borderRadius: '10px' }} onClick={() => openModal(room.roomPics[0], room.roomPics)} />
                                                 {room.roomPics.length > 0 && (
                                                     <div className="more-overlay" onClick={() => openModal(room.roomPics[0], room.roomPics)}>+</div>
                                                 )}
                                             </div>
                                         </td>
-                                        <td>{room.roomType}</td>
+                                        <td>{t('roomTypes.'+room.roomType)}</td>
                                         <td style={{ color: room.availability === 0 ? 'darkred' : room.availability > 20 ? 'green' : 'orangered' }}>
-                                            {room.availability === 0 ? 'Fully Booked!' : room.availability > 20 ? 'Available' : 'Almost Out!'}
+                                            {room.availability === 0 ? t('fullyBooked') : room.availability > 20 ? t('available') : t('almostOut')}
                                         </td>
-                                        <td>{room.viewType}</td>
-                                        <td>{room.services.map(service => capitalizeFirstLetter(service)).join(', ')}</td>
+                                        <td>{t('viewTypes.'+room.viewType)}</td>
+                                        <td>{room.services.map(service => translateService(service)).join(', ')}</td>
                                         <td>
                                             <select name='stay' value={stay} onChange={handleChange}>
-                                                <option value='4.5'>1 semester</option>
-                                                <option value='9'>2 semesters</option>
-                                                <option value='12'>1 year</option>
-                                                <option value='3'>Summer</option>
+                                                <option value='4.5'>{t('1Semester')}</option>
+                                                <option value='9'>{t('2Semesters')}</option>
+                                                <option value='12'>{t('1Year')}</option>
+                                                <option value='3'>{t('summer')}</option>
                                             </select>
                                         </td>
                                         <td>
                                             <select name='semester' value={semester} onChange={handleChange}>
-                                                <option value='spring'>{d.getFullYear()} - {d.getFullYear() + 1} Spring Term</option>
-                                                <option value='fall'>{d.getFullYear()} - {d.getFullYear() + 1} Fall Term</option>
-                                                <option value='summer'>{d.getFullYear()} - {d.getFullYear() + 1} Summer Term</option>
+                                                <option value='spring'>{`${d.getFullYear()} - ${d.getFullYear() + 1} ${t('springTerm')}`}</option>
+                                                <option value='fall'>{`${d.getFullYear()} - ${d.getFullYear() + 1} ${t('fallTerm')}`}</option>
+                                                <option value='summer'>{`${d.getFullYear()} - ${d.getFullYear() + 1} ${t('summerTerm')}`}</option>
                                             </select>
                                         </td>
                                         <td>{getPrice(room, stay)}</td>
                                         {role === 'student' ? (
                                             <td>
-                                                <button className="table-btn" onClick={() => handleBooking(room._id, dormID)}>Book Room</button>
+                                                <button className="table-btn" onClick={() => handleBooking(room._id, dormID)}>{t('bookRoom')}</button>
                                             </td>
-                                        ) :(!isLoggedIn)?<td>
-                                            <button className="table-btn" onClick={() => navigate('/login')}>Book Room</button>
-                                        </td>:null
+                                        ) : (!isLoggedIn) ? <td>
+                                            <button className="table-btn" onClick={() => navigate('/login')}>{t('bookRoom')}</button>
+                                        </td> : null
                                         }
                                     </tr>
                                 ))}
@@ -265,16 +280,16 @@ const DormDetails = () => {
                             </table>
                         </div>
                         <div className="reviews">
-                            <h2>Reviews</h2>
+                            <h2>{t('reviews')}</h2>
                             {reviews.length > 0 ? (
                                 <ul>
-                                    {reviews.map((review, index) => (
+                                    {currentReviews.map((review, index) => (
                                         <li key={review._id || index}>
                                             <div className="review-header">
                                                 <div className='review-info'>
-                                                    <strong>{review.student.name}  <span style={{color:'violet'}}>{review.student.role !== 'student'?review.student.role:null}</span></strong>
+                                                    <strong>{review.student.name}  <span style={{ color: 'violet' }}>{review.student.role !== 'student' ? review.student.role : null}</span></strong>
                                                 </div>
-                                                {user?review.student._id == user[0]?._id  || role === 'admin'?<FontAwesomeIcon icon={faTimes} style={{cursor:'pointer'}} onClick={()=>handleReviewDeletion(review._id)}/>:null:null}
+                                                {user ? review.student._id == user[0]?._id || role === 'admin' ? <FontAwesomeIcon icon={faTimes} style={{ cursor: 'pointer' }} onClick={() => handleReviewDeletion(review._id)} /> : null : null}
                                             </div>
                                             <div className="review-rating">
                                                 <StarRating rating={review.rating} />
@@ -283,18 +298,23 @@ const DormDetails = () => {
                                             <div className="review-comment">
                                                 <p>{review.comment}</p>
                                             </div>
-                                            {review.response?
+                                            {review.response ?
                                                 <div className='review-dormOwner-reply'>
-                                                    <span>Dorm owner reply:</span>
+                                                    <span>{t('dormOwnerReply')}:</span>
                                                     {review.response}
-                                                </div>:null
+                                                </div> : null
                                             }
                                         </li>
                                     ))}
                                 </ul>
                             ) : (
-                                <p>No reviews yet.</p>
+                                <p>{t('noReviewsYet')}</p>
                             )}
+                            <div className="pagination">
+                                <button onClick={goToPreviousPage} disabled={currentPage === 1}>{t('previous')}</button>
+                                <span>{t('page')} {currentPage} {t('of')} {totalPages}</span>
+                                <button onClick={goToNextPage} disabled={currentPage === totalPages}>{t('next')}</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -322,9 +342,9 @@ const DormDetails = () => {
                 <div className="modal-backdrop" onClick={closeReviewModal}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <span className="modal-close" onClick={closeReviewModal}>&times;</span>
-                        <h2>Add Review</h2>
+                        <h2>{t('addReview')}</h2>
                         <label>
-                            Rating:
+                            {t('rating')}:
                             <input
                                 type="number"
                                 value={newReview.rating}
@@ -334,13 +354,13 @@ const DormDetails = () => {
                             />
                         </label>
                         <label>
-                            Comment:
+                            {t('comment')}:
                             <textarea
                                 value={newReview.comment}
                                 onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
                             />
                         </label>
-                        <button className="modal-btn" onClick={handleReviewSubmit}>Submit Review</button>
+                        <button className="modal-btn" onClick={handleReviewSubmit}>{t('submitReview')}</button>
                     </div>
                 </div>
             )}
@@ -349,7 +369,6 @@ const DormDetails = () => {
 }
 
 export default DormDetails;
-
 
 const StarRating = ({ rating }) => {
     const stars = [];
