@@ -59,7 +59,7 @@ export const UserProvider = ({ children }) => {
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, userId, role, status, isLoggedIn }}>
+        <UserContext.Provider value={{ user, userId, role, status, isLoggedIn, email }}>
             {children}
         </UserContext.Provider>
     );

@@ -71,6 +71,7 @@ app.use('/api', userRoutes);
 app.use('/dorms',dormRoutes);
 app.use('/booking',bookingRoutes);
 app.use('/reviews',reviewRoutes);
+app.use('/chat',chatRoutes)
 
 
 
@@ -175,59 +176,6 @@ const seedDatabase = async ()=>{
 //seedDatabase();
 
 // app.use(bodyParser.json());
-
-
-// chat endpoints.
-// TODo: migrate the code to its own directory 
-app.get('/api/getMessages', async (req, res) => {
-  console.log("get messages: Called")
-  const { userId, otherUserId } = req.query;
-  try {
-    const messages = await Chat.find({
-      $or: [
-        { sender: userId, receiver: otherUserId },
-        { sender: otherUserId, receiver: userId },
-      ],
-    }).sort({ timestamp: 1 });
-    res.json({ messages });
-  } catch (error) {
-    res.status(500).send('Error fetching messages');
-  }
-});
-
-// Post a new message
-app.post('/chat', async (req, res) => {
-  console.log("chat: Called")
-
-  const { content, sender, receiver } = req.body;
-  try {
-    const newMessage = new Chat({ content, sender, receiver });
-    await newMessage.save();
-    res.status(201).send('Message saved');
-  } catch (error) {
-    res.status(500).send('Error saving message');
-  }
-});
-
-// Express route to fetch chat messages
-app.get('/api/getChat', async (req, res) => {
-  console.log("getChat: Called")
-
-  const { sender, receiver } = req.query;
-  try {
-      const messages = await Chat.find({ $or: [
-        { sender: sender, receiver: receiver },
-        { sender: receiver, receiver: sender },
-      ],
-    }).sort({ timestamp: 1 });
-      res.json(messages);
-  } catch (error) {
-      console.error('Error fetching chat messages:', error);
-      res.status(500).json({ error: 'Failed to fetch chat messages' });
-  }
-});
-
-
 
 app.get('/',(req,res)=>{
     res.send('backend working?')
