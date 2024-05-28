@@ -198,7 +198,7 @@ exports.logout = async (req, res) => {
 
 exports.getStudentUser = async (req,res)=>{
     try{
-        const user = await User.find({microsoftID:req.params.sID})
+        const user = await User.findOne({ microsoftID: req.params.sID });
         if(user){
             res.status(200).json(user)
         }else{
