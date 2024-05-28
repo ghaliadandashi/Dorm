@@ -109,7 +109,7 @@ const seedDatabase = async ()=>{
 //         const dorm = new Dorm({
 //             dormName: 'Lotus',
 //             owner: savedDormOwner._id,
-//             services: ['WiFi', 'Laundry'],
+//             services: ['wifi', 'laundry','gym],
 //             capacity: 100,
 //             occupancy: 0,
 //             location: 'Dorm Location',

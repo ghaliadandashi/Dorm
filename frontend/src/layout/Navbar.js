@@ -71,10 +71,7 @@ const Navbar = () => {
                                 <Link to='/profile' className="nav-link"><FontAwesomeIcon icon={faUser} /></Link>
                             </li>
                             <li className="nav-item">
-                                <Link to='/settings' className="nav-link"><FontAwesomeIcon icon={faCog} /></Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link to='/chat' className="nav-link"><FontAwesomeIcon icon={faComments} /></Link>
+                                <Link to='/chat' className="nav-link"><FontAwesomeIcon icon={faComments}/></Link>
                             </li>
                             <li className="nav-item">
                                 <div className="notification-wrapper">

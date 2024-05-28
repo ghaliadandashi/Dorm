@@ -12,6 +12,8 @@ import Dashboard from './dashboard';
 import noImage from '../../images/1554489-200.png'
 import ProfilePicSection from "./profilePicSection";
 import {useNotification} from "../../layout/Notifications";
+import Settings from "./settings";
+import {Link} from "react-router-dom";
 
 const DormOwnerProfile = () => {
     const {user, setUser} = useAuth()
@@ -324,7 +326,9 @@ const DormOwnerProfile = () => {
                         </tr>
                         {bookings.map((booking, index) => (
                             <tr>
-                                <td key={index}>{booking.user.name.toUpperCase()}</td>
+                                <td key={index}><Link to={`/user/${booking.user._id}`}>
+                                    {booking.user.name}
+                                </Link></td>
                                 <td>{booking.dorm.dormName || '----'}</td>
                                 <td>{booking.room?.roomType?? '-----'}</td>
                                 <td>{booking.startDate.substring(0,booking.startDate.indexOf('T')).split('-').reverse().join('-')}</td>
@@ -382,6 +386,11 @@ const DormOwnerProfile = () => {
                         </div>
                         {tempID? <Dashboard dormId={tempID}/>:<h3 style={{color:"white",fontWeight:'bold'}}>Select Dorm to view insights!</h3>}
 
+                    </div>
+                )}
+                {activeTab === 'settings' &&(
+                    <div>
+                        <Settings/>
                     </div>
                 )}
             </div>

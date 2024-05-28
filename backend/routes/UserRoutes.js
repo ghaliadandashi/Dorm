@@ -8,7 +8,9 @@ const { register, login, validate, user, logout,profile,getDorm, changeProfilePi
     rejectLogin,
     getOccupancyData,
     getRevenueData,
-    getExistingChats, getUserByName
+    getExistingChats, getUserByName,
+    changePassword,
+    getPublicProf
 } = require('../controllers/userController');
 const upload = multer({ storage: multer.memoryStorage() });
 const authenticateToken = require('../middleware/auth')
@@ -40,4 +42,6 @@ router.put('/acceptLogin/:userID',acceptLogin)
 router.put('/rejectLogin/:userID',rejectLogin)
 router.get('/occupancy/:dormId',getOccupancyData)
 router.get('/revenue/:dormId',getRevenueData)
+router.put('/changePassword',authenticateToken,changePassword)
+router.get('/getPublicProf/:userID',authenticateToken,getPublicProf)
 module.exports = router;

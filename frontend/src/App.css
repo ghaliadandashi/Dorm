@@ -1,9 +1,10 @@
 .App {
   text-align: center;
-  background-color:  #1f203e;;
+  background-color:  #1f203e;
   display: flex;
   flex-direction: column;
   height:170vh;
+  width: 100vw;
 }
 html, body, #root {
   height: 100vh;
