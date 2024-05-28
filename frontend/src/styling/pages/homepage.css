@@ -21,15 +21,19 @@
     background-color: #1f203e;
 }
 
-.homeContent .homeLast{
+.homeContent .homeLast {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap:20px;
-    border-left:1px solid #565169;
+    gap: 20px;
+    border-left: 1px solid #565169;
     background-color: #2d2d45;
     margin-top: -40px;
+    height: 65vh;
+    border-bottom-left-radius: 15px; /* Adjust the value as needed */
+    border-bottom-right-radius: 15px; /* Adjust the value as needed */
 }
+
 
 .homeLast .bookingStatus{
     background-color: #1f203e;
@@ -56,14 +60,7 @@
     font-weight: bold;
 }
 
-.homeContent .homeFirst{
-    border: 1px solid #565169;
-    background-color: #2d2d45;
-    height: 70%;
-    border-radius: 20px;
-    margin-left:20px;
-    box-shadow: 1px 2px 2px black;
-}
+
 .comfortsign{
     display: flex;
     justify-content: space-between;

@@ -43,198 +43,166 @@
 .personalInfo {
     display: flex;
     flex-direction: column;
-    background-color: #1f203e;
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    gap: 20px;
-    margin-top: 40px;
-    margin-left:50px;
-    margin-right: 50px;
-}
-
-.profileNav {
+    background-color: #1a1a2e;
+    color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    gap: 30px;
+    max-width: 800px;
+    margin: 40px auto;
+  }
+  
+  .profileNav {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     gap: 20px;
-}
-
-.profilePicSection {
+  }
+  
+  .profilePicSection {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    margin-left:30px;
-    flex:1;
-}
-
-.profilePicSection img {
+  }
+  
+  .profilePicSection img {
     border-radius: 50%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.updatePicSection {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+  }
+  
+  .updatePicSection {
     display: flex;
-    flex-direction: row;
+    gap: 10px;
+  }
+  
+  .custom-file-upload {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    color: #fff;
+  font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    background-color: #6c63ff;
+  }
+  
+  .custom-file-upload:hover {
+    background-color: #5a4dff;
+  }
+  
+  .custom-file-upload input[type="file"] {
+    display: none;
+  }
+  
+  .updatePicSection button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    color: #fff;
+    font-weight: 500;
+    background-color: #ff5f5f;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 15px;
+   font-weight:bold;
+  }
+  
+  .updatePicSection button:hover {
+    background-color: #ff3d3d;
+  }
+  
+  .editBtn button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    color: #fff;
+    font-weight: 500;
+    background-color: #47cf73;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .editBtn button:hover {
+    background-color: #37b35c;
+  }
+  
+  .personalInfo form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .personalInfo form input {
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 1px solid #3a3a5c;
+    background-color: #262642;
+    color: #fff;
+    font-size: 16px;
+  }
+  
+  .personalInfo form button[type="submit"] {
+    padding: 12px 20px;
+    border-radius: 6px;
+    border: none;
+    color: #fff;
+    font-weight: 500;
+    background-color: #47cf73;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .personalInfo form button[type="submit"]:hover {
+    background-color: #37b35c;
+  }
+  
+  .personalInfo form button {
+    padding: 12px 20px;
+    border-radius: 6px;
+    border: none;
+    color: #fff;
+    font-weight: 500;
+    background-color: #ff5f5f;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .personalInfo form button:hover {
+    background-color: #ff3d3d;
+  }
+  
+  .profile-info {
+    text-align: left;
+    background-color: #262642;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .profile-info p {
+    margin: 0;
+    font-size: 16px;
+    color: #bbb;
+    display: flex;
     align-items: center;
     gap: 10px;
-}
-
-.custom-file-upload {
-    padding: 10px 20px;
-    border-radius: 15px;
-    border: none;
-    color: white;
-    font-weight: bold;
-    font-size: medium;
-    background-color: #6565a5;
-    cursor: pointer;
-    box-shadow: #2b2c48 2px 2px 1px;
-    transition: background-color 0.3s ease;
-}
-
-.custom-file-upload:hover {
-    background-color: #575795;
-}
-
-.custom-file-upload input[type="file"] {
-    display: none;
-}
-
-.updatePicSection button {
-    padding: 10px 20px;
-    border-radius: 15px;
-    border: none;
-    color: white;
-    font-weight: bold;
-    font-size: medium;
-    background-color: #f44336;
-    cursor: pointer;
-    box-shadow: #2b2c48 2px 2px 1px;
-    transition: background-color 0.3s ease;
-}
-
-.updatePicSection button:hover {
-    background-color: #e53935;
-}
-
-.editBtn {
-    display: flex;
-    justify-content: center;
-    align-self: flex-start;
-}
-
-.editBtn button {
-    padding: 10px 20px;
-    border-radius: 15px;
-    border: none;
-    color: white;
-    font-weight: bold;
-    font-size: medium;
-    background-color: #4caf50;
-    cursor: pointer;
-    box-shadow: #2b2c48 2px 2px 1px;
-    transition: background-color 0.3s ease;
-}
-
-.editBtn button:hover {
-    background-color: #45a049;
-}
-
-.personalInfo form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width:80%;
-    align-self: center;
-}
-
-.personalInfo form input {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #444;
-    background-color: #2d2e44;
-    color: white;
-    font-size: medium;
-}
-
-.personalInfo form button[type="submit"] {
-    padding: 10px 20px;
-    border-radius: 15px;
-    border: none;
-    color: white;
-    font-weight: bold;
-    font-size: medium;
-    background-color: #4caf50;
-    cursor: pointer;
-    box-shadow: #2b2c48 2px 2px 1px;
-    transition: background-color 0.3s ease;
-}
-
-.personalInfo form button[type="submit"]:hover {
-    background-color: #45a049;
-}
-
-.personalInfo form button {
-    width: 100%;
-    padding: 10px 20px;
-    border-radius: 15px;
-    border: none;
-    color: white;
-    font-weight: bold;
-    font-size: medium;
-    background-color: #f44336;
-    cursor: pointer;
-    box-shadow: #2b2c48 2px 2px 1px;
-    transition: background-color 0.3s ease;
-    align-self: center;
-}
-
-.personalInfo form button:hover {
-    background-color: #e53935;
-}
-
-.personalInfo form button[type="button"] {
-    background-color: #f44336;
-}
-
-.personalInfo form button[type="button"]:hover {
-    background-color: #e53935;
-}
-
-.profile-info {
-    text-align: left;
-    margin-top: 20px;
-    background-color: #2d2e44;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width:80%;
-    align-self: center;
-    display: flex;
-    flex-direction: column;
-    gap:10px;
-}
-
-.profile-info p {
-    margin: 10px 0;
-    font-size: 1.2rem;
-    color: #e0e0e0;
-    border:2px solid white;
-    padding:15px;
-    z-index: 1;
-}
-
-.profile-info p strong {
-    color: #9696e7;
-    position: relative;
-    top:-30px;
-    z-index: 0;
-    background-color:#2d2e44 ;
-}
-
+  }
+  
+  .profile-info p strong {
+    color: #fff;
+    font-weight: 500;
+    min-width: 120px;
+  }
 .tab-content ul {
     list-style: none;
 }
