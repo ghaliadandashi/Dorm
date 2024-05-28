@@ -7,6 +7,7 @@ const Dorm = require("../models/Dorm");
 const admin = require('firebase-admin');
 const Booking = require('../models/Booking')
 const Review = require('../models/Review')
+const Chat = require('../models/Chat')
 
 const serviceAccount = require('../dorm-2aa81-firebase-adminsdk-88ye5-597ead691c.json');
 const mongoose = require("mongoose");
@@ -361,16 +362,7 @@ exports.deleteProfilePic = async (req,res)=>{
 }
 
 
-exports.getUsers = async (req,res)=>{
-    try{
-        const users = await User.find({})
-        res.status(200).json(users)
-    }catch(error){
-        console.error('Failed to retrieve users:', error);
-        res.status(500).send('Error retrieving all users');
-    }
 
-}
 
 exports.getDorm = async (req,res)=>{
     const userid = req.user.userId;
@@ -709,3 +701,63 @@ exports.rejectLogin = async (req,res)=>{
         res.status(500).json({ message: 'Server error' });
     }
 }
+exports.getExistingChats = async (req, res) => {
+    try {
+        const userEmail = req.query.user;
+
+        if (!userEmail) {
+            console.error('User email is missing in the request');
+            return res.status(400).send('User email is required');
+        }
+
+        // Find all chats where the current user is either the sender or the receiver
+        const chats = await Chat.find({
+            $or: [
+                { sender: userEmail },
+                { receiver: userEmail }
+            ]
+        });
+
+        // Extract the other participants' emails
+        const userEmails = [...new Set(chats.map(chat => chat.sender === userEmail ? chat.receiver : chat.sender))];
+
+        // Fetch user details based on these emails
+        const users = await User.find({ email: { $in: userEmails } });
+
+        // Add chat data to users
+        const usersWithChats = users.map(user => {
+            const userChats = chats.filter(chat => chat.sender === user.email || chat.receiver === user.email);
+            return { ...user._doc, chats: userChats };
+        });
+
+        res.status(200).json(usersWithChats);
+    } catch (error) {
+        console.error('Failed to retrieve users:', error);
+        res.status(500).send('Error retrieving users');
+    }
+};
+
+
+exports.getUsers = async (req,res)=>{
+    console.log("getusers: called")
+    try{
+        const users = await User.find({})
+        res.status(200).json(users)
+    }catch(error){
+        console.error('Failed to retrieve users:', error);
+        res.status(500).send('Error retrieving all users');
+    }
+}
+
+// Controller function to search users by name
+exports.getUserByName = async (req, res) => {
+    const userName = req.query.name;
+    try {
+      const users = await User.find({ name: new RegExp(userName, 'i') }); // Case-insensitive search
+      res.status(200).json(users);
+    } catch (error) {
+      console.error('Error searching users by name:', error);
+      res.status(500).send('Error searching users');
+    }
+  };
+  

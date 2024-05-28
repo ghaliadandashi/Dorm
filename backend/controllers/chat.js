@@ -65,7 +65,6 @@ exports.getChatHistory = async (req, res) => {
 };
 
 exports.getMessages = async (req, res) => {
-    console.log("get messages: Called")
     const { userId, otherUserId } = req.query;
     try {
         const messages = await Chat.find({
@@ -81,9 +80,7 @@ exports.getMessages = async (req, res) => {
 };
 
 exports.chat= async (req, res) => {
-    console.log("chat: Called")
     const { content, sender, receiver } = req.body;
-    console.log(req.body)
     try {
         const newMessage = new Chat({ content, sender, receiver });
         await newMessage.save();
@@ -93,9 +90,7 @@ exports.chat= async (req, res) => {
     }
 };
 
-exports.getChat= async (req, res) => {
-    console.log("getChat: Called")
-
+exports.getChat = async (req, res) => {
     const { sender, receiver } = req.params;
     try {
         const messages = await Chat.find({ $or: [
@@ -109,3 +104,18 @@ exports.getChat= async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch chat messages' });
     }
 };
+
+exports.markAsRead = async (req, res) => {
+        const { userEmail, otherUserEmail } = req.body;
+      
+        try {
+          await Chat.updateMany(
+            { sender: otherUserEmail, receiver: userEmail, read: false },
+            { $set: { read: true } }
+          );
+          res.status(200).send('Messages marked as read');
+        } catch (error) {
+          console.error('Failed to mark messages as read:', error);
+          res.status(500).send('Error marking messages as read');
+        }
+    }
