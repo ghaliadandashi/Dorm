@@ -173,6 +173,28 @@ const seedDatabase = async ()=>{
 //     }
 //   };
 
+
+// seedChatDatabase();
+
+const addUser = async () =>{
+  try {
+    const newUsers = new User(
+      {
+        name: 'Rahim Berdiev',
+        email: 'roha@example.com',
+        role: 'student',
+        password: 'roha',
+        status: 'Valid',
+    });
+    await newUsers.save();
+    console.log('User created successfully!');
+        } catch (error) {
+            console.error('Error creating user:', error);
+        }
+}
+// addUser()
+
+
 //seedDatabase();
 
 // app.use(bodyParser.json());
