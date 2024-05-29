@@ -70,7 +70,7 @@ const DormDetails = () => {
     };
 
     const handleBooking = (roomID, dormID) => {
-        axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}/${stay}/${semester}`)
+        axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}/${stay}/${semester}`,{},{withCredentials:true})
             .then(response => {
                 console.log(response.data);
                 addNotification(t('bookingPlaced'), 'success');
@@ -223,7 +223,7 @@ const DormDetails = () => {
                                 <thead>
                                 <tr>
                                     <th></th>
-                                    <th>{t('roomTypeTitle')}</th>
+                                    <th>{t('roomTypesTitle')}</th>
                                     <th>{t('availability')}</th>
                                     <th>{t('viewType')}</th>
                                     <th>{t('servicesTitle')}</th>

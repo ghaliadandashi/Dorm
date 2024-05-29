@@ -148,3 +148,12 @@ exports.handleStatus = async (req, res) => {
         return res.status(500).json({ message: 'Error processing request', error: error.message });
     }
 };
+
+exports.deleteRequest = async (req,res)=>{
+    try{
+        const deletedRequest = await Booking.findByIdAndDelete(req.params.bookingID);
+    }catch (error){
+        console.error('Failed to delete booking',error);
+        return res.status(500).json({message:'Error processing request',error:error.message})
+    }
+}

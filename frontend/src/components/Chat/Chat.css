@@ -8,7 +8,7 @@ body {
   }
   
   .chat-container {
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(241, 7, 7, 0.1);
     background: linear-gradient(135deg, #1F203E, #1c123c, #201c3d); /* Gradient background */
@@ -22,27 +22,28 @@ body {
   
   .user-list {
     border-right: 1px solid #ccc;
-    background: linear-gradient(135deg, #1F203E, #1c123c, #201c3d); /* Gradient background */
+    border-radius: 10px 0 0 10px ;
+    background: linear-gradient(135deg, #1F203E, #1c123c, #201c3d);
     overflow-y: auto;
-    padding: 10px; /* Add padding */
-    color: white; /* Ensuring text is readable against the gradient background */
+    padding: 10px;
+    color: white;
   }
   
   
   .user-list ul {
     list-style-type: none;
-    padding: 0; /* Remove default padding */
+    padding: 0;
   }
   
   .user-list input[type="text"] {
-    width: calc(100% - 20px); /* Adjust width to fit within the container */
-    padding: 10px; /* Add padding for better appearance */
-    border: none; /* Remove border */
-    border-radius: 5px; /* Add border radius */
-    margin-bottom: 10px; /* Add margin for spacing */
-    background-color: #fff; /* Set background color to white */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
-    transition: box-shadow 0.3s ease; /* Add transition effect */
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
   }
   
   .user-list input[type="text"]:focus {

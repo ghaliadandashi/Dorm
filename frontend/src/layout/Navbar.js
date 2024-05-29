@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBell, faCog, faComments, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import axios from "axios";
 import { useAuth } from "../components/Auth/AuthHook";
 import LoginForm from "../components/Auth/LoginForm";
 import '../styling/navbar.css';
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
     const { isLoggedIn, role, status } = useAuth();
     const currentPage = useLocation().pathname;
     const navigate = useNavigate();
-    axios.defaults.withCredentials = true;
+    const { t } = useTranslation();
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([
@@ -20,6 +21,7 @@ const Navbar = () => {
         'Price drop alert: Dorm A',
         'New review for Dorm B'
     ]);
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         if (sessionStorage.getItem('reloadAfterLogout')) {
@@ -45,6 +47,12 @@ const Navbar = () => {
             });
     };
 
+    const handleSearch = (e) => {
+        if (e.key === 'Enter') {
+            navigate(`/home?search=${searchQuery}`);
+        }
+    };
+
     if (status === 'Invalid' || status === 'Pending') {
         setTimeout(() => {
             handleLogout();
@@ -63,7 +71,14 @@ const Navbar = () => {
         <>
             <nav className="navbar">
                 <Link to='/' className="navbar-brand"><h1>Dormy</h1></Link>
-                <input className="search-bar" type="search" placeholder="Explore" />
+                <input
+                    className="search-bar"
+                    type="search"
+                    placeholder={t('searchDorm')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearch}
+                />
                 <ul className="navbar-nav">
                     {(isLoggedIn || status === 'Valid') ? (
                         <>
@@ -71,7 +86,7 @@ const Navbar = () => {
                                 <Link to='/profile' className="nav-link"><FontAwesomeIcon icon={faUser} /></Link>
                             </li>
                             <li className="nav-item">
-                                <Link to='/chat' className="nav-link"><FontAwesomeIcon icon={faComments}/></Link>
+                                <Link to='/chat' className="nav-link"><FontAwesomeIcon icon={faComments} /></Link>
                             </li>
                             <li className="nav-item">
                                 <div className="notification-wrapper">
@@ -88,22 +103,22 @@ const Navbar = () => {
                                 </div>
                             </li>
                             <li className="nav-item">
-                                <button onClick={handleLogout} className="nav-link" style={{ backgroundColor: '#2b2b43', border: 'none' ,padding:'0px'}}><FontAwesomeIcon icon={faSignInAlt} /></button>
+                                <button onClick={handleLogout} className="nav-link" style={{ backgroundColor: '#2b2b43', border: 'none', padding: '0px' }}><FontAwesomeIcon icon={faSignInAlt} /></button>
                             </li>
                         </>
                     ) : (
                         <>
                             {currentPage === '/register' ? (
                                 <li className="nav-item">
-                                    <Link to='/login' className="nav-link">Login</Link>
+                                    <Link to='/login' className="nav-link">{t('login')}</Link>
                                 </li>
                             ) : (
                                 <>
                                     <li className="nav-item">
-                                        <Link to='/login' className="nav-link">Login</Link>
+                                        <Link to='/login' className="nav-link">{t('login')}</Link>
                                     </li>
                                     <li className="nav-item">
-                                        <Link to='/register' className="nav-link">Register As Dorm Owner</Link>
+                                        <Link to='/register' className="nav-link">{t('registerDormOwner')}</Link>
                                     </li>
                                 </>
                             )}
@@ -119,6 +134,6 @@ const Navbar = () => {
             )}
         </>
     );
-}
+};
 
 export default Navbar;

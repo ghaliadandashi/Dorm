@@ -123,7 +123,7 @@ const DormOwnerProfile = () => {
             },
             editRoom: {
                 title: t('editRoom'),
-                initialData: { services: '', pricePerSemester: '', summerPrice: '', extraFee: '', noOfRooms: '', viewType: 'CityView', space: '', roomPics: '' },
+                initialData: { services: '', pricePerSemester: '', summerPrice: '', extraFee: '', noOfRooms: '', viewType: '', space: '', roomPics: '' },
                 fields: [
                     { name: 'services', label: t('servicesTitle'), type: 'checkbox', options: [
                             { id: "ac", name: "ac", label: t('servicesList.ac') },
@@ -154,7 +154,7 @@ const DormOwnerProfile = () => {
             },
             editDorm: {
                 title: t('editDorm'),
-                initialData: { city: 'Famagusta', streetName: '', capacity: '', type: 'on-campus', dormPics: '' },
+                initialData: { city: '', streetName: '', capacity: '', type: 'on-campus', dormPics: '' },
                 fields: [
                     { name: 'streetName', label: t('streetName'), type: 'text' },
                     { name: 'city', label: t('city'), type: 'select', options: [
@@ -246,7 +246,7 @@ const DormOwnerProfile = () => {
                 .catch(error => { console.error('Failed to get Dorms: ', error) });
             getBooking();
         }
-    }, [user]);
+    }, [user],[bookings]);
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
@@ -282,7 +282,16 @@ const DormOwnerProfile = () => {
             setTempID(id);
         }, 0);
     };
-
+    const deleteRequest= async (bookingID)=>{
+        try {
+            const response = await axios.delete(`http://localhost:3001/booking/deleteRequest/${bookingID}`)
+                .then(
+                    addNotification('Booking Rejected!', 'error')
+                )
+        }catch (error){
+            console.error('Failed to update Booking status', error);
+        }
+    }
     return (
         <div className="profile">
             <div className="tabs">
@@ -354,7 +363,7 @@ const DormOwnerProfile = () => {
                                             {booking.status === 'Reserved' ? <td><button onClick={() => handleStatus(booking._id)}>{t('confirmBooking')}</button></td> : null
                                             }
                                         </>}
-                                    {booking.status !== 'Booked' ? <td><FontAwesomeIcon icon={faTimes} /></td> : null}
+                                    {booking.status !== 'Booked' ? <td><FontAwesomeIcon icon={faTimes} onClick={()=>deleteRequest(booking._id)} /></td> : null}
                                 </tr>
                             ))}
                             </tbody>

@@ -51,7 +51,7 @@ const AdminProfile = () => {
                     console.error('Failed to get dorm requests', error);
                 });
         }
-    }, [user]);
+    }, [user],[users]);
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);

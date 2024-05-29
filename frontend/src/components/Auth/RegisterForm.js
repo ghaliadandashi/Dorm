@@ -178,8 +178,8 @@ const RegisterForm = () => {
                             <input type='tel' id='phoneNo' name='phoneNo' value={formData.phoneNo} onChange={handleInputChange} />
                             <select id='langPref' name='langPref' value={formData.langPref} onChange={handleInputChange}>
                                 <option>{t('selectLangPref')}</option>
-                                <option value='en'>{t('english')}</option>
-                                <option value='tr'>{t('turkish')}</option>
+                                <option value='english'>{t('english')}</option>
+                                <option value='turkish'>{t('turkish')}</option>
                             </select>
                             <label htmlFor='personalFile'>{t('uploadPersonalDocs')}</label>
                             <input type='file' id='personalFile' name='personalFile' onChange={handleInputChange} multiple />

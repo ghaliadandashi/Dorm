@@ -68,6 +68,7 @@ const Dashboard = ({ dormId }) => {
             await axios.post(`http://localhost:3001/reviews/respond/${reviewId}`, { response });
             fetchInsights();
             setResponse('');
+            addNotification(t('responseAdded'), 'success')
         } catch (error) {
             console.error('Error responding to review:', error);
         }
@@ -113,7 +114,7 @@ const Dashboard = ({ dormId }) => {
 
     const deleteResponse = (reviewID) => {
         axios.delete(`http://localhost:3001/reviews/deleteResponse/${reviewID}`)
-            .then(addNotification(t('responseDeleted'), 'success'))
+            .then(addNotification(t('responseDeleted'), 'error'))
     }
 
     return (
@@ -177,7 +178,7 @@ const Dashboard = ({ dormId }) => {
                                     onChange={(e) => setResponse(e.target.value)}
                                     placeholder={t('respondToReview')}
                                 />
-                                <button onClick={() => handleResponseSubmit(review._id)}>{t('submitResponse')}</button>
+                                <button onClick={() => handleResponseSubmit(review._id)} >{t('submitResponse')}</button>
                             </div>
                         )}
                     </div>

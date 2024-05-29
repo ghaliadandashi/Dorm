@@ -113,14 +113,13 @@ exports.dormDetails = async (req, res) => {
 
 exports.searchDormByName = async (req, res) => {
     try {
-        const dorm = await Dorm.findOne({ dormName: req.params.dormName }).populate('rooms');
-        if (!dorm) {
+        const dormName = req.query.dormName;
+        const regex = new RegExp(dormName, 'i'); // 'i' for case-insensitive
+        const dorms = await Dorm.find({ dormName: regex }).populate('rooms');
+        if (!dorms.length) {
             return res.status(404).send('Dorm not found');
         }
-        res.status(200).json({
-            dorm,
-        });
-
+        res.status(200).json(dorms);
     } catch (error) {
         console.error('Failed to retrieve dorm', error);
         res.status(500).send('Error retrieving dorm details');

@@ -3,16 +3,16 @@ import Header from '../layout/Header';
 import '../styling/pages/homepage.css';
 import axios from "axios";
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
-import noImage from '../images/1554489-200.png'
-import avatar from '../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp'
-import image3 from '../images/Saly-16.png'
-import image4 from '../images/[removal.ai]_74281a78-76c3-42db-925c-2b9637458cb3-saly-37.png'
+import noImage from '../images/1554489-200.png';
+import avatar from '../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp';
+import image3 from '../images/Saly-16.png';
+import image4 from '../images/[removal.ai]_74281a78-76c3-42db-925c-2b9637458cb3-saly-37.png';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import { useAuth } from "../components/Auth/AuthHook";
 import Search from '../layout/Search';
 import { useTranslation } from 'react-i18next';
-import LanguageSelector from "../components/LanguageSelector";
+import DormComparison from '../layout/DormComparison';
 
 const Home = () => {
     const [dorms, setDorms] = useState([]);
@@ -20,7 +20,9 @@ const Home = () => {
     const { isLoggedIn, user, role } = useAuth();
     const [booking, setBooking] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedDorms, setSelectedDorms] = useState([]);
     const dormsPerPage = 6;
+    const location = useLocation();
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -32,29 +34,41 @@ const Home = () => {
             .catch(error => {
                 console.error("Failed to fetch data:", error);
             });
+        const searchParams = new URLSearchParams(location.search);
+        const query = searchParams.get('search');
+        if (query) {
+            axios.get(`http://localhost:3001/dorms/searchDorm?dormName=${query}`)
+                .then(response => {
+                    console.log(response.data)
+                    setDorms(response.data);
+                })
+                .catch(error => {
+                    console.error('Failed to fetch search results:', error);
+                });
+        }
         axios.get('http://localhost:3001/booking/getBooking', { withCredentials: true })
             .then(response => {
                 if (role === 'student') {
-                    setBooking(response.data)
+                    setBooking(response.data);
                 }
             })
             .catch(error => {
-                console.error('Failed to fetch booking')
-            })
+                console.error('Failed to fetch booking');
+            });
         if (role !== 'student') {
             axios.get('http://localhost:3001/api/profile', { withCredentials: true })
                 .then(response => {
-                    setCUser(response.data)
+                    setCUser(response.data);
                     localStorage.setItem('currUser', JSON.stringify(response.data));
                 })
                 .catch(error => {
-                    console.error('Failed to get user info', error)
-                })
+                    console.error('Failed to get user info', error);
+                });
         } else {
-            setCUser(user)
+            setCUser(user);
             localStorage.setItem('currUser', JSON.stringify(user));
         }
-    }, [user, role]);
+    }, [user, role,location.search]);
 
     const indexOfLastDorm = currentPage * dormsPerPage;
     const indexOfFirstDorm = indexOfLastDorm - dormsPerPage;
@@ -70,12 +84,23 @@ const Home = () => {
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
     };
 
+    const handleDormSelection = (dorm) => {
+        setSelectedDorms((prevSelected) => {
+            if (prevSelected.includes(dorm)) {
+                return prevSelected.filter(selected => selected !== dorm);
+            } else {
+                return [...prevSelected, dorm];
+            }
+        });
+    };
+
     return (
         <div className='body'>
             <Header />
             <div className='homeContent'>
                 <div className='homeFirst'>
                     <Search setDorms={setDorms} />
+                    <DormComparison selectedDorms={selectedDorms} />
                 </div>
                 <div className='homeMiddle'>
                     <div className='comfortsign'>
@@ -93,7 +118,6 @@ const Home = () => {
                         gap: '90px',
                     }}>
                         {currentDorms.length > 0 ? currentDorms.map((dorm, index) => (
-                                <Link to='/dormDetails' style={{textDecoration:'none'}} onClick={() => localStorage.setItem('DormId', dorm._id)}>
                             <div key={index} style={{
                                 backgroundColor: "white",
                                 borderRadius: '10px',
@@ -101,19 +125,46 @@ const Home = () => {
                                 padding: '10px',
                                 minWidth: '200px',
                                 maxWidth: '300px',
-                                textAlign: 'center'
+                                textAlign: 'left',
+                                position: 'relative'
                             }}>
+                                <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedDorms.includes(dorm)}
+                                        onChange={() => handleDormSelection(dorm)}
+                                        style={{
+                                            width: '24px',
+                                            height: '24px',
+                                            cursor: 'pointer',
+                                        }}
+                                    />
+                                </div>
                                 <div>
-                                    {dorm.dormPics.length > 0 ? <img style={{ objectFit: 'cover' }} src={dorm.dormPics[0]} alt='' width='300' height='200' /> :
-                                        <img src={noImage} style={{ objectFit: 'cover' }} width='300' height='200' />}
-
+                                    {dorm.dormPics.length > 0 ? (
+                                        <Link to='/dormDetails' style={{ textDecoration: 'none' }} onClick={() => localStorage.setItem('DormId', dorm._id)}>
+                                            <img style={{ objectFit: 'cover', borderRadius: '10px' }} src={dorm.dormPics[0]} alt='' width='300' height='200' />
+                                        </Link>
+                                    ) : (
+                                        <img src={noImage} style={{ objectFit: 'cover', borderRadius: '10px' }} width='300' height='200' />
+                                    )}
                                 </div>
-                                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                                    <h5 style={{ color: 'black', fontSize: '20px', margin: '10px' }}>{dorm.dormName}</h5>
-                                    <p style={{ margin: '5px' ,color:'black'}}><FontAwesomeIcon icon={faMapMarkerAlt} /> {dorm.location}</p>
-                                </div>
+                                <Link to='/dormDetails' style={{ textDecoration: 'none' }} onClick={() => localStorage.setItem('DormId', dorm._id)}>
+                                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: '10px' }}>
+                                        <h5 style={{ color: 'black', fontSize: '20px', margin: '10px 0' }}>{dorm.dormName}</h5>
+                                        <p style={{ margin: '5px 0', color: 'black' }}>
+                                            <FontAwesomeIcon icon={faMapMarkerAlt} /> {dorm.location}
+                                        </p>
+                                    </div>
+                                </Link>
                             </div>
-                                </Link>)) : <div style={{ color: "white", height: '100vh' }}><h1>{t('noDorms')}</h1></div>}
+                        )) : (
+                            <div style={{ color: "white", height: '100vh' }}>
+                                <h1>{t('noDorms')}</h1>
+                            </div>
+                        )}
+
+
                     </div>
                     <div className="pagination">
                         <button onClick={goToPreviousPage} disabled={currentPage === 1}>{t('previous')}</button>
@@ -137,7 +188,7 @@ const Home = () => {
                                 <p style={{ color: "white", fontWeight: "bold" }}>{user?.name?.toUpperCase()}</p></div>}
                         <div className='bookingStatus-container'>
                             <label htmlFor='bookingStatus'>{t('bookingStatus')}</label>
-                            <p id='bookingStatus' className='bookingStatus' style={booking[0]?.status == 'Booked' ? { color: 'green' } : { color: '#f8c200' }}>{booking.length !== 0 ? booking[0].status : t('noBookingYet')}</p>
+                            <p id='bookingStatus' className='bookingStatus' style={booking[0]?.status === 'Booked' ? { color: 'green' } : { color: '#f8c200' }}>{booking.length !== 0 ? booking[0].status : t('noBookingYet')}</p>
                         </div>
                     </div>) : null)}
             </div>

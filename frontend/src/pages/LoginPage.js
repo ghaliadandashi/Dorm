@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LoginForm from '../components/Auth/LoginForm';
-import '../styling/loginPage.css'; // Import the CSS file
+import '../styling/loginPage.css';
+import {useTranslation} from "react-i18next"; // Import the CSS file
 
 const Login = () => {
   const [showPopup, setShowPopup] = useState(false); // State to track popup visibility
-
+  const {t}= useTranslation()
   const handlePopupOpen = () => {
     setShowPopup(true);
   };
@@ -18,14 +19,14 @@ const Login = () => {
     <div className="login-page">
       <div className="left-section"> {/* Dark blue section */}
         <div className="intro-content">
-          <h1 className="title">Begin now</h1>
-          <p className="subtitle">Find your dorm</p>
+          <h1 className="title">{t('beginNow')}</h1>
+          <p className="subtitle">{t('findYourDorm')}</p>
           <div className="actions">
             <button className="action-btn" onClick={handlePopupOpen}>
-              Sign-in
+              {t('sigin')}
             </button>
             <Link to="/register" className="action-btn">
-              Register As Dorm Owner
+              {t('registerDormOwner')}
             </Link>
           </div>
         </div>
