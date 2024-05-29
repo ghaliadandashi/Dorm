@@ -3,6 +3,8 @@ import './Chat.css';
 import { useAuth } from '../Auth/AuthHook';
 import avatar from '../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp';
 import axios from "axios";
+import sendIcon from '../../images/send.png';
+import uploadIcon from '../../images/upload.png';
 
 const Chat = () => {
   const { user } = useAuth();
@@ -14,6 +16,7 @@ const Chat = () => {
   const [search, setSearch] = useState('');
 
   const fetchUsers = useRef(null);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     fetchUsers.current = async () => {
@@ -56,7 +59,6 @@ const Chat = () => {
             otherUserEmail: activeUser.email
           });
 
-
           // Update the unread count for the active user
           setUsers((prevUsers) =>
             prevUsers.map((u) =>
@@ -77,6 +79,11 @@ const Chat = () => {
     fetchMessages();
   }, [activeUser, user]);
 
+  useEffect(() => {
+    // Scroll to bottom whenever messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (input.trim()) {
@@ -89,21 +96,14 @@ const Chat = () => {
       try {
         const response = await axios.post('http://localhost:3001/chat/chat', newMessage, { withCredentials: true });
 
-        const user =  {
-          unreadCount: 1,
-          email: newMessage.receiver,
-        }
-
-        setActiveUser(user);
-
         // Add the new message to the current state
         const messageWithTimestamp = {
           ...newMessage,
-          timestamp: new Date().toISOString() // Adding timestamp to the new message
+          timestamp: new Date().toISOString(), // Adding timestamp to the new message
         };
 
         setMessages((prevMessages) => [...prevMessages, messageWithTimestamp]);
-        setInput('');  // Clear the input field
+        setInput(''); // Clear the input field
 
         // Move the chat to the top
         moveChatToTop(activeUser.email);
@@ -185,8 +185,13 @@ const Chat = () => {
       };
       fetchUsers();
     }
-  };
 
+    
+  };
+    const handleFileSelect = (e) => {
+      const file = e.target.files[0];
+      // Do something with the selected file, such as uploading it to a server
+    }
   return (
     <div className="chat-container">
       <div className="user-list">
@@ -211,24 +216,40 @@ const Chat = () => {
         {activeUser && <div className="header"><h2> <img src={activeUser?.profilePic || activeUser?.photoURL || avatar} width='50' height='50' style={{ objectFit: 'cover', borderRadius: '10px' }} /> {activeUser.name}</h2></div>}
         <ul id="messages">
           {messages.map((msg, index) => (
-            <li key={index} className={msg.sender === user.email ? 'my-message' : 'their-message'}>
-              <div className="message-header">
-                <span>{msg.sender}</span>
-                <span className="timestamp">{formatTime(msg.timestamp)}</span>
+            <li key={index}>
+              <div className={msg.sender === user.email ? 'my-message message-container' : 'their-message message-container'}>
+                <div className="message-header">
+                  <span>{msg.sender}</span>
+                  <span className="timestamp">{formatTime(msg.timestamp)}</span>
+                </div>
+                <div className="message-content">{msg.content}</div>
               </div>
-              <div className="message-content">{msg.content}</div>
             </li>
           ))}
+          <div ref={messagesEndRef} />
         </ul>
         <form id="form" onSubmit={handleSubmit}>
-          <input
-            id="input"
-            autoComplete="off"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <button type="submit">Send</button>
-        </form>
+  <label htmlFor="file-input" className="upload-button">
+    <img src={uploadIcon} alt="Upload" className="upload-icon" />
+  </label>
+  <input
+    type="file"
+    id="file-input"
+    onChange={handleFileSelect}
+    style={{ display: 'none' }}
+  />
+  <input
+    id="input"
+    autoComplete="off"
+    value={input}
+    onChange={(e) => setInput(e.target.value)}
+    placeholder="Type your message..."
+  />
+  <button type="submit" className="send-button">
+    <img src={sendIcon} alt="Send" className="send-icon" />
+  </button>
+</form>
+
       </div>
     </div>
   );

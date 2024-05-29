@@ -1,42 +1,76 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: white;
   }
-  .chatPage{
-    height: 100vh;
+  
+  .chatPage {
+    height: 85vh;
   }
-
+  
   .chat-container {
     border: 1px solid #ccc;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background: #fff;
-    height:60% ;
-    width: 50%;
+    box-shadow: 0 0 10px rgba(241, 7, 7, 0.1);
+    background: #1F203E; /* Updated background color */
+    height: 90%;
+    width: 60%;
     display: flex;
     flex-direction: row;
+    margin-left: 300px;
+    margin-top: 10px;
   }
   
   .user-list {
     border-right: 1px solid #ccc;
-    background: #f7f7f7;
+    background: #1F203E; /* Updated background color */
     overflow-y: auto;
+    padding: 10px; /* Add padding */
   }
   
   .user-list ul {
     list-style-type: none;
+    padding: 0; /* Remove default padding */
+  }
+  
+  .user-list input[type="text"] {
+    width: calc(100% - 20px); /* Adjust width to fit within the container */
+    padding: 10px; /* Add padding for better appearance */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Add border radius */
+    margin-bottom: 10px; /* Add margin for spacing */
+    background-color: #fff; /* Set background color to white */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+    transition: box-shadow 0.3s ease; /* Add transition effect */
+  }
+  
+  .user-list input[type="text"]:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add stronger box shadow on focus */
   }
   
   .user-list li {
     display: flex;
-    flex-direction: row;
-    gap:10px;
+    align-items: center; /* Align items vertically */
+    gap: 10px; /* Add gap between items */
     padding: 10px;
     cursor: pointer;
     border-bottom: 1px solid #ccc;
+    justify-content: flex-start; /* Align items to the start */
   }
   
   .user-list li:hover {
     background: #e6e6e6;
+  }
+  
+  .user-list li img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  
+  .user-list li span {
+    flex-grow: 1; /* Allow span to grow and occupy remaining space */
   }
   
   .chat-box {
@@ -57,9 +91,7 @@ body {
     padding: 0.5rem 1rem;
   }
   
-  #messages > li:nth-child(odd) {
-    background: #efefef;
-  }
+
   
   #form {
     background: rgba(0, 0, 0, 0.15);
@@ -111,36 +143,68 @@ body {
   }
   
   #messages {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  #messages li {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-  }
-  
-  .my-message {
-    background-color: #d1e7dd;
-    text-align: right;
-  }
-  
-  .their-message {
-    background-color: #f8d7da;
-    text-align: left;
-  }
-  
-  .message-header {
-    font-weight: bold;
-  }
-  
-  .message-content {
-    margin-top: 5px;
-  }
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  flex-grow: 1;
+  overflow-y: auto;
+  background: #f9f9f9;
+  padding: 10px; /* Add padding to the messages container */
+}
+
+#messages li {
+  padding: 0;
+  margin-bottom: 10px;
+  display: flex; /* Ensure the messages adjust based on content size */
+  flex-direction: column;
+  align-items: flex-start; /* Align items to the start */
+}
+
+.my-message,
+.their-message {
+  max-width: 60%; /* Set a max-width for messages */
+  padding: 10px; /* Add padding inside the message box */
+  margin: 5px 0; /* Add margin to separate messages */
+  border: 1px solid #ccc; /* Add a border to the messages */
+  border-radius: 10px; /* Add border radius for rounded corners */
+  font-size: 0.9rem; /* Smaller font size */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+}
+
+.my-message {
+  background-color: #697dd8;
+  color: white;
+  text-align: left;
+  align-self: flex-end; /* Align sent messages to the right */
+}
+
+.their-message {
+  background-color: #6c757d;
+  color: white;
+  text-align: left;
+  align-self: flex-start; /* Align received messages to the left */
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.message-header {
+  font-size: 0.8rem; /* Smaller font size for header */
+  color: blue;
+  margin-bottom: 5px; /* Add margin to separate header and content */
+}
+
+.message-content {
+  margin-top: 5px;
+  font-size: 0.9rem; /* Smaller font size for message content */
+}
   
   #form {
     display: flex;
+    align-items: center; /* Align items vertically */
   }
   
   #input {
@@ -151,10 +215,35 @@ body {
   button {
     padding: 10px;
   }
-
+  
   .message-header .timestamp {
     font-weight: normal;
     font-size: 0.8em;
     margin-left: 10px;
   }
   
+  .send-button {
+    padding: 8px; /* Adjust padding to change button size */
+    background-color: white !important; /* Add white background */
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Optional: makes the button round */
+  }
+  
+  .send-icon {
+    width: 24px; /* Keep the width of the icon */
+    height: 24px; /* Keep the height of the icon */
+  }
+  
+  .upload-button {
+    cursor: pointer;
+    background-color: white; /* Add white background color */
+    border: none; /* Remove border */
+    padding: 5px; /* Add padding */
+    border-radius: 50%; /* Make it circular */
+  }
+  
+  .upload-icon {
+    width: 20px; /* Adjust the size of the upload icon as needed */
+    height: 20px;
+  }
