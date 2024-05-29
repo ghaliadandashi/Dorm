@@ -289,7 +289,7 @@ const DormDetails = () => {
                                                 <div className='review-info'>
                                                     <strong>{review.student.name}  <span style={{ color: 'violet' }}>{review.student.role !== 'student' ? review.student.role : null}</span></strong>
                                                 </div>
-                                                {user ? review.student._id == user[0]?._id || role === 'admin' ? <FontAwesomeIcon icon={faTimes} style={{ cursor: 'pointer' }} onClick={() => handleReviewDeletion(review._id)} /> : null : null}
+                                                {user ? review.student._id == user?._id || role === 'admin' ? <FontAwesomeIcon icon={faTimes} style={{ cursor: 'pointer' }} onClick={() => handleReviewDeletion(review._id)} /> : null : null}
                                             </div>
                                             <div className="review-rating">
                                                 <StarRating rating={review.rating} />

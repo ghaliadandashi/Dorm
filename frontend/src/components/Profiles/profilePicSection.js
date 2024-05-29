@@ -3,6 +3,8 @@ import avatar from "../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral,
 import { deleteFileFromFirebase, uploadFileToFirebase } from "../../firbase-storage";
 import axios from "axios";
 import {useAuth} from "../Auth/AuthHook";
+import {useTranslation} from "react-i18next";
+import {useNotification} from "../../layout/Notifications";
 
 const ProfilePicSection = () => {
     const [profile, setProfile] = useState({
@@ -12,9 +14,11 @@ const ProfilePicSection = () => {
         phoneNo: '',
         profilePic: ''
     });
+    const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const {role} =useAuth()
+    const {addNotification} = useNotification()
 
     useEffect(() => {
         axios.get(`http://localhost:3001/api/profile`, { withCredentials: true })
@@ -28,7 +32,7 @@ const ProfilePicSection = () => {
                 });
             })
             .catch(error => console.error("Failed to fetch user data:", error));
-    }, []);
+    }, [profile.profilePic]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -41,6 +45,7 @@ const ProfilePicSection = () => {
             const response = await axios.put('http://localhost:3001/api/profileEdit', profile, { withCredentials: true });
             setProfile(response.data);
             setEditMode(false);
+            addNotification(t("profileUpdated"),'success')
         } catch (error) {
             console.error('Failed to update profile:', error);
         }
@@ -54,7 +59,7 @@ const ProfilePicSection = () => {
             const downloadURL = await uploadFileToFirebase(file);
             const response = await axios.post('http://localhost:3001/api/profile/profilePic', { pictureUrl: downloadURL }, { withCredentials: true });
             setProfile(prevProfile => ({ ...prevProfile, profilePic: response.data.pictureUrl }));
-            window.location.reload();
+            addNotification(t('profilePicUpdated'),'success')
         } catch (error) {
             console.error('Failed to update picture URL in the backend:', error);
         }
@@ -67,7 +72,7 @@ const ProfilePicSection = () => {
             await deleteFileFromFirebase(profile.profilePic);
             await axios.delete('http://localhost:3001/api/profile/profilePic', { withCredentials: true });
             setProfile(prevProfile => ({ ...prevProfile, profilePic: '' }));
-            window.location.reload();
+            addNotification(t('profilePicDeleted'),'error')
         } catch (error) {
             console.error('Failed to delete picture URL in the backend:', error);
         }
@@ -85,13 +90,13 @@ const ProfilePicSection = () => {
                     <div className="updatePicSection">
                         <label className="custom-file-upload">
                             <input type="file" accept="image/*" onChange={handleFileChange} />
-                            Change Picture
+                            {t('changePicture')}
                         </label>
-                        <button onClick={handleDeletePicture}>Delete Picture</button>
+                        <button onClick={handleDeletePicture}>{t('deletePicture')}</button>
                     </div>
                 </div>
                 <div className='editBtn'>
-                    <button onClick={() => setEditMode(true)}>Edit Info</button>
+                    <button onClick={() => setEditMode(true)}>{t('editInfo')}</button>
                 </div>
             </div>
             {editMode ? (
@@ -117,14 +122,14 @@ const ProfilePicSection = () => {
                         onChange={handleInputChange}
                         placeholder="Phone"
                     />
-                    <button type="submit">Save Changes</button>
-                    <button type="button" onClick={() => setEditMode(false)}>Cancel</button>
+                    <button type="submit">{t('saveChanges')}</button>
+                    <button type="button" onClick={() => setEditMode(false)}>{t('cancel')}</button>
                 </form>
             ) : (
                 <div className="profile-info">
-                    <p><strong>Name:</strong> {profile.name}</p>
-                    <p><strong>Email:</strong> {profile.email}</p>
-                    <p><strong>Phone:</strong> {profile.phoneNo}</p>
+                    <p><strong>{t('name')+':'}</strong> {profile.name}</p>
+                    <p><strong>{t('email')+':'}</strong> {profile.email}</p>
+                    <p><strong>{t('phone')+':'}</strong> {profile.phoneNo}</p>
                 </div>
             )}
         </div>

@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     ownershipFiles:[{type:String}],
     profilePic:{type:String},
     dorm:{type:mongoose.Schema.Types.ObjectId,ref:'Dorm'},
-    status:{type:String,enum:['Valid','Invalid','Pending']}
+    status:{type:String,enum:['Valid','Invalid','Pending']},
 })
 
 userSchema.pre('save', function(next) {

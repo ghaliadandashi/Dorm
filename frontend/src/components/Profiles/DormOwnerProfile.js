@@ -1,266 +1,268 @@
-import React, {useEffect, useState} from 'react';
-import '../../styling/pages/profile.css'
-import {useAuth} from "../Auth/AuthHook";
+import React, { useEffect, useState } from 'react';
+import '../../styling/pages/profile.css';
+import { useAuth } from "../Auth/AuthHook";
 import axios from "axios";
-import avatar from '../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral, anonymous avatar for a profile picture. The design features a sleek, minimalist silhouette with abstract elements. The color palette.webp'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import Modal from "../Modal";
 import DormList from "./dormList";
-import { uploadFileToFirebase,deleteFileFromFirebase } from '../../firbase-storage';
+import { uploadFileToFirebase, deleteFileFromFirebase } from '../../firbase-storage';
 import Dashboard from './dashboard';
-import noImage from '../../images/1554489-200.png'
+import noImage from '../../images/1554489-200.png';
 import ProfilePicSection from "./profilePicSection";
-import {useNotification} from "../../layout/Notifications";
+import { useNotification } from "../../layout/Notifications";
 import Settings from "./settings";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 const DormOwnerProfile = () => {
-    const {user, setUser} = useAuth()
-    const [profile,setProfile] = useState({
-        name:'',
-        email:'',
-        dob:'',
-        phoneNo:'',
-        profilePic:''
-    })
-    const[bookings,setBookings] = useState([]);
+    const { t } = useTranslation();
+    const { user, setUser } = useAuth();
+    const [profile, setProfile] = useState({
+        name: '',
+        email: '',
+        dob: '',
+        phoneNo: '',
+        profilePic: ''
+    });
+    const [bookings, setBookings] = useState([]);
     const [activeTab, setActiveTab] = useState('personalInfo');
-    const [dorms,setDorm] =useState([])
-    const [tempID,setTempID] = useState(null);
+    const [dorms, setDorm] = useState([]);
+    const [tempID, setTempID] = useState(null);
     const [currentAction, setCurrentAction] = useState(null);
-    const [currentObj,setCurrentObj] = useState(null);
+    const [currentObj, setCurrentObj] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState(null);
     const d = new Date();
-    const {addNotification} = useNotification()
+    const { addNotification } = useNotification();
 
-
-    const handleOpenModal = (type,object) => {
+    const handleOpenModal = (type, object) => {
         const contents = {
             room: {
-                title: 'Add Room',
+                title: t('addRoom'),
                 initialData: { dorm: dorms[0].dormName, roomType: 'Double', pricePerSemester: '', summerPrice: '', viewType: 'CityView', noOfRooms: '' },
                 fields: [
-                    { name: 'dorm', label: 'Dorm: ', type: 'select', options: dorms.map(dorm=>({
-                            value:dorm.dormName,label:dorm.dormName
+                    { name: 'dorm', label: t('dorm'), type: 'select', options: dorms.map(dorm => ({
+                            value: dorm.dormName, label: dorm.dormName
                         })) },
-                    { name: 'roomType', label: 'Room Type: ', type: 'select',
-                        options:[
-                            {value:'Double',label: 'Double'},
-                            {value:'Single',label: 'Single'},
-                            {value:'Triple',label:'Triple'},
-                            {value:'Quad',label: 'Quad'},
-                            {value:'Suite',label:'Suite'},
-                            {value:'Studio',label:'Studio'}
+                    { name: 'roomType', label: t('roomType'), type: 'select',
+                        options: [
+                            { value: 'Double', label: t('roomTypes.Double') },
+                            { value: 'Single', label: t('roomTypes.Single') },
+                            { value: 'Triple', label: t('roomTypes.Triple') },
+                            { value: 'Quad', label: t('roomTypes.Quad') },
+                            { value: 'Suite', label: t('roomTypes.Suite') },
+                            { value: 'Studio', label: t('roomTypes.Studio') }
                         ] },
-                    { name: 'pricePerSemester', label: 'Price per Semester($): ', type: 'number' },
-                    {name:'summerPrice',label: 'Summer Price ($ per month): ',type: 'number'},
-                    {name:'viewType',label:'View Type: ',type: 'select',
-                        options: [{value: 'CityView',label:'City View'},
-                            {value: 'StreetView',label:'Street View'},
-                            {value: 'SeaView',label:'Sea View'},
-                            {value: 'CampusView',label:'Campus View'}
+                    { name: 'pricePerSemester', label: t('pricePerSemester'), type: 'number' },
+                    { name: 'summerPrice', label: t('summerPrice'), type: 'number' },
+                    { name: 'viewType', label: t('viewType'), type: 'select',
+                        options: [
+                            { value: 'CityView', label: t('viewTypes.CityView') },
+                            { value: 'StreetView', label: t('viewTypes.StreetView') },
+                            { value: 'SeaView', label: t('viewTypes.SeaView') },
+                            { value: 'CampusView', label: t('viewTypes.CampusView') }
                         ]},
-                    {name:'extraFee',label:'Extra fee for View($): ',type: 'number'},
-                    {name:'space',label:'Room space:(m^2)',type:'number'},
-                    {name:'noOfRooms',label:'Number of Rooms: ',type: 'number'},
+                    { name: 'extraFee', label: t('extraFeeForView'), type: 'number' },
+                    { name: 'space', label: t('roomSpace'), type: 'number' },
+                    { name: 'noOfRooms', label: t('numberOfRooms'), type: 'number' },
                     {
                         name: "services",
-                        label: "Services:",
+                        label: t('servicesTitle'),
                         type: "checkbox",
                         options: [
-                            {id: "ac", name: "ac", label: "Air Conditioning"},
-                            {id: "heating", name: "heating", label: "Heating"},
-                            {id: "furniture", name: "furniture", label: "Furnished"},
-                            {id: "linens", name: "linens", label: "Linens Provided"},
-                            {id: "electricity", name: "electricity", label: "Electricity Included"},
-                            {id: "water", name: "water", label: "Water Included"},
-                            {id: "gas", name: "gas", label: "Gas Included"},
-                            {id: "cableTv", name: "cableTv", label: "Cable TV Support"},
-                            {id: "smokeDetector", name: "smokeDetector", label: "Smoke Detector"},
-                            {id: "fireExtinguisher", name: "fireExtinguisher", label: "Fire Extinguisher"},
+                            { id: "ac", name: "ac", label: t('servicesList.ac') },
+                            { id: "heating", name: "heating", label: t('servicesList.heating') },
+                            { id: "furniture", name: "furniture", label: t('servicesList.furniture') },
+                            { id: "linens", name: "linens", label: t('servicesList.linens') },
+                            { id: "electricity", name: "electricity", label: t('servicesList.electricity') },
+                            { id: "water", name: "water", label: t('servicesList.water') },
+                            { id: "gas", name: "gas", label: t('servicesList.gas') },
+                            { id: "cableTv", name: "cableTv", label: t('servicesList.cableTv') },
+                            { id: "smokeDetector", name: "smokeDetector", label: t('servicesList.smokeDetector') },
+                            { id: "fireExtinguisher", name: "fireExtinguisher", label: t('servicesList.fireExtinguisher') },
                         ]
                     },
-                    {name:'roomPics',label:' Room Pictures',type:'file'}
+                    { name: 'roomPics', label: t('roomPictures'), type: 'file' }
                 ]
             },
             dorm: {
-                title: 'Add Dorm',
-                initialData: { dormName: '', city:'Famagusta',streetName:'',capacity:'',type:'on-campus',dormPics:''},
+                title: t('addDorm'),
+                initialData: { dormName: '', city: 'Famagusta', streetName: '', capacity: '', type: 'on-campus', dormPics: '' },
                 fields: [
-                    { name: 'dormName', label: 'Dorm Name: ', type: 'text' },
-                    { name: 'streetName', label: 'Street Name: ', type: 'text' },
-                    { name: 'city',label:'City',type: 'select',options:[
-                            {value:'Famagusta',label:'Famagusta'},
-                            {value:'Kyrenia',label:'Kyrenia'},
-                            {value:'Nicosia',label: 'Nicosia'},
-                            {value:'Lefke',label: 'Lefke'},
-                            {value: 'Iskele',label:'Iskele'},
-                            {value:'Guzelyurt',label:'Guzelyurt'}
+                    { name: 'dormName', label: t('dormName'), type: 'text' },
+                    { name: 'streetName', label: t('streetName'), type: 'text' },
+                    { name: 'city', label: t('city'), type: 'select', options: [
+                            { value: 'Famagusta', label: t('famagusta') },
+                            { value: 'Kyrenia', label: t('kyrenia') },
+                            { value: 'Nicosia', label: t('nicosia') },
+                            { value: 'Lefke', label: t('lefke') },
+                            { value: 'Iskele', label: t('iskele') },
+                            { value: 'Guzelyurt', label: t('guzelyurt') }
                         ]},
-                    { name:'capacity', label:'Capacity: ',type:'number'},
-                    { name: 'type', label:'Type: ',type: 'select',options:[{
-                        value:'on-campus', label:'On-campus'},
-                            {value:'off-campus',label:'Off-campus'}
+                    { name: 'capacity', label: t('capacity'), type: 'number' },
+                    { name: 'type', label: t('type'), type: 'select', options: [
+                            { value: 'on-campus', label: t('onCampus') },
+                            { value: 'off-campus', label: t('offCampus') }
                         ]},
-                    {name:'services',label: 'Services:',type:'checkbox',options:[
-                            { id: 'wifi',name:'wifi', label: 'Wi-Fi' },
-                            { id: 'laundry',name:'laundry', label: 'Laundry' },
-                            { id: 'market',name:'market' ,label: 'Market' },
-                            { id: 'sharedKitchen',name:'sharedKitchen', label:'Shared Kitchen'},
-                            { id: 'restaurant',name:'restaurant', label: 'Restaurant' },
-                            { id: 'gym',name:'gym', label: 'Gym Access' },
-                            { id: 'studyRoom',name:'studyRoom', label: 'Study Rooms'},
-                            { id: 'cleaning',name:'cleaning', label: 'Weekly Cleaning Services' },
-                            { id: 'security',name:'security', label: '24/7 Security' },
-                            { id: 'elevator',name:'elevator', label: 'Elevator'}
+                    { name: 'services', label: t('servicesTitle'), type: 'checkbox', options: [
+                            { id: 'wifi', name: 'wifi', label: t('servicesList.wifi') },
+                            { id: 'laundry', name: 'laundry', label: t('servicesList.laundry') },
+                            { id: 'market', name: 'market', label: t('servicesList.market') },
+                            { id: 'sharedKitchen', name: 'sharedKitchen', label: t('servicesList.sharedKitchen') },
+                            { id: 'restaurant', name: 'restaurant', label: t('servicesList.restaurant') },
+                            { id: 'gym', name: 'gym', label: t('servicesList.gym') },
+                            { id: 'studyRoom', name: 'studyRoom', label: t('servicesList.studyRoom') },
+                            { id: 'cleaning', name: 'cleaning', label: t('servicesList.cleaning') },
+                            { id: 'security', name: 'security', label: t('servicesList.security') },
+                            { id: 'elevator', name: 'elevator', label: t('servicesList.elevator') }
                         ]},
-                    { name: 'dormPics', label: 'Dorm Pictures: ',type:'file'},
-                    { name: 'ownershipFiles', label: 'Ownership Files: ',type:'file'}
+                    { name: 'dormPics', label: t('dormPictures'), type: 'file' },
+                    { name: 'ownershipFiles', label: t('ownershipFiles'), type: 'file' }
                 ]
             },
-            editRoom:{title:'Edit Room',initialData:{services:'',pricePerSemester:'',summerPrice: '',extraFee:'',noOfRooms:'',viewType: 'CityView',space:'',roomPics:''},
-            fields:[
-                {name:'services',label:'Services',type:'checkbox',options:[
-                        {id: "ac", name: "ac", label: "Air Conditioning"},
-                        {id: "heating", name: "heating", label: "Heating"},
-                        {id: "furniture", name: "furniture", label: "Furnished"},
-                        {id: "linens", name: "linens", label: "Linens Provided"},
-                        {id: "electricity", name: "electricity", label: "Electricity Included"},
-                        {id: "water", name: "water", label: "Water Included"},
-                        {id: "gas", name: "gas", label: "Gas Included"},
-                        {id: "cableTv", name: "cableTv", label: "Cable TV Support"},
-                        {id: "smokeDetector", name: "smokeDetector", label: "Smoke Detector"},
-                        {id: "fireExtinguisher", name: "fireExtinguisher", label: "Fire Extinguisher"}
-                    ]},
-                { name: 'pricePerSemester', label: 'Price per Semester($): ', type: 'number' },
-                {name:'summerPrice',label: 'Summer Price ($ per month): ',type: 'number'},
-                {name:'viewType',label:'View Type: ',type: 'select',
-                    options: [{value: 'CityView',label:'City View'},
-                        {value: 'StreetView',label:'Street View'},
-                        {value: 'SeaView',label:'Sea View'},
-                        {value: 'CampusView',label:'Campus View'}
-                    ]},
-                {name:'extraFee',label:'Extra fee for View($): ',type: 'number'},
-                {name:'space',label:'Room space:(m^2)',type:'number'},
-                {name:'availability',label:'Number of Rooms: ',type: 'number'},
-                {name:'roomPics',label:'Room Pictures',type:'file'}
-            ]
-            },
-            editDorm:{title:'Edit Dorm',initialData:{ city:'Famagusta',streetName:'',capacity:'',type:'on-campus',dormPics:''},fields:[
-                    { name: 'streetName', label: 'Street Name: ', type: 'text' },
-                    { name: 'city',label:'City',type: 'select',options:[
-                            {value:'Famagusta',label:'Famagusta'},
-                            {value:'Kyrenia',label:'Kyrenia'},
-                            {value:'Nicosia',label: 'Nicosia'},
-                            {value:'Lefke',label: 'Lefke'},
-                            {value: 'Iskele',label:'Iskele'},
-                            {value:'Guzelyurt',label:'Guzelyurt'}
+            editRoom: {
+                title: t('editRoom'),
+                initialData: { services: '', pricePerSemester: '', summerPrice: '', extraFee: '', noOfRooms: '', viewType: 'CityView', space: '', roomPics: '' },
+                fields: [
+                    { name: 'services', label: t('servicesTitle'), type: 'checkbox', options: [
+                            { id: "ac", name: "ac", label: t('servicesList.ac') },
+                            { id: "heating", name: "heating", label: t('servicesList.heating') },
+                            { id: "furniture", name: "furniture", label: t('servicesList.furniture') },
+                            { id: "linens", name: "linens", label: t('servicesList.linens') },
+                            { id: "electricity", name: "electricity", label: t('servicesList.electricity') },
+                            { id: "water", name: "water", label: t('servicesList.water') },
+                            { id: "gas", name: "gas", label: t('servicesList.gas') },
+                            { id: "cableTv", name: "cableTv", label: t('servicesList.cableTv') },
+                            { id: "smokeDetector", name: "smokeDetector", label: t('servicesList.smokeDetector') },
+                            { id: "fireExtinguisher", name: "fireExtinguisher", label: t('servicesList.fireExtinguisher') }
                         ]},
-                    { name:'capacity', label:'Capacity: ',type:'number'},
-                    { name: 'type', label:'Type: ',type: 'select',options:[{
-                            value:'on-campus', label:'On-campus'},
-                            {value:'off-campus',label:'Off-campus'}
+                    { name: 'pricePerSemester', label: t('pricePerSemester'), type: 'number' },
+                    { name: 'summerPrice', label: t('summerPrice'), type: 'number' },
+                    { name: 'viewType', label: t('viewType'), type: 'select',
+                        options: [
+                            { value: 'CityView', label: t('viewTypes.CityView') },
+                            { value: 'StreetView', label: t('viewTypes.StreetView') },
+                            { value: 'SeaView', label: t('viewTypes.SeaView') },
+                            { value: 'CampusView', label: t('viewTypes.CampusView') }
                         ]},
-                    {name:'services',label: 'Services:',type:'checkbox',options:[
-                            { id: 'wifi',name:'wifi', label: 'Wi-Fi' },
-                            { id: 'laundry',name:'laundry', label: 'Laundry' },
-                            { id: 'market',name:'market' ,label: 'Market' },
-                            { id: 'sharedKitchen',name:'sharedKitchen', label:'Shared Kitchen'},
-                            { id: 'restaurant',name:'restaurant', label: 'Restaurant' },
-                            { id: 'gym',name:'gym', label: 'Gym Access' },
-                            { id: 'studyRoom',name:'studyRoom', label: 'Study Rooms'},
-                            { id: 'cleaning',name:'cleaning', label: 'Weekly Cleaning Services' },
-                            { id: 'security',name:'security', label: '24/7 Security' },
-                            { id: 'elevator',name:'elevator', label: 'Elevator'}
-                        ]},
-                    { name: 'dormPics', label: 'Dorm Pictures: ',type:'file'}
+                    { name: 'extraFee', label: t('extraFeeForView'), type: 'number' },
+                    { name: 'space', label: t('roomSpace'), type: 'number' },
+                    { name: 'availability', label: t('numberOfRooms'), type: 'number' },
+                    { name: 'roomPics', label: t('roomPictures'), type: 'file' }
                 ]
-        }}
+            },
+            editDorm: {
+                title: t('editDorm'),
+                initialData: { city: 'Famagusta', streetName: '', capacity: '', type: 'on-campus', dormPics: '' },
+                fields: [
+                    { name: 'streetName', label: t('streetName'), type: 'text' },
+                    { name: 'city', label: t('city'), type: 'select', options: [
+                            { value: 'Famagusta', label: t('famagusta') },
+                            { value: 'Kyrenia', label: t('kyrenia') },
+                            { value: 'Nicosia', label: t('nicosia') },
+                            { value: 'Lefke', label: t('lefke') },
+                            { value: 'Iskele', label: t('iskele') },
+                            { value: 'Guzelyurt', label: t('guzelyurt') }
+                        ]},
+                    { name: 'capacity', label: t('capacity'), type: 'number' },
+                    { name: 'type', label: t('type'), type: 'select', options: [
+                            { value: 'on-campus', label: t('onCampus') },
+                            { value: 'off-campus', label: t('offCampus') }
+                        ]},
+                    { name: 'services', label: t('servicesTitle'), type: 'checkbox', options: [
+                            { id: 'wifi', name: 'wifi', label: t('servicesList.wifi') },
+                            { id: 'laundry', name: 'laundry', label: t('servicesList.laundry') },
+                            { id: 'market', name: 'market', label: t('servicesList.market') },
+                            { id: 'sharedKitchen', name: 'sharedKitchen', label: t('servicesList.sharedKitchen') },
+                            { id: 'restaurant', name: 'restaurant', label: t('servicesList.restaurant') },
+                            { id: 'gym', name: 'gym', label: t('servicesList.gym') },
+                            { id: 'studyRoom', name: 'studyRoom', label: t('servicesList.studyRoom') },
+                            { id: 'cleaning', name: 'cleaning', label: t('servicesList.cleaning') },
+                            { id: 'security', name: 'security', label: t('servicesList.security') },
+                            { id: 'elevator', name: 'elevator', label: t('servicesList.elevator') }
+                        ]},
+                    { name: 'dormPics', label: t('dormPictures'), type: 'file' }
+                ]
+            }
+        };
 
         setModalContent(contents[type]);
         setCurrentObj(object);
         setCurrentAction(type);
         setIsModalOpen(true);
     };
-    
+
     const handleSubmit = async (formData) => {
         const endpoint = currentAction === 'dorm'
-        ? 'http://localhost:3001/dorms/add'
-        : (currentAction === 'room'
-            ? 'http://localhost:3001/dorms/addRoom'
-            : (currentAction === 'editDorm'
-                ? `http://localhost:3001/dorms/editDorm/${currentObj._id}`
-                : `http://localhost:3001/dorms/editRoom/${currentObj._id}`));
+            ? 'http://localhost:3001/dorms/add'
+            : (currentAction === 'room'
+                ? 'http://localhost:3001/dorms/addRoom'
+                : (currentAction === 'editDorm'
+                    ? `http://localhost:3001/dorms/editDorm/${currentObj._id}`
+                    : `http://localhost:3001/dorms/editRoom/${currentObj._id}`));
         try {
             const response = await axios.post(endpoint, formData, { withCredentials: true });
-            if(currentAction.includes('dorm'||'Dorm') ){
-                addNotification('Dorm Updated!','success')
-            }else{
-                addNotification('Room Updated!','success')
+            if (currentAction.includes('dorm' || 'Dorm')) {
+                addNotification(t('dormRequestAccepted'), 'success');
+            } else {
+                addNotification(t('roomRequestAccepted'), 'success');
             }
             setIsModalOpen(false);
             setCurrentAction(null);
             setCurrentObj(null);
-            window.location.reload()
+            window.location.reload();
         } catch (error) {
             console.error(`Failed to submit ${currentAction}:`, error);
         }
     };
 
-    const getBooking = async()=>{
-        axios.get('http://localhost:3001/booking/getBooking',{withCredentials:true})
-                .then(response=>{
-                    setBookings(response.data);
-                    // console.log(response.data)
-                }).catch(error=>{
-                    console.error('Failed to get Bookings: ',error)
-            })
+    const getBooking = async () => {
+        axios.get('http://localhost:3001/booking/getBooking', { withCredentials: true })
+            .then(response => {
+                setBookings(response.data);
+            }).catch(error => {
+            console.error('Failed to get Bookings: ', error);
+        });
     }
 
     useEffect(() => {
         if (user) {
-            axios.get(`http://localhost:3001/api/profile`,{withCredentials:true})
+            axios.get(`http://localhost:3001/api/profile`, { withCredentials: true })
                 .then(response => {
-                    // console.log(response.data)
                     setProfile({
                         name: response.data.user.name,
                         email: response.data.user.email,
-                        dob:response.data.user.dob,
-                        phoneNo:response.data.user.phoneNo,
-                        profilePic:response.data.user.profilePic
+                        dob: response.data.user.dob,
+                        phoneNo: response.data.user.phoneNo,
+                        profilePic: response.data.user.profilePic
                     });
                 })
                 .catch(error => console.error("Failed to fetch user data:", error));
-            axios.get(`http://localhost:3001/api/dorm`,{withCredentials:true})
-                .then(response=>{
-                    // console.log(response)
+            axios.get(`http://localhost:3001/api/dorm`, { withCredentials: true })
+                .then(response => {
                     setDorm(response.data);
                 })
-                .catch(error=>{console.error('Failed to get Dorms: ',error)})
-            getBooking()
+                .catch(error => { console.error('Failed to get Dorms: ', error) });
+            getBooking();
         }
     }, [user]);
-
-
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
     };
 
-    const handleStatus = async (id)=>{
-        try{
-            const response = await axios.put(`http://localhost:3001/booking/handleStatus/${id}`,{})
-            window.location.reload()
-            
-        }catch(error){
-            console.error('Failed to update Booking status',error)
+    const handleStatus = async (id) => {
+        try {
+            const response = await axios.put(`http://localhost:3001/booking/handleStatus/${id}`, {});
+            window.location.reload();
+        } catch (error) {
+            console.error('Failed to update Booking status', error);
         }
     }
 
     const getPrice = (room, stay) => {
-        switch(Number(stay)) {
+        switch (Number(stay)) {
             case 9:
                 return room.pricePerSemester * 2;
             case 12:
@@ -268,11 +270,12 @@ const DormOwnerProfile = () => {
             case 4.5:
                 return room?.pricePerSemester;
             case 3:
-                return room?.summerPrice*3;
+                return room?.summerPrice * 3;
             default:
                 return room?.pricePerSemester;
         }
     };
+
     const handleDormClick = (id) => {
         setTempID(null);
         setTimeout(() => {
@@ -283,80 +286,83 @@ const DormOwnerProfile = () => {
     return (
         <div className="profile">
             <div className="tabs">
-                {profile.name.length<20?<h2 style={{color:"white"}}>@ {profile.name.toUpperCase()}</h2>:
-                    <h3 style={{color:"white"}}>@ {profile.name.toUpperCase()}</h3>}
+                {profile.name.length < 20 ? <h2 style={{ color: "white" }}>@ {profile.name.toUpperCase()}</h2> :
+                    <h3 style={{ color: "white" }}>@ {profile.name.toUpperCase()}</h3>}
                 <button onClick={() => handleTabClick('personalInfo')}
                         className={activeTab === 'personalInfo' ? 'active' : ''}>
-                    Personal Info
+                    {t('personalInfo')}
                 </button>
                 <button onClick={() => handleTabClick('bookings')}
                         className={activeTab === 'bookings' ? 'active' : ''}>
-                    Booking Requests
+                    {t('bookingRequests')}
                 </button>
                 <button onClick={() => handleTabClick('properties')}
                         className={activeTab === 'properties' ? 'active' : ''}>
-                    Properties
+                    {t('properties')}
                 </button>
                 <button onClick={() => handleTabClick('financials')}
                         className={activeTab === 'financials' ? 'active' : ''}>
-                    Financials
+                    {t('financials')}
                 </button>
                 <button onClick={() => handleTabClick('settings')}
                         className={activeTab === 'settings' ? 'active' : ''}>
-                    Settings
+                    {t('settings')}
                 </button>
             </div>
             <div className="tab-content">
                 {activeTab === 'personalInfo' && (
-                    <ProfilePicSection/>
+                    <ProfilePicSection />
                 )}
                 {activeTab === 'bookings' && (
                     <div className='table-container'>
-                    <table style={{color:'white'}}>
-                        <tr>
-                            <th style={{color:'#a1a1ae'}}>Student Name</th>
-                            <th>Dorm Name</th>
-                            <th >Room Type</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Semester</th>
-                            <th>Stay Duration</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                        </tr>
-                        {bookings.map((booking, index) => (
+                        <table style={{ color: 'white' }}>
+                            <thead>
                             <tr>
-                                <td key={index}><Link to={`/user/${booking.user._id}`}>
-                                    {booking.user.name}
-                                </Link></td>
-                                <td>{booking.dorm.dormName || '----'}</td>
-                                <td>{booking.room?.roomType?? '-----'}</td>
-                                <td>{booking.startDate.substring(0,booking.startDate.indexOf('T')).split('-').reverse().join('-')}</td>
-                                <td>{booking.endDate.substring(0,booking.startDate.indexOf('T')).split('-').reverse().join('-')}</td>
-                                <td>{d.getFullYear()}- {d.getFullYear()+1} {booking.semester.toUpperCase()}</td>
-                                <td>{booking.stayDuration===9?'2 Semesters':
-                                    booking.stayDuration ===4.5?'1 Semester':
-                                    booking.stayDuration ===12?'1 Year':
-                                    booking.stayDuration ===3?'Summer':
-                                    '-----'
-                                }</td>
-                                <td>{getPrice(booking.room,booking.stayDuration)}</td>
-                                <td>{booking.status}</td>
-                                {(booking.status === 'Requested')?
-                                    (<><td><button onClick={()=>handleStatus(booking._id)}>Confirm Reservation</button></td></>)
-                                    :<>
-                                        {booking.status === 'Reserved'?<td><button onClick={()=>handleStatus(booking._id)}>Confirm Booking</button></td>:null
-                                        }
-                                    </>}
-                                    {booking.status !== 'Booked'?<td><FontAwesomeIcon icon={faTimes}/></td>:null}
+                                <th style={{ color: '#a1a1ae' }}>{t('name')}</th>
+                                <th>{t('dormName')}</th>
+                                <th>{t('roomTypesTitle')}</th>
+                                <th>{t('startDate')}</th>
+                                <th>{t('endDate')}</th>
+                                <th>{t('semester')}</th>
+                                <th>{t('stayDuration')}</th>
+                                <th>{t('price')}</th>
+                                <th>{t('status')}</th>
                             </tr>
-                        ))}
-                    </table>
+                            </thead>
+                            <tbody>
+                            {bookings.map((booking, index) => (
+                                <tr key={index}>
+                                    <td><Link to={`/user/${booking.user._id}`} style={{ textDecoration: "underline", color: 'white', cursor: 'pointer' }}>
+                                        {booking.user.name}
+                                    </Link></td>
+                                    <td>{booking.dorm.dormName || '----'}</td>
+                                    <td>{t(`roomTypes.${booking.room.roomType}`)}</td>
+                                    <td>{booking.startDate.substring(0, booking.startDate.indexOf('T')).split('-').reverse().join('-')}</td>
+                                    <td>{booking.endDate.substring(0, booking.startDate.indexOf('T')).split('-').reverse().join('-')}</td>
+                                    <td>{d.getFullYear()}- {d.getFullYear() + 1} {booking.semester.toUpperCase()}</td>
+                                    <td>{booking.stayDuration === 9 ? t('2Semesters') :
+                                        booking.stayDuration === 4.5 ? t('1Semester') :
+                                            booking.stayDuration === 12 ? t('1Year') :
+                                                booking.stayDuration === 3 ? t('summer') :
+                                                    '-----'
+                                    }</td>
+                                    <td>{getPrice(booking.room, booking.stayDuration)}</td>
+                                    <td>{t(`bookingStats.${booking.status}`)}</td>
+                                    {(booking.status === 'Requested') ?
+                                        (<><td><button onClick={() => handleStatus(booking._id)}>{t('confirmReservation')}</button></td></>)
+                                        : <>
+                                            {booking.status === 'Reserved' ? <td><button onClick={() => handleStatus(booking._id)}>{t('confirmBooking')}</button></td> : null
+                                            }
+                                        </>}
+                                    {booking.status !== 'Booked' ? <td><FontAwesomeIcon icon={faTimes} /></td> : null}
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
                 {activeTab === 'properties' && (
                     <div className='properties'>
-
                         {modalContent && isModalOpen && (
                             <Modal
                                 isOpen={isModalOpen}
@@ -369,28 +375,26 @@ const DormOwnerProfile = () => {
                                 initialData={modalContent.initialData}
                                 fields={modalContent.fields}
                             />)}
-
                         <div>
-                            <DormList handleModalOpen={handleOpenModal}/>
+                            <DormList handleModalOpen={handleOpenModal} />
                         </div>
                     </div>
                 )}
                 {activeTab === 'financials' && (
                     <div>
                         <div className='dorms-container-f'>
-                            {dorms.map((dorm,index)=>(
+                            {dorms.map((dorm, index) => (
                                 <div key={index} className='dorms-financials' onClick={() => handleDormClick(dorm._id)}>
-                                    <img src={dorm.dormPics[0] || noImage} width='50px' height='50px'/>
+                                    <img src={dorm.dormPics[0] || noImage} width='50px' height='50px' />
                                     <p>{dorm.dormName}</p>
-                            </div>))}
+                                </div>))}
                         </div>
-                        {tempID? <Dashboard dormId={tempID}/>:<h3 style={{color:"white",fontWeight:'bold'}}>Select Dorm to view insights!</h3>}
-
+                        {tempID ? <Dashboard dormId={tempID} /> : <h3 style={{ color: "white", fontWeight: 'bold' }}>{t('selectDormToViewInsights')}</h3>}
                     </div>
                 )}
-                {activeTab === 'settings' &&(
+                {activeTab === 'settings' && (
                     <div>
-                        <Settings/>
+                        <Settings />
                     </div>
                 )}
             </div>

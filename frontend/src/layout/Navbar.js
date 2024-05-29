@@ -88,7 +88,7 @@ const Navbar = () => {
                                 </div>
                             </li>
                             <li className="nav-item">
-                                <button onClick={handleLogout} className="nav-link" style={{ backgroundColor: '#2b2b43', border: 'none' }}><FontAwesomeIcon icon={faSignInAlt} /></button>
+                                <button onClick={handleLogout} className="nav-link" style={{ backgroundColor: '#2b2b43', border: 'none' ,padding:'0px'}}><FontAwesomeIcon icon={faSignInAlt} /></button>
                             </li>
                         </>
                     ) : (

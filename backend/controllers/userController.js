@@ -52,6 +52,7 @@ exports.register = async (req, res) => {
             password: req.body.password,
             dob: req.body.dob,
             phoneNo: req.body.phoneNo,
+            languagePreference:req.body.langPref,
             role: 'dormOwner',
             status: 'Pending',
             personalFiles: personalFile,

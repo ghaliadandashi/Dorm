@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../components/Auth/AuthHook";
 import Search from '../layout/Search';
 import { useTranslation } from 'react-i18next';
+import LanguageSelector from "../components/LanguageSelector";
 
 const Home = () => {
     const [dorms, setDorms] = useState([]);
@@ -92,6 +93,7 @@ const Home = () => {
                         gap: '90px',
                     }}>
                         {currentDorms.length > 0 ? currentDorms.map((dorm, index) => (
+                                <Link to='/dormDetails' style={{textDecoration:'none'}} onClick={() => localStorage.setItem('DormId', dorm._id)}>
                             <div key={index} style={{
                                 backgroundColor: "white",
                                 borderRadius: '10px',
@@ -107,11 +109,11 @@ const Home = () => {
 
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                                    <h5 style={{ color: 'black', fontSize: '20px', margin: '10px' }}><Link to='/dormDetails' onClick={() => localStorage.setItem('DormId', dorm._id)} style={{ textDecoration: 'none', color: 'black' }}>{dorm.dormName}</Link></h5>
-                                    <p style={{ margin: '5px' }}><FontAwesomeIcon icon={faMapMarkerAlt} /> {dorm.location}</p>
+                                    <h5 style={{ color: 'black', fontSize: '20px', margin: '10px' }}>{dorm.dormName}</h5>
+                                    <p style={{ margin: '5px' ,color:'black'}}><FontAwesomeIcon icon={faMapMarkerAlt} /> {dorm.location}</p>
                                 </div>
                             </div>
-                        )) : <div style={{ color: "white", height: '100vh' }}><h1>{t('noDorms')}</h1></div>}
+                                </Link>)) : <div style={{ color: "white", height: '100vh' }}><h1>{t('noDorms')}</h1></div>}
                     </div>
                     <div className="pagination">
                         <button onClick={goToPreviousPage} disabled={currentPage === 1}>{t('previous')}</button>
@@ -130,9 +132,9 @@ const Home = () => {
                                 )}
                                 <p style={{ color: "white", fontWeight: "bold" }}>{currUser?.user?.name?.toUpperCase()}</p>
                             </div> : <div style={{ marginTop: '40px' }}>
-                                {user[0]?.profilePic ? (<img src={user[0].profilePic} width='150' height='150' style={{ objectFit: 'cover', borderRadius: '40px' }} />) :
+                                {user?.profilePic ? (<img src={user?.profilePic || avatar} width='150' height='150' style={{ objectFit: 'cover', borderRadius: '40px' }} />) :
                                     <img src={avatar} width='150' height='150' style={{ objectFit: 'cover', borderRadius: '40px' }} />}
-                                <p style={{ color: "white", fontWeight: "bold" }}>{user[0]?.name?.toUpperCase()}</p></div>}
+                                <p style={{ color: "white", fontWeight: "bold" }}>{user?.name?.toUpperCase()}</p></div>}
                         <div className='bookingStatus-container'>
                             <label htmlFor='bookingStatus'>{t('bookingStatus')}</label>
                             <p id='bookingStatus' className='bookingStatus' style={booking[0]?.status == 'Booked' ? { color: 'green' } : { color: '#f8c200' }}>{booking.length !== 0 ? booking[0].status : t('noBookingYet')}</p>

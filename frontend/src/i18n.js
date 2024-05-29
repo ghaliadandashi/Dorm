@@ -4,6 +4,8 @@ import { initReactI18next } from 'react-i18next';
 import enTranslation from './locales/en/translation.json';
 import trTranslation from './locales/tr/translation.json';
 
+
+
 i18n
     .use(initReactI18next)
     .init({
@@ -15,10 +17,10 @@ i18n
                 translation: trTranslation
             }
         },
-        lng: 'en', // default language
-        fallbackLng: 'en', // fallback language
+        lng: 'en',
+        fallbackLng: 'en',
         interpolation: {
-            escapeValue: false // React already does escaping
+            escapeValue: false
         }
     });
 
