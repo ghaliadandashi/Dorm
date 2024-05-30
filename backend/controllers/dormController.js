@@ -114,8 +114,8 @@ exports.dormDetails = async (req, res) => {
 exports.searchDormByName = async (req, res) => {
     try {
         const dormName = req.query.dormName;
-        const regex = new RegExp(dormName, 'i'); // 'i' for case-insensitive
-        const dorms = await Dorm.find({ dormName: regex }).populate('rooms');
+        const regex = new RegExp(dormName, 'i');
+        const dorms = await Dorm.find({ dormName: regex });
         if (!dorms.length) {
             return res.status(404).send('Dorm not found');
         }

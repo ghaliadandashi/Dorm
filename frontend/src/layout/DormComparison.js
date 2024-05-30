@@ -26,7 +26,6 @@ const DormComparison = ({ selectedDorms }) => {
                         {selectedDorms.map((dorm, index) => (
                             <div key={index} className='dorm-card'>
                                 <h4>{dorm.dormName}</h4>
-                                <img src={dorm.dormPics[0]} width='100' height='100' style={{ objectFit: 'cover' }} />
                                 <h5>{t('services')}</h5>
                                 <ul>
                                     {renderServices(dorm.services)}

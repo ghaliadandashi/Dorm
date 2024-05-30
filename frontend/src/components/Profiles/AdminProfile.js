@@ -8,6 +8,7 @@ import { useNotification } from "../../layout/Notifications";
 import { useTranslation } from 'react-i18next';
 import Settings from "./settings";
 import '../../styling/pages/profile.css';
+import {Link} from "react-router-dom";
 
 const AdminProfile = () => {
     const { t } = useTranslation();
@@ -139,7 +140,7 @@ const AdminProfile = () => {
                                 <tbody>
                                 {users.map(use =>
                                     <tr key={use._id}>
-                                        <td>{use.name}</td>
+                                        <td><Link to={`/user/${use._id}`} style={{color:"white"}}>{use.name}</Link></td>
                                         <td>{use.email}</td>
                                         <td>{use.phoneNo}</td>
                                         <td><FileLinks files={use.personalFiles} /> </td>
@@ -170,7 +171,7 @@ const AdminProfile = () => {
                                 {dormRequests.map(request =>
                                     <tr key={request._id}>
                                         <td>{request.dormName}</td>
-                                        <td>{request.owner.name}</td>
+                                        <td><Link to={`/user/${request.owner._id}`} style={{color:"white"}}>{request.owner.name}</Link></td>
                                         <td><FileLinks files={request.owner.personalFiles} /> </td>
                                         <td><FileLinks files={request.ownershipFiles} /> </td>
                                         <td>

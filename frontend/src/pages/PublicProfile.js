@@ -14,7 +14,7 @@ const PublicProfile = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get(`http://localhost:3001/api/getPublicProf/${userId}`);
+                const response = await axios.get(`http://localhost:3001/api/getPublicProf/${userId}`,{withCredentials:true});
                 setUserData(response.data);
             } catch (error) {
                 console.error('Failed to fetch user data', error);
@@ -36,12 +36,14 @@ const PublicProfile = () => {
                     <h2>{t('contactInformation')}</h2>
                     <p>{t('email')}: {userData?.email}</p>
                     <p>{t('phone')}: {userData?.phoneNo}</p>
+                    <p>{t('bio')}:{userData?.bio??'----'}</p>
                     <h2>{t('preferences')}</h2>
                     <ul>
                         {userData?.preferences?.length > 0 ? userData.preferences.map((preference, index) => (
                             <li key={index}>{preference}</li>
                         )) : <p>{t('noPreferencesListed')}</p>}
                     </ul>
+
                 </div>
             </div>
         </>

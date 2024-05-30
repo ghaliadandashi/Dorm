@@ -10,6 +10,7 @@ import '../styling/navbar.css';
 import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
+    // const [search, setSearch] = useState('');
     const { isLoggedIn, role, status } = useAuth();
     const currentPage = useLocation().pathname;
     const navigate = useNavigate();
@@ -21,6 +22,8 @@ const Navbar = () => {
         'Price drop alert: Dorm A',
         'New review for Dorm B'
     ]);
+    const [dorms, setDorms] = useState([]);
+
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
@@ -51,6 +54,9 @@ const Navbar = () => {
         if (e.key === 'Enter') {
             navigate(`/home?search=${searchQuery}`);
         }
+        if (e.key === 'Escape') {
+            navigate(`/home`);
+        }
     };
 
     if (status === 'Invalid' || status === 'Pending') {
@@ -66,6 +72,39 @@ const Navbar = () => {
     const toggleNotifications = () => {
         setShowNotifications(!showNotifications);
     };
+    const handleSearchChange = async (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        if (query.trim()) {
+            try {
+                const response = await fetch(`http://localhost:3001/dorms/searchDorm?dormName=${query}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setDorms(data);
+                } else {
+                    throw new Error('Failed to fetch dorms by name');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            // Reset to the original dorm list if search query is empty
+            const fetchDorms = async () => {
+                try {
+                    const response = await fetch(`http://localhost:3001/dorms/show`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setDorms(data);
+                    } else {
+                        throw new Error('Failed to fetch dorms');
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+            fetchDorms();
+        }
+    };
 
     return (
         <>
@@ -76,7 +115,7 @@ const Navbar = () => {
                     type="search"
                     placeholder={t('searchDorm')}
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={handleSearchChange}
                     onKeyDown={handleSearch}
                 />
                 <ul className="navbar-nav">

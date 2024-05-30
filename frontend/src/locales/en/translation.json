@@ -229,5 +229,6 @@
   "showComparison": "Show Comparison",
   "hideComparison": "Hide Comparison",
   "room": "Room",
-  "duration": "Duration"
+  "duration": "Duration",
+  "bio": "Bio"
 }

@@ -34,13 +34,14 @@ const Home = () => {
             .catch(error => {
                 console.error("Failed to fetch data:", error);
             });
+
         const searchParams = new URLSearchParams(location.search);
         const query = searchParams.get('search');
         if (query) {
             axios.get(`http://localhost:3001/dorms/searchDorm?dormName=${query}`)
                 .then(response => {
-                    console.log(response.data)
                     setDorms(response.data);
+                    console.log("Dorms: ",response.data);
                 })
                 .catch(error => {
                     console.error('Failed to fetch search results:', error);
@@ -172,16 +173,17 @@ const Home = () => {
                         <button onClick={goToNextPage} disabled={currentPage === totalPages}>{t('next')}</button>
                     </div>
                 </div>
+                {console.log(currUser)}
                 {(isLoggedIn ? (
                     <div className='homeLast'>
                         {(role !== 'student') ?
                             <div style={{ marginTop: '40px' }}>
-                                {currUser?.user?.profilePic ? (
-                                    <img src={currUser.user.profilePic} width='150' height='150' style={{ objectFit: 'cover', borderRadius: '40px' }} />
+                                {currUser?.profilePic ? (
+                                    <img src={currUser?.profilePic} width='150' height='150' style={{ objectFit: 'cover', borderRadius: '40px' }} />
                                 ) : (
                                     <img src={avatar} width='150' height='150' style={{ objectFit: 'cover', borderRadius: '40px' }} />
                                 )}
-                                <p style={{ color: "white", fontWeight: "bold" }}>{currUser?.user?.name?.toUpperCase()}</p>
+                                <p style={{ color: "white", fontWeight: "bold" }}>{currUser?.name?.toUpperCase()}</p>
                             </div> : <div style={{ marginTop: '40px' }}>
                                 {user?.profilePic ? (<img src={user?.profilePic || avatar} width='150' height='150' style={{ objectFit: 'cover', borderRadius: '40px' }} />) :
                                     <img src={avatar} width='150' height='150' style={{ objectFit: 'cover', borderRadius: '40px' }} />}

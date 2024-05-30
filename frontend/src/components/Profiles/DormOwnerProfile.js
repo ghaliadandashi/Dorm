@@ -230,13 +230,7 @@ const DormOwnerProfile = () => {
         if (user) {
             axios.get(`http://localhost:3001/api/profile`, { withCredentials: true })
                 .then(response => {
-                    setProfile({
-                        name: response.data.user.name,
-                        email: response.data.user.email,
-                        dob: response.data.user.dob,
-                        phoneNo: response.data.user.phoneNo,
-                        profilePic: response.data.user.profilePic
-                    });
+                    setProfile(response.data);
                 })
                 .catch(error => console.error("Failed to fetch user data:", error));
             axios.get(`http://localhost:3001/api/dorm`, { withCredentials: true })

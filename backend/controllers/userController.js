@@ -313,16 +313,7 @@ exports.profile = async (req, res) => {
         if (!owner) {
             return res.status(404).send('User not found');
         }
-        res.json({
-            user: {
-                name: owner.name,
-                email: owner.email,
-                dob: owner.dob,
-                phoneNo: owner.phoneNo,
-                profilePic:owner.profilePic,
-                role:owner.role
-            }
-        });
+        res.json(owner);
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).send('Error retrieving dorm owner data');
@@ -779,4 +770,37 @@ exports.getUserByName = async (req, res) => {
       res.status(500).send('Error searching users');
     }
   };
-  
+
+exports.getRoommateSuggestions = async (req, res) => {
+    try {
+        const userId = req.user.userId; // Assuming you have the user ID from the authenticated user
+        const preferences = req.body;
+
+        // Find users who match the given preferences but exclude the current user
+        const users = await User.find({
+            _id: { $ne: userId },
+            role:'student'// Exclude the current user
+        });
+
+        console.log(users);
+
+        // Filter users based on matching preferences
+        const filteredUsers = users.filter(user => {
+            let matches = 0;
+            if (user.preferences.gender === preferences.gender) matches++;
+            if (user.preferences.cleanliness === preferences.cleanliness) matches++;
+            if (user.preferences.studyHabits === preferences.studyHabits) matches++;
+            if (user.preferences.socialHabits === preferences.socialHabits) matches++;
+            if (user.preferences.smoking === preferences.smoking) matches++;
+            if (user.preferences.pets === preferences.pets) matches++;
+
+
+            return matches >= 3;
+        });
+
+        res.status(200).json(filteredUsers);
+    } catch (error) {
+        console.error('Failed to fetch roommate suggestions:', error);
+        res.status(500).send('Error fetching roommate suggestions');
+    }
+};
