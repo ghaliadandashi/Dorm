@@ -49,22 +49,33 @@ To get started with the Dormitory Management System, follow these steps:
 2. **Navigate to the project directory**:
     ```bash
     cd Dorm
-3. **Install backend dependencies:**:
+    
+3. **Install MongoDB:**
+    Follow the instructions to install MongoDB on your system from the [official MongoDB installation guide](https://www.mongodb.com/docs/manual/installation/).
+
+4. **Start MongoDB:**
+   ```bash
+    mongod
+
+5. **Install backend dependencies:**:
    ```bash
    cd backend
    npm install
+   
+6. **Uncomment the seedDatabase function in server.js:**
+   ```javascript
+    // seedDatabase();
+   ```
 
-4. **Start the backend server:**:
+7. **Start the backend server:**:
     ```bash
     node server.js
 
-5. **Install frontend dependencies:**:
+8. **Install frontend dependencies:**:
     ```bash
     cd ../frontend
     npm install
 
-6. **Start the frontend development server:**:
+9. **Start the frontend development server:**:
     ```bash
     npm start
-
-    
