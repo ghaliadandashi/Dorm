@@ -1,6 +1,6 @@
 .profile {
     width: 100vw;
-    height: 100vh;
+    height: 130vh;
     display: flex;
     flex-direction: row;
     margin-top:-40px;
@@ -38,6 +38,7 @@
     background-color: #1f203e;
     width: 100vw;
     /*border:1px solid white*/
+    height: fit-content;
 }
 
 .personalInfo {
@@ -316,4 +317,51 @@
 .dorms-financials img{
     border-radius: 10px;
     border:2px solid black;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.profile-table th, .profile-table td {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.profile-table th {
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+.profile-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.profile-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.accept-btn, .reject-btn {
+    background-color: #1a73e8;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.reject-btn {
+    background-color: #d32f2f;
+}
+
+.accept-btn:hover {
+    background-color: #1558b3;
+}
+
+.reject-btn:hover {
+    background-color: #b02525;
 }

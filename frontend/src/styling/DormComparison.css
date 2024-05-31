@@ -1,0 +1,67 @@
+.dorm-comparison {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #2b2c43;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease-in-out;
+    position: fixed;
+    left: 20px;
+    top: 100px;
+    width: 300px;
+    z-index: 1000;
+    max-height: 70vh; /* Adjust the height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.dorm-comparison.hidden {
+    transform: translateX(-90%);
+}
+
+.dorm-comparison button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.dorm-comparison h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.comparison-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.dorm-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px -10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 100%;
+    text-align: center;
+    color: black;
+}
+
+.dorm-card h4 {
+    margin-top: 0;
+}
+
+.dorm-card ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.dorm-card ul li {
+    background-color: #e7e7e7;
+    margin: 5px 0;
+    padding: 5px;
+    border-radius: 5px;
+}

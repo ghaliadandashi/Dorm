@@ -10,7 +10,8 @@ const { register, login, validate, user, logout,profile,getDorm, changeProfilePi
     getRevenueData,
     getExistingChats, getUserByName,
     changePassword,
-    getPublicProf
+    getPublicProf,
+    getRoommateSuggestions
 } = require('../controllers/userController');
 const upload = multer({ storage: multer.memoryStorage() });
 const authenticateToken = require('../middleware/auth')
@@ -44,4 +45,5 @@ router.get('/occupancy/:dormId',getOccupancyData)
 router.get('/revenue/:dormId',getRevenueData)
 router.put('/changePassword',authenticateToken,changePassword)
 router.get('/getPublicProf/:userID',authenticateToken,getPublicProf)
+router.post('/roommateSuggestions',authenticateToken,getRoommateSuggestions)
 module.exports = router;

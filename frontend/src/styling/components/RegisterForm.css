@@ -50,3 +50,11 @@
     text-align: left;
     font-weight: bold;
 }
+
+.register-form form select{
+    padding:8px;
+    border-radius: 5px;
+    border:none;
+    outline:0;
+    box-shadow: 2px 2px 2px black;
+}

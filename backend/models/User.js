@@ -21,14 +21,21 @@ const userSchema = new mongoose.Schema({
     dob:{type:Date, required:false},
     booking:{type:mongoose.Schema.Types.ObjectId,ref:'Booking'},
     roommate:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
-    preferences:[{type:String}],
-    phoneNo:{type:String},
+    preferences: {
+        gender: String,
+        cleanliness: String,
+        studyHabits: String,
+        socialHabits: String,
+        smoking: String,
+        pets: String
+    },
     languagePreference:{type:String, enum:['turkish','english']},
     personalFiles:[{type:String}],
     ownershipFiles:[{type:String}],
     profilePic:{type:String},
     dorm:{type:mongoose.Schema.Types.ObjectId,ref:'Dorm'},
-    status:{type:String,enum:['Valid','Invalid','Pending']}
+    status:{type:String,enum:['Valid','Invalid','Pending']},
+    bio:{type:String}
 })
 
 userSchema.pre('save', function(next) {

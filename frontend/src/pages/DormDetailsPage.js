@@ -70,7 +70,7 @@ const DormDetails = () => {
     };
 
     const handleBooking = (roomID, dormID) => {
-        axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}/${stay}/${semester}`)
+        axios.post(`http://localhost:3001/booking/add/${roomID}/${dormID}/${stay}/${semester}`,{},{withCredentials:true})
             .then(response => {
                 console.log(response.data);
                 addNotification(t('bookingPlaced'), 'success');
@@ -223,7 +223,7 @@ const DormDetails = () => {
                                 <thead>
                                 <tr>
                                     <th></th>
-                                    <th>{t('roomTypeTitle')}</th>
+                                    <th>{t('roomTypesTitle')}</th>
                                     <th>{t('availability')}</th>
                                     <th>{t('viewType')}</th>
                                     <th>{t('servicesTitle')}</th>
@@ -289,7 +289,7 @@ const DormDetails = () => {
                                                 <div className='review-info'>
                                                     <strong>{review.student.name}  <span style={{ color: 'violet' }}>{review.student.role !== 'student' ? review.student.role : null}</span></strong>
                                                 </div>
-                                                {user ? review.student._id == user[0]?._id || role === 'admin' ? <FontAwesomeIcon icon={faTimes} style={{ cursor: 'pointer' }} onClick={() => handleReviewDeletion(review._id)} /> : null : null}
+                                                {user ? review.student._id == user?._id || role === 'admin' ? <FontAwesomeIcon icon={faTimes} style={{ cursor: 'pointer' }} onClick={() => handleReviewDeletion(review._id)} /> : null : null}
                                             </div>
                                             <div className="review-rating">
                                                 <StarRating rating={review.rating} />

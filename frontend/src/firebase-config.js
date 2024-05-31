@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 import React, {useEffect} from "react";
 import axios from "axios";
 import LoadingPage from "./pages/LoadingPage";
+import {useNotification} from "./layout/Notifications";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDaFEUXYBDVw6V2cn6Wsq7kKyJf3MurorA",
@@ -27,7 +28,7 @@ export const signInWithMicrosoft = () => {
 };
 export const RedirectHandler = () => {
     const navigate = useNavigate();
-
+    const {addNotification} = useNotification()
     useEffect(() => {
         const auth = getAuth();
         getRedirectResult(auth)
@@ -39,10 +40,12 @@ export const RedirectHandler = () => {
                     name: displayName,
                 },{withCredentials:true})
                     .then(response => {
+                        addNotification('Login Successful!','success')
                         navigate('/home');
                     })
                     .catch(error => {
                         // console.error('Failed to save user:', error);
+                        addNotification('Login Failed!','error')
                         navigate('/home')
                     });
             })

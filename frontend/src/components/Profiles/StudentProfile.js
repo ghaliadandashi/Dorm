@@ -9,6 +9,7 @@ import avatar from '../../images/DALL·E 2024-05-05 19.40.58 - A gender-neutral,
 import ProfilePicSection from "./profilePicSection";
 import Settings from "./settings";
 import {Link} from "react-router-dom";
+import {useTranslation} from "react-i18next";
 const StudentProfile = () => {
     const [profile, setProfile] = useState({
         name: '',
@@ -19,6 +20,7 @@ const StudentProfile = () => {
     const [bookings, setBookings] = useState([]);
     const [activeTab, setActiveTab] = useState('personalInfo');
     const { user } = useAuth();
+    const {t}= useTranslation()
 
     useEffect(() => {
         if (user) {
@@ -82,15 +84,15 @@ const StudentProfile = () => {
 
                     <button onClick={() => handleTabClick('personalInfo')}
                         className={activeTab === 'personalInfo' ? 'active' : ''}>
-                        Personal Info
+                        {t('personalInfo')}
                     </button>
                     <button onClick={() => handleTabClick('bookings')}
                         className={activeTab === 'bookings' ? 'active' : ''}>
-                        Booking Requests
+                        {t('bookingRequests')}
                     </button>
                     <button onClick={() => handleTabClick('settings')}
                         className={activeTab === 'settings' ? 'active' : ''}>
-                        Settings
+                        {t('settings')}
                     </button>
                 </div>
                 <div className="tab-content">
@@ -125,27 +127,27 @@ const StudentProfile = () => {
                                     <div style={{ display: "flex", flexDirection: "column" }}>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                                             <div style={{ display: "flex", flexDirection: "column", alignItems: 'flex-start' }}>
-                                                <span style={{ fontSize: '13px', marginBottom: '-10px' }}>Room: </span>
-                                                <p style={{ width: '100px', textAlign: "center", backgroundColor: 'white', color: "black", padding: '5px', borderRadius: '30px' }}>{booking.room.roomType}</p>
+                                                <span style={{ fontSize: '13px', marginBottom: '-10px' }}>{t('room')} </span>
+                                                <p style={{ width: '100px', textAlign: "center", backgroundColor: 'white', color: "black", padding: '5px', borderRadius: '30px' }}>{t(`roomTypes.${booking.room.roomType}`)}</p>
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: "column", alignItems: "flex-start" }}>
-                                                <span style={{ fontSize: '13px', marginBottom: '-10px' }}>Status: </span>
-                                                <p style={{ width: '100px', textAlign: "center", backgroundColor: 'white', color: "black", padding: '5px', borderRadius: '30px' }}>{booking.status}</p>
+                                                <span style={{ fontSize: '13px', marginBottom: '-10px' }}>{t('status')} </span>
+                                                <p style={{ width: '100px', textAlign: "center", backgroundColor: 'white', color: "black", padding: '5px', borderRadius: '30px' }}>{t(`bookingStats.${booking.status}`)}</p>
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: "column", alignItems: "flex-start" }}>
-                                                <span style={{ fontSize: '13px', marginBottom: '-10px' }}>Duration: </span>
+                                                <span style={{ fontSize: '13px', marginBottom: '-10px' }}>{t('duration')} </span>
                                                 <p style={{ width: '100px', textAlign: "center", backgroundColor: 'white', color: "black", padding: '5px', borderRadius: '30px' }}>{getStayDescription(booking.stayDuration)}</p>
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: "column", alignItems: "flex-start" }}>
-                                                <span style={{ fontSize: '13px', marginBottom: '-10px' }}>Price: </span>
+                                                <span style={{ fontSize: '13px', marginBottom: '-10px' }}>{t('price')} </span>
                                                 <p style={{ width: '100px', textAlign: "center", backgroundColor: 'white', color: "black", padding: '5px', borderRadius: '30px' }}>{getPrice(booking)}</p>
                                             </div>
                                             <div style={{ display: 'flex',flexDirection:"column", alignItems:"flex-start"}}>
-                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Start Date: </span>
+                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>{t('startDate')} </span>
                                                 <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{booking.startDate.substring(0, booking.bookingDate.indexOf('T')).split('-').reverse().join('-')}</p>
                                             </div>
                                             <div style={{ display: 'flex',flexDirection:"column", alignItems:"flex-start"}}>
-                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>Start Date: </span>
+                                                <span style={{fontSize:'13px',marginBottom:'-10px'}}>{t('endDate')} </span>
                                                 <p style={{width:'100px',textAlign:"center",backgroundColor:'white',color:"black",padding:'5px',borderRadius:'30px'}}>{booking.endDate.substring(0, booking.bookingDate.indexOf('T')).split('-').reverse().join('-')}</p>
                                             </div>
                                         </div>

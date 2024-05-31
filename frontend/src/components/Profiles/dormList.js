@@ -5,11 +5,14 @@ import { faPlus, faEdit, faTrash, faHouse, faBed } from '@fortawesome/free-solid
 import '../../styling/components/dormList.css';
 import { useNavigate } from 'react-router-dom';
 import noImage from '../../images/1554489-200.png';
+import { useTranslation } from "react-i18next";
+import {t} from "i18next";
 
 const DormList = ({ handleModalOpen }) => {
     const navigate = useNavigate();
     const [dorms, setDorms] = useState([]);
     const [dormID, setDormID] = useState('');
+    const { t } = useTranslation();
 
     useEffect(() => {
         fetchDorms();
@@ -31,11 +34,11 @@ const DormList = ({ handleModalOpen }) => {
                 <div className='dormss'>
                     <div className='cardNav'>
                         <div style={{display:"flex",flexDirection:'column',alignItems:'flex-start'}}>
-                        <h2>Dorms</h2>
-                        <h6 style={{marginTop:'-10px'}}>Click dorm name to view rooms.</h6>
+                        <h2>{t('dorms')}</h2>
+                        <h6 style={{marginTop:'-10px'}}>{t('clickDormNameToViewRooms')}</h6>
                         </div>
                         <button onClick={() => handleModalOpen('dorm')}>
-                            <FontAwesomeIcon icon={faPlus} /> <FontAwesomeIcon icon={faHouse}/> Add Dorm
+                            <FontAwesomeIcon icon={faPlus} /> <FontAwesomeIcon icon={faHouse}/> {t('addDorm')}
                         </button>
                     </div>
                     <div className='dorms'>
@@ -52,10 +55,10 @@ const DormList = ({ handleModalOpen }) => {
                                 </div>
                                 <div className='dormActions'>
                                     <button className='editBtn' onClick={() => handleModalOpen('editDorm', dorm)}>
-                                        <FontAwesomeIcon icon={faEdit} /> Edit
+                                        <FontAwesomeIcon icon={faEdit} /> {t('edit')}
                                     </button>
                                     <button className='deleteBtn' onClick={() => handleDelete(dorm._id)}>
-                                        <FontAwesomeIcon icon={faTrash} /> Delete
+                                        <FontAwesomeIcon icon={faTrash} /> {t('delete')}
                                     </button>
                                 </div>
                             </div>
@@ -89,9 +92,9 @@ const RoomList = ({ dormId, handleModalOpen }) => {
     return (
         <div className='roomList'>
             <div className='cardNav'>
-                <h2>Rooms</h2>
+                <h2>{t('rooms')}</h2>
                 <button onClick={() => handleModalOpen('room')}>
-                    <FontAwesomeIcon icon={faPlus} /> <FontAwesomeIcon icon={faBed} /> Add Room
+                    <FontAwesomeIcon icon={faPlus} /> <FontAwesomeIcon icon={faBed} /> {t('addRoom')}
                 </button>
             </div>
             <div className='rooms'>
@@ -102,13 +105,13 @@ const RoomList = ({ dormId, handleModalOpen }) => {
                         : <img src={noImage} alt='No Image' width='100' height='100' style={{objectFit: 'cover'}}/>
                     }
                     <div className='roomDetails'>
-                        <h4>{room.roomType}</h4>
+                        <h4>{t(`roomTypes.${room.roomType}`)}</h4>
                         <div className='roomActions'>
                             <button className='editBtn' onClick={() => handleModalOpen('editRoom', room, dormId)}>
-                                <FontAwesomeIcon icon={faEdit} /> Edit
+                                <FontAwesomeIcon icon={faEdit} /> {t('edit')}
                             </button>
                             <button className='deleteBtn' onClick={() => handleDelete(room._id)}>
-                                <FontAwesomeIcon icon={faTrash} /> Delete
+                                <FontAwesomeIcon icon={faTrash} /> {t('delete')}
                             </button>
                         </div>
                     </div>

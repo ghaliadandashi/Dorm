@@ -14,7 +14,6 @@ const Chat = () => {
   const [activeUser, setActiveUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-
   const fetchUsers = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -51,7 +50,8 @@ const Chat = () => {
     const fetchMessages = async () => {
       if (activeUser) {
         try {
-          const response = await axios.get(`http://localhost:3001/chat/getChat/${user.email}/${activeUser.email}`);
+          const response = await axios.get(`http://localhost:3001/chat/getChat/${user.email}/${activeUser.email}`,{withCredentials:true});
+          console.log(response.data)
           setMessages(response.data);
           console.log("users data: ", users)
           await axios.post('http://localhost:3001/chat/markAsRead', {
