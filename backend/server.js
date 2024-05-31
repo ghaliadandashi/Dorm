@@ -79,7 +79,6 @@ mongoose.connect(process.env.DB_URI)
     .then(()=>console.log("DATABASE CONNECTED <3"))
     .catch(err => console.error('MongoDB connection error:', err));
 
-//UNCOMMENT THIS TO ADD USER, DORM, AND ROOMS
 const seedDatabase = async ()=>{
     try{
         const admin = new User({
@@ -94,87 +93,55 @@ const seedDatabase = async ()=>{
         console.error(error)
     }
 }
-// const seedDatabase = async () => {
-//     try {
-//         const dormOwner = new User({
-//             name: 'Dorm Owner',
-//             email: 'dormowner@example.com',
-//             role: 'dormOwner',
-//             password: 'dormOwnie',
-//             status: 'Valid',
+ const seedDatabase = async () => {
+     try {
+         const dormOwner = new User({
+             name: 'Dorm Owner',
+             email: 'dormowner@example.com',
+             role: 'dormOwner',
+             password: 'dormOwnie',
+             status: 'Valid',
             
-//         });
+         });
 
-//         const savedDormOwner = await dormOwner.save();
-//         const dorm = new Dorm({
-//             dormName: 'Lotus',
-//             owner: savedDormOwner._id,
-//             services: ['wifi', 'laundry','gym],
-//             capacity: 100,
-//             occupancy: 0,
-//             location: 'Dorm Location',
-//             type: 'off-campus',
-//             isActive:true
-//         });
+         const savedDormOwner = await dormOwner.save();
+         const dorm = new Dorm({
+             dormName: 'Lotus',
+             owner: savedDormOwner._id,
+             services: ['wifi', 'laundry','gym],
+             capacity: 100,
+             occupancy: 0,
+             location: 'Dorm Location',
+             type: 'off-campus',
+             isActive:true
+         });
 
-//         const savedDorm = await dorm.save();
+         const savedDorm = await dorm.save();
 
-//         const rooms = [
-//             { roomName: '101', roomType: 'Single', services: ['Balcony'], pricePerSemester: 500,summerPrice: 300,extraFee:50,viewType:'SeaView', availability: 50,space:23 },
-//             { roomName: '102', roomType: 'Double', services: ['Private Bathroom'], pricePerSemester: 1500,summerPrice: 300,extraFee:0,viewType:'CampusView', availability: 120,space:54 },
-//         ];
+         const rooms = [
+             { roomName: '101', roomType: 'Single', services: ['Balcony'], pricePerSemester: 500,summerPrice: 300,extraFee:50,viewType:'SeaView', availability: 50,space:23 },
+             { roomName: '102', roomType: 'Double', services: ['Private Bathroom'], pricePerSemester: 1500,summerPrice: 300,extraFee:0,viewType:'CampusView', availability: 120,space:54 },
+         ];
 
-//         const roomPromises = rooms.map(async roomData => {
-//             const room = new Room({ ...roomData, dorm: savedDorm._id });
-//             return room.save();
-//         });
+         const roomPromises = rooms.map(async roomData => {
+             const room = new Room({ ...roomData, dorm: savedDorm._id });
+             return room.save();
+         });
 
-//         const savedRooms = await Promise.all(roomPromises);
+         const savedRooms = await Promise.all(roomPromises);
 
-//         savedDorm.rooms = savedRooms.map(room => room._id);
-//         await savedDorm.save();
+         savedDorm.rooms = savedRooms.map(room => room._id);
+         await savedDorm.save();
 
-//         console.log('Database seeded successfully!');
-//     } catch (error) {
-//         console.error('Error seeding database:', error);
-//     } finally {
-//         mongoose.disconnect();
-//     }
-// };
+         console.log('Database seeded successfully!');
+     } catch (error) {
+         console.error('Error seeding database:', error);
+     } finally {
+         mongoose.disconnect();
+     }
+ };
 
-
-// Socket.IO setup
-// io.on('connection', (socket) => {
-//     console.log('a user connected');
-  
-//     socket.on('chat message', async (msg) => {
-//       const chat = new Chat({ content: msg, user: 'SULAIMON INOMOV' }); // Adjust to include actual user data
-//       await chat.save();
-//       io.emit('chat message', msg);
-//     });
-  
-//     socket.on('disconnect', () => {
-//       console.log('user disconnected');
-//     });
-//   });
-  
-  // Seed database with initial messages
-// const seedDatabase = async () => {
-//     try {
-//       const initialMessages = [
-//         { content: 'Welcome to the chat!', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
-//         { content: 'Feel free to start a conversation.', sender: 'SULAIMON INOMOV', receiver: 'Dorm Owner' },
-//       ];
-//
-//       await Chat.insertMany(initialMessages);
-//       console.log('Database seeded with initial messages');
-//     } catch (error) {
-//       console.error('Error seeding database:', error);
-//     }
-//   };
-
-
-// seedChatDatabase();
+//seedDatabase();
 
 const addUser = async () =>{
   try {
@@ -194,10 +161,6 @@ const addUser = async () =>{
 }
 // addUser()
 
-
-//seedDatabase();
-
-// app.use(bodyParser.json());
 
 app.get('/',(req,res)=>{
     res.send('backend working?')
